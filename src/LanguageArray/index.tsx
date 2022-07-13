@@ -1,13 +1,14 @@
 import React, {forwardRef, useCallback, useMemo} from 'react'
-import {useUnsetInputComponent, NestedFormBuilder} from '@nrk/sanity-plugin-nrkno-odd-utils'
 import {Code, Text, Card, Label, Flex, Box, Stack, Button, Grid} from '@sanity/ui'
 import {withDocument} from 'part:@sanity/form-builder'
 import {PatchEvent, setIfMissing, insert, unset, set} from '@sanity/form-builder/PatchEvent'
 import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
 import {FormFieldValidationStatus} from '@sanity/base/components'
 import {FieldPresence} from '@sanity/base/presence'
+import {FormBuilderInput} from '@sanity/form-builder/lib/FormBuilderInput'
 
 import ValueInput from './ValueInput'
+import {useUnsetInputComponent} from './useUnsetInputComponent'
 
 const schemaExample = {
   name: 'title',
@@ -283,7 +284,9 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
         </Stack>
       ) : null}
 
-      {showNativeInput ? <NestedFormBuilder {...props} type={type} /> : null}
+      {showNativeInput ? (
+        <FormBuilderInput {...props} type={typeWithoutInputComponent} ref={ref} />
+      ) : null}
     </Stack>
   )
 })

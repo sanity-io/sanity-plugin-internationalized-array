@@ -1,3 +1,3 @@
-import {internationalizedArray} from './internationalizedArray'
+import {internationalizedArray as helperFunction} from './internationalizedArray'
 
-export default internationalizedArray
+export const internationalizedArray = (config) => helperFunction(config)
