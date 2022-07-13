@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-internationalized-array",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Store localised fields in an array to save on attributes",
   "main": "lib/index.js",
   "scripts": {
@@ -29,13 +29,16 @@
   "author": "Sanity.io <hello@sanity.io>",
   "license": "MIT",
   "dependencies": {
-    "@sanity/ui": "^0.37.12"
+    "@nrk/sanity-plugin-nrkno-odd-utils": "^1.0.11",
+    "@sanity/icons": "^1.3.1",
+    "@sanity/ui": "^0.37.9"
   },
   "peerDependencies": {
     "@sanity/base": "^2.30.1",
     "@sanity/desk-tool": "^2.30.1",
+    "@sanity/form-builder": "^2.30.1",
     "@sanity/util": "^2.29.5",
-    "react": "^16.0.0 || ^17.0.0"
+    "react": "^16.0.0 || ^17.0.0 || ^18.0.0"
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^2.0.0",
