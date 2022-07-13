@@ -4,9 +4,19 @@ A helper function that renders a custom input component for writing localised fi
 
 **This an early proof-of-concept and should not yet be used without thorough testing**
 
+![2022-07-13 12 53 29](https://user-images.githubusercontent.com/9684022/178729823-cbb1059f-4ae0-4ab0-900d-4f22b030c1d1.gif)
+
+## Installation
+
+```
+sanity install internationalized-array
+```
+
 Add an array to your schema by importing the helper function.
 
 ```js
+import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+
 // ./src/schema/person.js
 export default {
   name: 'person',
