@@ -54,6 +54,14 @@ Using GROQ filters you can query for a specific language key like so:
 }
 ```
 
+## Migrate from objects to arrays
+
+[See the migration script](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/blob/main/migrations/transformObjectToArray.js) inside `./migrations/transformObjectToArray.js` of this Repo.
+
+Follow the instructions inside the script and set the `_type` and field name you wish to target.
+
+Please take a backup first!
+
 ### Why store localised field data like this?
 
 The most popular way to store field-level translated content is in an object using the method prescribed in [@sanity/language-filter](https://www.npmjs.com/package/@sanity/language-filter). This works well and creates tidy object structures, but also create a unique field path for every unique field name, multiplied by the number of languages in your dataset.
