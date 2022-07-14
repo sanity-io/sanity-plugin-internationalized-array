@@ -1,6 +1,10 @@
 export type ArrayConfig = Options & {
   name: string
   type: 'string' | 'number' | 'boolean' | 'text'
+  title?: string
+  group?: string
+  hidden?: boolean | (() => boolean)
+  readOnly?: boolean | (() => boolean)
 }
 
 export type Value = {

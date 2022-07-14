@@ -6,6 +6,10 @@ export function internationalizedArray(config: ArrayConfig) {
 
   return {
     name,
+    title: config?.title ?? undefined,
+    group: config?.group ?? undefined,
+    hidden: config?.hidden ?? undefined,
+    readOnly: config?.readOnly ?? undefined,
     type: 'array',
     inputComponent: LanguageArray,
     options: {

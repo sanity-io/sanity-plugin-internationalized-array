@@ -172,9 +172,15 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
     .map((mark) => mark.path)
     .flat()
     .map((item) => item._key)
+  console.log(props)
 
   return (
-    <Stack space={2}>
+    <Stack space={3}>
+      <Box>
+        <Text size={1} weight="bold">
+          {type?.title ?? type.name}
+        </Text>
+      </Box>
       {/* Loop over the values */}
       {value?.length > 0 ? (
         <Card padding={1} border radius={1}>
@@ -205,7 +211,7 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                             </Box>
                             <Box flex={1}>
                               {/* There _should_ only be one field */}
-                              {subType.fields.map((subTypeField) => (
+                              {subType.fields.map((subTypeField, subTypeFieldIndex) => (
                                 <ValueInput
                                   key={subTypeField.name}
                                   onChange={(patchEvent) =>
@@ -215,12 +221,16 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                                   // We don't want the array item to open onFocus
                                   onFocus={() => null}
                                   path={[{_key: item._key}, subTypeField.name]}
+                                  focusPath={[{_key: item._key}, subTypeField.name]}
                                   parent={item}
                                   readOnly={readOnly}
                                   type={subTypeField}
                                   value={item.value}
                                   level={props.level + 1}
                                   markers={[]}
+                                  compareValue={
+                                    props?.compareValue?.find((c) => c._key === item._key)?.value
+                                  }
                                 />
                               ))}
                             </Box>
@@ -278,15 +288,14 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
             tone="primary"
             mode="ghost"
             disabled={readOnly || value?.length >= languages?.length}
+            icon={AddIcon}
             text={value?.length ? `Add missing languages` : `Add all languages`}
             onClick={() => handleAddLanguage()}
           />
         </Stack>
       ) : null}
 
-      {showNativeInput ? (
-        <FormBuilderInput {...props} type={typeWithoutInputComponent} ref={ref} />
-      ) : null}
+      {showNativeInput ? <FormBuilderInput {...props} type={type} ref={ref} /> : null}
     </Stack>
   )
 })
