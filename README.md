@@ -25,13 +25,18 @@ export default {
   fields: [
     // ...all your other fields
     internationalizedArray({
-      name: "greeting", // required
-      type: "string", // required: string | text | number | boolean
+      // Required, the `name` of the outer array
+      name: "greeting",
+      // Required, the `type` of the inner field
+      // One of: string | text | number | boolean
+      type: "string",
+      // Required, must be an array of objects
       languages: [
         { id: "en", title: "English" },
         { id: "fr", title: "French" },
-      ], // required, must be an array of objects
-      showNativeInput: false, // optional: just for debugging
+      ],
+      // Optional: just for debugging
+      showNativeInput: false,
     }),
   ],
 };
@@ -66,20 +71,39 @@ Please take a backup first!
 
 The most popular way to store field-level translated content is in an object using the method prescribed in [@sanity/language-filter](https://www.npmjs.com/package/@sanity/language-filter). This works well and creates tidy object structures, but also create a unique field path for every unique field name, multiplied by the number of languages in your dataset.
 
-For most people, this won't become an issue. On a very large dataset with a lot of languages, the [Attribute Limit](https://www.sanity.io/docs/attribute-limit) can become a concern.
+For most people, this won't become an issue. On a very large dataset with a lot of languages, the [Attribute Limit](https://www.sanity.io/docs/attribute-limit) can become a concern. This plugin's arrays will use less attributes than an object once you have more than three languages.
 
-An object with the same content as above would look like this:
+The same content as above, plus a third language, structed as an `object` of `string` fields looks like this:
 
 ```json
 "greeting" {
   "en": "hello",
-  "fr": "bonjour"
+  "fr": "bonjour",
+  "es": "hola"
 }
 ```
 
-This creates three unique query paths. The array created by this plugin creates four.
+Which creates four unique query paths, one for the object and one for each language.
 
-However, every language added to the object increases the number of attributes. Where the array method is limited only by the amount of data you can store in your dataset (heaps!).
+```
+greeting
+greeting.en
+greeting.fr
+greeting.es
+```
+
+Every language you add to every object that uses this structure will add to the number of unique query paths.
+
+The array created by this plugin creates four query paths by default, but is not effected by the number of languages:
+
+```
+greeting
+greeting[]
+greeting[]._key
+greeting[].value
+```
+
+By using this plugin you can safely extend the number of languages without adding any additional query paths.
 
 ## License
 
