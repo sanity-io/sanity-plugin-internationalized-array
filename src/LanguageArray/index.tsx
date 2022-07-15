@@ -9,6 +9,7 @@ import {FormBuilderInput} from '@sanity/form-builder/lib/FormBuilderInput'
 
 import ValueInput from './ValueInput'
 import {useUnsetInputComponent} from './useUnsetInputComponent'
+import {Table, TableCell, TableRow} from './Table'
 
 const schemaExample = {
   name: 'title',
@@ -172,7 +173,6 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
     .map((mark) => mark.path)
     .flat()
     .map((item) => item._key)
-  console.log(props)
 
   return (
     <Stack space={3}>
@@ -183,33 +183,37 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
       </Box>
       {/* Loop over the values */}
       {value?.length > 0 ? (
-        <Card padding={1} border radius={1}>
-          <Stack space={1}>
-            {value.map((item) => (
-              <Card
-                paddingY={1}
-                paddingX={2}
-                key={item._key}
-                tone={
-                  // TODO: Move this logic somewhere else
-                  invalidKeys.includes(item._key)
-                    ? `critical`
-                    : undefined || languagesOutOfOrder.find((l) => l._key === item._key)
-                    ? `caution`
-                    : undefined
-                }
-              >
-                <Flex gap={3} align="center">
+        <Card>
+          <Table>
+            <tbody>
+              {value.map((item) => (
+                <TableRow
+                  paddingY={1}
+                  paddingX={2}
+                  key={item._key}
+                  tone={
+                    // TODO: Move this logic somewhere else
+                    invalidKeys.includes(item._key)
+                      ? `critical`
+                      : undefined || languagesOutOfOrder.find((l) => l._key === item._key)
+                      ? `caution`
+                      : undefined
+                  }
+                >
                   {/* To render each individual field in this type */}
                   {type?.of?.length > 0 &&
                     type?.of.map((subType) => (
-                      <Flex key={subType.name} flex={1} align="center" gap={2}>
+                      <>
                         {subType?.fields?.length > 0 ? (
                           <>
-                            <Box>
-                              <Label>{item._key}</Label>
-                            </Box>
-                            <Box flex={1}>
+                            <TableCell>
+                              <Box paddingRight={2}>
+                                <Label muted size={1}>
+                                  {item._key}
+                                </Label>
+                              </Box>
+                            </TableCell>
+                            <TableCell style={{width: `100%`}}>
                               {/* There _should_ only be one field */}
                               {subType.fields.map((subTypeField, subTypeFieldIndex) => (
                                 <ValueInput
@@ -221,39 +225,43 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                                   // We don't want the array item to open onFocus
                                   onFocus={() => null}
                                   path={[{_key: item._key}, subTypeField.name]}
-                                  focusPath={[{_key: item._key}, subTypeField.name]}
+                                  // focusPath={[{_key: item._key}, subTypeField.name]}
                                   parent={item}
                                   readOnly={readOnly}
                                   type={subTypeField}
                                   value={item.value}
                                   level={props.level + 1}
                                   markers={[]}
-                                  compareValue={
-                                    props?.compareValue?.find((c) => c._key === item._key)?.value
-                                  }
+                                  compareValue={props.compareValue}
                                 />
                               ))}
-                            </Box>
+                            </TableCell>
                           </>
                         ) : null}
-                      </Flex>
+                      </>
                     ))}
                   {presence?.length > 0 ? (
-                    <FieldPresence maxAvatars={1} presence={presence} />
+                    <TableCell>
+                      <FieldPresence maxAvatars={1} presence={presence} />
+                    </TableCell>
                   ) : null}
                   {invalidKeys.includes(item._key) ? (
-                    <FormFieldValidationStatus __unstable_markers={validationMarkers} />
+                    <TableCell>
+                      <FormFieldValidationStatus __unstable_markers={validationMarkers} />
+                    </TableCell>
                   ) : null}
-                  <Button
-                    mode="ghost"
-                    icon={RemoveIcon}
-                    tone="critical"
-                    onClick={() => handleUnsetByKey(item._key)}
-                  />
-                </Flex>
-              </Card>
-            ))}
-          </Stack>
+                  <TableCell>
+                    <Button
+                      mode="ghost"
+                      icon={RemoveIcon}
+                      tone="critical"
+                      onClick={() => handleUnsetByKey(item._key)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </tbody>
+          </Table>
         </Card>
       ) : null}
 
