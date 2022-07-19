@@ -188,8 +188,6 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
             <tbody>
               {value.map((item) => (
                 <TableRow
-                  paddingY={1}
-                  paddingX={2}
                   key={item._key}
                   tone={
                     // TODO: Move this logic somewhere else
@@ -213,7 +211,7 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                                 </Label>
                               </Box>
                             </TableCell>
-                            <TableCell style={{width: `100%`}}>
+                            <TableCell paddingRight={2} style={{width: `100%`}}>
                               {/* There _should_ only be one field */}
                               {subType.fields.map((subTypeField) => (
                                 <ValueInput
@@ -242,7 +240,7 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                     ))}
 
                   <TableCell>
-                    <Flex align="center" justify="flex-end" gap={2}>
+                    <Flex align="center" justify="flex-end" gap={3}>
                       {presence?.length > 0 ? (
                         <FieldPresence maxAvatars={1} presence={presence} />
                       ) : null}

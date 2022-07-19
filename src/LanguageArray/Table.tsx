@@ -1,30 +1,44 @@
 import React from 'react'
 import styled, {css} from 'styled-components'
-import {Box, Card} from '@sanity/ui'
+import {Box, BoxProps, Card, CardProps} from '@sanity/ui'
 
-export const TableWrapper = styled(Box)(
+// Wrappers required because of bug with passing down "as" prop
+// https://github.com/styled-components/styled-components/issues/2449
+
+// Table
+const TableWrapper = (props = {}) => {
+  return <Box as="table" {...props} />
+}
+
+const StyledTable = styled(TableWrapper)(
   () =>
     css`
       display: table;
+      width: 100%;
+
+      &:not([hidden]) {
+        display: table;
+      }
     `
 )
 
-type TableProps = {
+type TableProps = BoxProps & {
   children: React.ReactNode
-  [key: string]: unknown
+  style?: React.CSSProperties
 }
 
 export function Table(props: TableProps) {
   const {children, ...rest} = props
 
-  return (
-    <TableWrapper as="table" {...rest}>
-      {children}
-    </TableWrapper>
-  )
+  return <StyledTable {...rest}>{children}</StyledTable>
 }
 
-export const Row = styled(Card)(
+// Row
+const RowWrapper = (props = {}) => {
+  return <Card as="tr" {...props} />
+}
+
+const StyledRow = styled(RowWrapper)(
   () =>
     css`
       display: table-row;
@@ -35,39 +49,40 @@ export const Row = styled(Card)(
     `
 )
 
-type TableRowProps = {
+type TableRowProps = CardProps & {
   children: React.ReactNode
-  [key: string]: unknown
+  style?: React.CSSProperties
 }
 
 export function TableRow(props: TableRowProps) {
   const {children, ...rest} = props
 
-  return (
-    <Row as="tr" {...rest}>
-      {children}
-    </Row>
-  )
+  return <StyledRow {...rest}>{children}</StyledRow>
 }
 
-export const Cell = styled(Box)(
+// Cell
+const CellWrapper = (props = {}) => {
+  return <Box as="td" {...props} />
+}
+
+const StyledCell = styled(CellWrapper)(
   () =>
     css`
       display: table-cell;
+
+      &:not([hidden]) {
+        display: table-cell;
+      }
     `
 )
 
-type TableCellProps = {
+type TableCellProps = BoxProps & {
   children: React.ReactNode
   style?: React.CSSProperties
 }
 
 export function TableCell(props: TableCellProps) {
-  const {children, style} = props
+  const {children, ...rest} = props
 
-  return (
-    <Cell as="td" style={style}>
-      {children}
-    </Cell>
-  )
+  return <StyledCell {...rest}>{children}</StyledCell>
 }
