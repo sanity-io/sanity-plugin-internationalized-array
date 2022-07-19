@@ -3,6 +3,9 @@ import LanguageArray from './LanguageArray'
 
 export function internationalizedArray(config: ArrayConfig) {
   const {name = `title`, type = `string`, languages = [], showNativeInput = false} = config
+  const configValidation = Array.isArray(config?.validation)
+    ? config.validation
+    : [config?.validation]
 
   return {
     name,
@@ -31,7 +34,7 @@ export function internationalizedArray(config: ArrayConfig) {
         },
       },
     ],
-    validation: (Rule) =>
+    validation: (Rule) => [
       Rule.max(languages.length).custom((value: Value[], context) => {
         const {languages} = context.type.options
 
@@ -75,5 +78,7 @@ export function internationalizedArray(config: ArrayConfig) {
 
         return true
       }),
+      ...configValidation,
+    ],
   }
 }

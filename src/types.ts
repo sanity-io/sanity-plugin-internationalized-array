@@ -1,3 +1,5 @@
+import {Rule} from '@sanity/types'
+
 export type ArrayConfig = Options & {
   name: string
   type: 'string' | 'number' | 'boolean' | 'text'
@@ -5,6 +7,7 @@ export type ArrayConfig = Options & {
   group?: string
   hidden?: boolean | (() => boolean)
   readOnly?: boolean | (() => boolean)
+  validation?: Rule | Rule[]
 }
 
 export type Value = {

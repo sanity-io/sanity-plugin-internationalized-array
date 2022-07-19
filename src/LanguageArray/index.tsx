@@ -1,5 +1,5 @@
 import React, {forwardRef, useCallback, useMemo} from 'react'
-import {Code, Text, Card, Label, Flex, Box, Stack, Button, Grid} from '@sanity/ui'
+import {Code, Text, Card, Label, Box, Stack, Button, Grid, Flex} from '@sanity/ui'
 import {withDocument} from 'part:@sanity/form-builder'
 import {PatchEvent, setIfMissing, insert, unset, set} from '@sanity/form-builder/PatchEvent'
 import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
@@ -8,8 +8,8 @@ import {FieldPresence} from '@sanity/base/presence'
 import {FormBuilderInput} from '@sanity/form-builder/lib/FormBuilderInput'
 
 import ValueInput from './ValueInput'
-import {useUnsetInputComponent} from './useUnsetInputComponent'
 import {Table, TableCell, TableRow} from './Table'
+import {useUnsetInputComponent} from '../hooks/useUnsetInputComponent'
 
 const schemaExample = {
   name: 'title',
@@ -215,7 +215,7 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                             </TableCell>
                             <TableCell style={{width: `100%`}}>
                               {/* There _should_ only be one field */}
-                              {subType.fields.map((subTypeField, subTypeFieldIndex) => (
+                              {subType.fields.map((subTypeField) => (
                                 <ValueInput
                                   key={subTypeField.name}
                                   onChange={(patchEvent) =>
@@ -240,23 +240,25 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
                         ) : null}
                       </>
                     ))}
-                  {presence?.length > 0 ? (
-                    <TableCell>
-                      <FieldPresence maxAvatars={1} presence={presence} />
-                    </TableCell>
-                  ) : null}
-                  {invalidKeys.includes(item._key) ? (
-                    <TableCell>
-                      <FormFieldValidationStatus __unstable_markers={validationMarkers} />
-                    </TableCell>
-                  ) : null}
+
                   <TableCell>
-                    <Button
-                      mode="ghost"
-                      icon={RemoveIcon}
-                      tone="critical"
-                      onClick={() => handleUnsetByKey(item._key)}
-                    />
+                    <Flex align="center" justify="flex-end" gap={2}>
+                      {presence?.length > 0 ? (
+                        <FieldPresence maxAvatars={1} presence={presence} />
+                      ) : null}
+                      {invalidKeys.includes(item._key) ? (
+                        <Box paddingLeft={2}>
+                          <FormFieldValidationStatus __unstable_markers={validationMarkers} />
+                        </Box>
+                      ) : null}
+                      <Button
+                        mode="ghost"
+                        icon={RemoveIcon}
+                        tone="critical"
+                        disabled={readOnly}
+                        onClick={() => handleUnsetByKey(item._key)}
+                      />
+                    </Flex>
                   </TableCell>
                 </TableRow>
               ))}

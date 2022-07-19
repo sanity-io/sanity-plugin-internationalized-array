@@ -1,6 +1,6 @@
-import React from 'react'
+import React, {ReactNode} from 'react'
 
-export function useUnsetInputComponent(type, component) {
+export function useUnsetInputComponent(type: unknown, component?: ReactNode) {
   return React.useMemo(() => unsetInputComponent(type, component), [type, component])
 }
 
