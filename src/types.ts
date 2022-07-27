@@ -1,4 +1,4 @@
-import {Rule} from '@sanity/types'
+import {Rule, ArraySchemaType} from 'sanity'
 
 export type Language = {
   id: string
@@ -25,4 +25,10 @@ export type Value = {
 
 export type PluginConfig = {
   languages: Language[]
+}
+
+export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
+  options: {
+    languages: Language[]
+  }
 }

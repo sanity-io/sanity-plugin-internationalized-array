@@ -1,4 +1,11 @@
-import {defineField, FieldDefinition, SchemaType} from 'sanity'
+import {
+  CustomValidatorResult,
+  defineField,
+  FieldDefinition,
+  Rule,
+  SchemaType,
+  ValidationError,
+} from 'sanity'
 
 import InternationalizedArrayInput from './components/InternationalizedArrayInput'
 import {AllowedType, ArrayConfig, Language, Value} from './types'
@@ -32,7 +39,9 @@ export function internationalizedArray(config: ArrayConfig = CONFIG_DEFAULT): Fi
         ],
         preview: {
           select: {title: 'value', key: '_key'},
-          prepare({title, key}) {
+          prepare(select) {
+            const {title, key} = select as Record<string, string>
+
             return {
               title,
               subtitle: key.toUpperCase(),
@@ -41,56 +50,62 @@ export function internationalizedArray(config: ArrayConfig = CONFIG_DEFAULT): Fi
         },
       },
     ],
-    validation: (Rule) => [
-      languages?.length ? Rule.max(languages.length) : null,
-      Rule.custom<Value[]>((value, context) => {
-        const {languages: contextLanguages}: {languages: Language[]} = context?.type?.options ?? {}
+    // @ts-ignore
+    validation: (rule: Rule) => {
+      const rules = [] as Rule[]
 
-        const nonLanguageKeys = value?.length
-          ? value.filter((item) => !contextLanguages.find((language) => item._key === language.id))
-          : []
-
-        if (nonLanguageKeys.length) {
-          return {
-            message: `Array item keys must be valid languages registered to the field type`,
-            paths: nonLanguageKeys.map((item) => ({_key: item._key})),
+      rules.push(
+        rule.custom<Value[]>((value, context) => {
+          const {languages: contextLanguages}: {languages: Language[]} =
+            context?.type?.options ?? {}
+          const nonLanguageKeys = value?.length
+            ? value.filter(
+                (item) => !contextLanguages.find((language) => item._key === language.id)
+              )
+            : []
+          if (nonLanguageKeys.length) {
+            return {
+              message: `Array item keys must be valid languages registered to the field type`,
+              paths: nonLanguageKeys.map((item) => [{_key: item._key}]),
+            }
           }
-        }
 
-        // Ensure there's no duplicate `language` fields
-        type KeyedValues = {
-          [key: string]: Value[]
-        }
-
-        const valuesByLanguage = value?.length
-          ? value
-              .filter((item) => Boolean(item?._key))
-              .reduce((acc, cur) => {
-                if (acc[cur._key]) {
-                  return {...acc, [cur._key]: [...acc[cur._key], cur]}
-                }
-
-                return {
-                  ...acc,
-                  [cur._key]: [cur],
-                }
-              }, {} as KeyedValues)
-          : {}
-
-        const duplicateValues = Object.values(valuesByLanguage)
-          .filter((item) => item?.length > 1)
-          .flat()
-
-        if (duplicateValues.length) {
-          return {
-            message: 'There can only be one field per language',
-            paths: duplicateValues.map((item) => ({_key: item._key})),
+          // Ensure there's no duplicate `language` fields
+          type KeyedValues = {
+            [key: string]: Value[]
           }
-        }
 
-        return true
-      }),
-      ...configValidation,
-    ],
+          const valuesByLanguage = value?.length
+            ? value
+                .filter((item) => Boolean(item?._key))
+                .reduce((acc, cur) => {
+                  if (acc[cur._key]) {
+                    return {...acc, [cur._key]: [...acc[cur._key], cur]}
+                  }
+                  return {
+                    ...acc,
+                    [cur._key]: [cur],
+                  }
+                }, {} as KeyedValues)
+            : {}
+          const duplicateValues = Object.values(valuesByLanguage)
+            .filter((item) => item?.length > 1)
+            .flat()
+          if (duplicateValues.length) {
+            return {
+              message: 'There can only be one field per language',
+              paths: duplicateValues.map((item) => [{_key: item._key}]),
+            }
+          }
+          return true
+        })
+      )
+
+      if (languages?.length) {
+        rules.push(rule.max(languages.length))
+      }
+
+      return [...rules, ...configValidation].filter(Boolean)
+    },
   })
 }

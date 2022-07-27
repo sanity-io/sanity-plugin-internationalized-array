@@ -1,5 +1,7 @@
 # sanity-plugin-internationalized-array
 
+> NOTE This is for the Studio v3 version of the plugin
+
 A helper function that renders a custom input component for writing localised fields of content into an array.
 
 **This an early proof-of-concept and should not yet be used without thorough testing.**

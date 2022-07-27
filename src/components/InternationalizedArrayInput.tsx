@@ -11,17 +11,19 @@ import {
 } from 'sanity/form'
 import {Box, Button, Flex, Grid, Label, Stack} from '@sanity/ui'
 
-import {Language, Value} from '../types'
+import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
 import {Table, TableCell, TableRow} from './Table'
 import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
 import Feedback from './Feedback'
 import {getToneFromValidation} from './getToneFromValidation'
 
-export type LocationInputProps = ArrayOfObjectsInputProps<Value>
+export type InternationalizedArrayInputProps = ArrayOfObjectsInputProps<
+  Value,
+  ArraySchemaWithLanguageOptions
+>
 
-export default function InternationalizedArrayInput(props: LocationInputProps) {
+export default function InternationalizedArrayInput(props: InternationalizedArrayInputProps) {
   const {members, value, schemaType, onChange} = props
-  console.log(props)
   const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
 
@@ -77,16 +79,6 @@ export default function InternationalizedArrayInput(props: LocationInputProps) {
   const handleUnsetByKey = useCallback(
     (_key) => {
       onChange(unset([{_key}]))
-    },
-    [onChange]
-  )
-
-  const handleInnerValueChange = useCallback(
-    (patchEvent: PatchEvent, _key: string) => {
-      const inputValue = patchEvent.patches[0]?.value
-      const inputPath = [{_key}, `value`]
-
-      onChange(inputValue ? set(inputValue, inputPath) : unset(inputPath))
     },
     [onChange]
   )
