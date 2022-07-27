@@ -1,0 +1,113 @@
+# sanity-plugin-internationalized-array
+
+A helper function that renders a custom input component for writing localised fields of content into an array.
+
+**This an early proof-of-concept and should not yet be used without thorough testing.**
+
+![2022-07-27 12 26 25](https://user-images.githubusercontent.com/9684022/181235876-45a6a4c5-e6d3-48a2-a6a0-523ee7196184.gif)
+
+## Installation
+
+```
+npm install --save sanity-plugin-internationalized-array@studio-v3
+```
+
+or
+
+```
+yarn add sanity-plugin-internationalized-array-v3@studio-v3
+```
+
+Add an array to your schema by importing the helper function.
+
+```js
+import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+
+// ./src/schema/person.js
+export default {
+  name: 'person',
+  title: 'Person',
+  type: 'document',
+  fields: [
+    // ...all your other fields
+    internationalizedArray({
+      // Required, the `name` of the outer array
+      name: 'greeting',
+      // Required, the `type` of the inner field
+      // One of: string | text | number | boolean
+      type: 'string',
+      // Required, must be an array of objects
+      languages: [
+        {id: 'en', title: 'English'},
+        {id: 'fr', title: 'French'},
+      ],
+    }),
+  ],
+}
+```
+
+This will create an Array field where `string` fields can be added with the name `title`. The custom input contains buttons which will add new array items with the language as the `_key` value. Data returned from this array will look like this:
+
+```json
+"greeting": [
+  { "_key": "en", "value": "hello" },
+  { "_key": "fr", "value": "bonjour" },
+]
+```
+
+Using GROQ filters you can query for a specific language key like so:
+
+```js
+*[_type == "person"] {
+  "greeting": greeting[_key == "en"][0].value
+}
+```
+
+## Migrate from objects to arrays
+
+[See the migration script](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/blob/main/migrations/transformObjectToArray.js) inside `./migrations/transformObjectToArray.js` of this Repo.
+
+Follow the instructions inside the script and set the `_type` and field name you wish to target.
+
+Please take a backup first!
+
+### Why store localised field data like this?
+
+The most popular way to store field-level translated content is in an object using the method prescribed in [@sanity/language-filter](https://www.npmjs.com/package/@sanity/language-filter). This works well and creates tidy object structures, but also create a unique field path for every unique field name, multiplied by the number of languages in your dataset.
+
+For most people, this won't become an issue. On a very large dataset with a lot of languages, the [Attribute Limit](https://www.sanity.io/docs/attribute-limit) can become a concern. This plugin's arrays will use less attributes than an object once you have more than three languages.
+
+The same content as above, plus a third language, structed as an `object` of `string` fields looks like this:
+
+```json
+"greeting" {
+  "en": "hello",
+  "fr": "bonjour",
+  "es": "hola"
+}
+```
+
+Which creates four unique query paths, one for the object and one for each language.
+
+```
+greeting
+greeting.en
+greeting.fr
+greeting.es
+```
+
+Every language you add to every object that uses this structure will add to the number of unique query paths.
+
+The array created by this plugin creates four query paths by default, but is not effected by the number of languages:
+
+```
+greeting
+greeting[]
+greeting[]._key
+greeting[].value
+```
+
+By using this plugin you can safely extend the number of languages without adding any additional query paths.
+
+MIT © Simeon Griggs
+See LICENSE
