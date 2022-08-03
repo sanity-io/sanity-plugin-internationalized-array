@@ -4,8 +4,6 @@
 
 A helper function that renders a custom input component for writing localised fields of content into an array.
 
-**This an early proof-of-concept and should not yet be used without thorough testing.**
-
 ![2022-07-27 12 26 25](https://user-images.githubusercontent.com/9684022/181235876-45a6a4c5-e6d3-48a2-a6a0-523ee7196184.gif)
 
 ## Installation
