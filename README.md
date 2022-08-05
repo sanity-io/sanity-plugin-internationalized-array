@@ -2,7 +2,7 @@
 
 > NOTE This is for the Studio v3 version of the plugin
 
-A helper function that renders a custom input component for writing localised fields of content into an array.
+A helper function that renders a custom input component for writing localized fields of content into an array.
 
 ![2022-07-27 12 26 25](https://user-images.githubusercontent.com/9684022/181235876-45a6a4c5-e6d3-48a2-a6a0-523ee7196184.gif)
 
@@ -71,7 +71,7 @@ Follow the instructions inside the script and set the `_type` and field name you
 
 Please take a backup first!
 
-### Why store localised field data like this?
+### Why store localized field data like this?
 
 The most popular way to store field-level translated content is in an object using the method prescribed in [@sanity/language-filter](https://www.npmjs.com/package/@sanity/language-filter). This works well and creates tidy object structures, but also create a unique field path for every unique field name, multiplied by the number of languages in your dataset.
 

@@ -1,7 +1,7 @@
 {
   "name": "sanity-plugin-internationalized-array",
   "version": "1.0.0",
-  "description": "Store localised fields in an array to save on attributes",
+  "description": "Store localized fields in an array to save on attributes",
   "author": "Simeon Griggs <simeon@sanity.io>",
   "license": "MIT",
   "source": "./src/index.tsx",
