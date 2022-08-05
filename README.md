@@ -4,7 +4,7 @@
 >
 > There is a [Studio v3 specific version in the studio-v3 branch](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/tree/studio-v3)
 
-A helper function that renders a custom input component for writing localised fields of content into an array.
+A helper function that renders a custom input component for writing localized fields of content into an array.
 
 ![2022-07-13 12 53 29](https://user-images.githubusercontent.com/9684022/178729823-cbb1059f-4ae0-4ab0-900d-4f22b030c1d1.gif)
 
@@ -69,7 +69,7 @@ Follow the instructions inside the script and set the `_type` and field name you
 
 Please take a backup first!
 
-### Why store localised field data like this?
+### Why store localized field data like this?
 
 The most popular way to store field-level translated content is in an object using the method prescribed in [@sanity/language-filter](https://www.npmjs.com/package/@sanity/language-filter). This works well and creates tidy object structures, but also create a unique field path for every unique field name, multiplied by the number of languages in your dataset.
 

@@ -13,7 +13,7 @@ import {useUnsetInputComponent} from '../hooks/useUnsetInputComponent'
 
 const schemaExample = {
   name: 'title',
-  type: 'localisedArray',
+  type: 'localizedArray',
   options: {
     languages: [
       {id: 'en', title: 'English'},
