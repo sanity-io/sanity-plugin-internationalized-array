@@ -60,7 +60,7 @@ const LanguageArrayWrapper = forwardRef(function CustomComponent(props, ref) {
         : // Or one for every missing language
           languages
             .filter((language) =>
-              value?.length ? !value.find((v) => v._key === language.id) : true
+              value?.length ? !value.find((v) => v?._key === language.id) : true
             )
             .map((language) => ({_key: language.id}))
 

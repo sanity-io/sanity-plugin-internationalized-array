@@ -39,7 +39,7 @@ export function internationalizedArray(config: ArrayConfig) {
         const {languages} = context.type.options
 
         const nonLanguageKeys = value?.length
-          ? value.filter((item) => !languages.find((language) => item._key === language.id))
+          ? value.filter((item) => !languages.find((language) => item?._key === language.id))
           : []
 
         if (nonLanguageKeys.length) {
