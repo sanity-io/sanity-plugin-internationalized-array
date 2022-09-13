@@ -22,61 +22,48 @@ export default (config: ArrayFactoryConfig): Schema.FieldDefinition<'array'> => 
     components: {input: InternationalizedArrayInput},
     options: {languages},
     of: [defineField({name: objectName, type: objectName})],
-    validation: (rule: Rule) => {
-      const rules = [] as Rule[]
-
-      rules.push(
-        rule.custom<Value[]>((value, context) => {
-          const {languages: contextLanguages}: {languages: Language[]} =
-            context?.type?.options ?? {}
-          const nonLanguageKeys = value?.length
-            ? value.filter(
-                (item) => !contextLanguages.find((language) => item._key === language.id)
-              )
-            : []
-          if (nonLanguageKeys.length) {
-            return {
-              message: `Array item keys must be valid languages registered to the field type`,
-              paths: nonLanguageKeys.map((item) => [{_key: item._key}]),
-            }
+    validation: (rule: Rule) =>
+      rule.max(languages?.length).custom<Value[]>((value, context) => {
+        const {languages: contextLanguages}: {languages: Language[]} = context?.type?.options ?? {}
+        const nonLanguageKeys = value?.length
+          ? value.filter((item) => !contextLanguages.find((language) => item._key === language.id))
+          : []
+        if (nonLanguageKeys.length) {
+          return {
+            message: `Array item keys must be valid languages registered to the field type`,
+            paths: nonLanguageKeys.map((item) => [{_key: item._key}]),
           }
+        }
 
-          // Ensure there's no duplicate `language` fields
-          type KeyedValues = {
-            [key: string]: Value[]
+        // Ensure there's no duplicate `language` fields
+        type KeyedValues = {
+          [key: string]: Value[]
+        }
+
+        const valuesByLanguage = value?.length
+          ? value
+              .filter((item) => Boolean(item?._key))
+              .reduce((acc, cur) => {
+                if (acc[cur._key]) {
+                  return {...acc, [cur._key]: [...acc[cur._key], cur]}
+                }
+                return {
+                  ...acc,
+                  [cur._key]: [cur],
+                }
+              }, {} as KeyedValues)
+          : {}
+        const duplicateValues = Object.values(valuesByLanguage)
+          .filter((item) => item?.length > 1)
+          .flat()
+        if (duplicateValues.length) {
+          return {
+            message: 'There can only be one field per language',
+            paths: duplicateValues.map((item) => [{_key: item._key}]),
           }
+        }
 
-          const valuesByLanguage = value?.length
-            ? value
-                .filter((item) => Boolean(item?._key))
-                .reduce((acc, cur) => {
-                  if (acc[cur._key]) {
-                    return {...acc, [cur._key]: [...acc[cur._key], cur]}
-                  }
-                  return {
-                    ...acc,
-                    [cur._key]: [cur],
-                  }
-                }, {} as KeyedValues)
-            : {}
-          const duplicateValues = Object.values(valuesByLanguage)
-            .filter((item) => item?.length > 1)
-            .flat()
-          if (duplicateValues.length) {
-            return {
-              message: 'There can only be one field per language',
-              paths: duplicateValues.map((item) => [{_key: item._key}]),
-            }
-          }
-          return true
-        })
-      )
-
-      if (languages?.length) {
-        rules.push(rule.max(languages.length))
-      }
-
-      return rules
-    },
+        return true
+      }),
   })
 }
