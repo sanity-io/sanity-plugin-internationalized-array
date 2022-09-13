@@ -1,6 +1,5 @@
 import React, {useCallback, useMemo} from 'react'
 import {
-  PatchEvent,
   ArrayOfObjectsInputProps,
   MemberItem,
   unset,
@@ -54,6 +53,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
 
         // So what is the index in the current value array of the next language in the language array?
         const nextLanguageIndex = languagesInUse.findIndex((l) =>
+          // eslint-disable-next-line max-nested-callbacks
           remainingLanguages.find((r) => r.id === l._key)
         )
 
@@ -77,7 +77,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   )
 
   const handleUnsetByKey = useCallback(
-    (_key) => {
+    (_key: string) => {
       onChange(unset([{_key}]))
     },
     [onChange]
@@ -124,7 +124,8 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   }, [value, languages])
 
   const languagesAreValid = useMemo(
-    () => languages?.length && languages.every((item) => item.id && item.title),
+    () =>
+      !languages?.length || (languages?.length && languages.every((item) => item.id && item.title)),
     [languages]
   )
 
@@ -154,12 +155,13 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
                   </Box>
                 </TableCell>
                 <TableCell paddingRight={2} style={{width: `100%`}}>
+                  {/* This renders the entire field default with title */}
                   <MemberItem {...props} member={member} />
                 </TableCell>
                 <TableCell style={{verticalAlign: 'bottom'}}>
                   <Flex align="center" justify="flex-end" gap={3}>
                     {/* Possibly unncessary, validation shows up in <MemberItem /> */}
-                    {member.item.validation.length > 0 ? (
+                    {member?.item?.validation?.length > 0 ? (
                       <Box paddingLeft={2}>
                         <FormFieldValidationStatus validation={member.item.validation} />
                       </Box>
@@ -188,7 +190,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
         />
       ) : null}
 
-      {value && value.length < languages.length ? (
+      {languages?.length > 0 ? (
         <Stack space={2}>
           {/* No more than 5 columns */}
           <Grid columns={Math.min(languages.length, 5)} gap={2}>

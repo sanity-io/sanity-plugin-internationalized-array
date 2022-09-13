@@ -1,11 +1,11 @@
-import {Rule, ArraySchemaType} from 'sanity'
+import {Rule, ArraySchemaType, Schema} from 'sanity'
 
 export type Language = {
   id: string
   title: string
 }
 
-export type AllowedType = 'string' | 'number' | 'boolean' | 'text'
+export type AllowedType = 'string' | 'number' | 'boolean' | 'text' | 'reference'
 
 export type ArrayConfig = {
   name: string
@@ -16,6 +16,7 @@ export type ArrayConfig = {
   hidden?: boolean | (() => boolean)
   readOnly?: boolean | (() => boolean)
   validation?: Rule | Rule[]
+  field?: {[key: string]: any; options: {[key: string]: any}}
 }
 
 export type Value = {
@@ -25,6 +26,7 @@ export type Value = {
 
 export type PluginConfig = {
   languages: Language[]
+  fieldTypes: (string | Schema.FieldDefinition)[]
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {

@@ -1,60 +1,27 @@
-import {defineField, FieldDefinition, Rule} from 'sanity'
+import {defineField, Rule, Schema} from 'sanity'
 
-import InternationalizedArrayInput from './components/InternationalizedArrayInput'
-import {AllowedType, ArrayConfig, Language, Value} from './types'
+import {createFieldName} from '../components/createFieldName'
+import InternationalizedArrayInput from '../components/InternationalizedArrayInput'
+import {Language, Value} from '../types'
 
-const CONFIG_DEFAULT = {
-  name: `title`,
-  type: `string` as AllowedType,
-  languages: [],
-  field: {
-    options: {},
-  },
+type ArrayFactoryConfig = {
+  languages: Language[]
+  type: string | Schema.FieldDefinition
 }
 
-export function internationalizedArrayField(config: ArrayConfig = CONFIG_DEFAULT): FieldDefinition {
-  const {name, type, languages, field} = config
-
-  // const configValidation = Array.isArray(config?.validation)
-  //   ? config.validation
-  //   : [config?.validation]
+export default (config: ArrayFactoryConfig): Schema.FieldDefinition<'array'> => {
+  const {languages, type} = config
+  const typeName = typeof type === `string` ? type : type.name
+  const arrayName = createFieldName(typeName)
+  const objectName = createFieldName(typeName, true)
 
   return defineField({
-    name,
-    title: config?.title ?? undefined,
-    group: config?.group ?? undefined,
-    hidden: config?.hidden ?? undefined,
-    readOnly: config?.readOnly ?? undefined,
+    name: arrayName,
+    title: 'Internationalized array',
     type: 'array',
     components: {input: InternationalizedArrayInput},
     options: {languages},
-    of: [
-      {
-        type: 'object',
-        fields: [
-          {
-            name: 'value',
-            type: field?.type ?? type,
-            ...field,
-            options: {
-              ...(field?.options ?? {}),
-            },
-          },
-        ],
-        preview: {
-          select: {title: 'value', key: '_key'},
-          prepare(select) {
-            const {title, key} = select as Record<string, string>
-
-            return {
-              title,
-              subtitle: key.toUpperCase(),
-            }
-          },
-        },
-      },
-    ],
-    // @ts-ignore
+    of: [defineField({name: objectName, type: objectName})],
     validation: (rule: Rule) => {
       const rules = [] as Rule[]
 
@@ -109,10 +76,7 @@ export function internationalizedArrayField(config: ArrayConfig = CONFIG_DEFAULT
         rules.push(rule.max(languages.length))
       }
 
-      return [
-        ...rules,
-        // ...configValidation
-      ].filter(Boolean)
+      return rules
     },
   })
 }

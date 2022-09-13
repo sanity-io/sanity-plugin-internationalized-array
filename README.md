@@ -18,35 +18,81 @@ or
 yarn add sanity-plugin-internationalized-array-v3@studio-v3
 ```
 
-Add an array to your schema by importing the helper function.
+## Usage (simple)
 
-```js
+Add it as a plugin in sanity.config.ts (or .js):
+
+```ts
+import {createConfig} from 'sanity'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
 
-// ./src/schema/person.js
-export default {
-  name: 'person',
-  title: 'Person',
-  type: 'document',
-  fields: [
-    // ...all your other fields
+ export const createConfig({
+  // ...
+  plugins: [
     internationalizedArray({
-      // Required, the `name` of the outer array
-      name: 'greeting',
-      // Required, the `type` of the inner field
-      // One of: string | text | number | boolean
-      type: 'string',
-      // Required, must be an array of objects
       languages: [
         {id: 'en', title: 'English'},
-        {id: 'fr', title: 'French'},
+        {id: 'fr', title: 'French'}
       ],
-    }),
-  ],
-}
+      fieldTypes: ['string'],
+    })
+  ]
+})
 ```
 
-This will create an Array field where `string` fields can be added with the name `title`. The custom input contains buttons which will add new array items with the language as the `_key` value. Data returned from this array will look like this:
+This will register two new fields to the schema, based on the settings passed into `fieldTypes`:
+
+- `internationalizedArrayString` an array field of:
+- `internationalizedArrayStringValue` an object field, with a single `string` field inside called `value`
+
+You can pass in more registered schema type names to generate more internationalized arrays. Use them in your schema like this:
+
+```ts
+defineField({
+  name: 'greeting',
+  type: 'internationalizedArrayString',
+}),
+```
+
+## Usage (advanced)
+
+For more control over the `value` field, you can pass a schema definition into the `fieldTypes` array.
+
+```ts
+import {createConfig} from 'sanity'
+import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+
+ export const createConfig({
+  // ...
+  plugins: [
+    internationalizedArray({
+      languages: [
+        {id: 'en', title: 'English'},
+        {id: 'fr', title: 'French'}
+      ],
+      fieldTypes: [
+        defineField({
+          name: 'featuredProduct',
+          type: 'reference',
+          to: [{type: 'product'}]
+          hidden: (({document}) => !document?.title)
+        })
+      ],
+    })
+  ]
+})
+```
+
+This would also create two new fields in your schema.
+
+- `internationalizedArrayFeaturedProduct` an array field of:
+- `internationalizedArrayFeaturedProductValue` an object field, with a single `string` field inside called `value`
+
+Note that the `name` key in the field gets rewritten to `value` and is instead used to name the object field.
+
+## Shape of stored data
+
+The custom input contains buttons which will add new array items with the language as the `_key` value. Data returned from this array will look like this:
 
 ```json
 "greeting": [
@@ -54,6 +100,8 @@ This will create an Array field where `string` fields can be added with the name
   { "_key": "fr", "value": "bonjour" },
 ]
 ```
+
+## Querying data
 
 Using GROQ filters you can query for a specific language key like so:
 
