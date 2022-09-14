@@ -8,7 +8,7 @@ import {
   setIfMissing,
   FormFieldValidationStatus,
 } from 'sanity/form'
-import {Box, Button, Flex, Grid, Label, Stack} from '@sanity/ui'
+import {Box, Button, Flex, Grid, Label, Stack, useToast} from '@sanity/ui'
 
 import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
 import {Table, TableCell, TableRow} from './Table'
@@ -25,6 +25,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   const {members, value, schemaType, onChange} = props
   const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
+  const toast = useToast()
 
   const languages: Language[] = useMemo(() => options?.languages ?? [], [options])
 
@@ -89,13 +90,15 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       return
     }
 
+    console.log(value)
+
     // Create a new value array in the correct order
     // This would also strip out values that don't have a language as the key
     const updatedValue = value
       .reduce((acc, v) => {
         const newIndex = languages.findIndex((l) => l.id === v?._key)
 
-        if (newIndex) {
+        if (newIndex > -1) {
           acc[newIndex] = v
         }
 
@@ -103,8 +106,15 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       }, [] as Value[])
       .filter(Boolean)
 
+    if (value.length !== updatedValue.length) {
+      toast.push({
+        title: 'There was an error reordering languages',
+        status: 'warning',
+      })
+    }
+
     onChange(set(updatedValue))
-  }, [languages, onChange, value])
+  }, [toast, languages, onChange, value])
 
   const allKeysAreLanguages = useMemo(() => {
     return value?.every((v) => languages.find((l) => l?.id === v?._key))
