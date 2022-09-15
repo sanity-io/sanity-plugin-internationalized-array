@@ -15,6 +15,7 @@ export default (config: ObjectFactoryConfig): Schema.FieldDefinition<'object'> =
     name: objectName,
     title: `Internationalized array ${type}`,
     type: 'object',
+    // TODO: Address this typing issue with the inner object
     // @ts-ignore
     fields: [
       typeof type === `string`

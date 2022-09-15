@@ -8,6 +8,7 @@ import {
   setIfMissing,
 } from 'sanity/form'
 import {
+  Text,
   Box,
   Button,
   Flex,
@@ -176,67 +177,71 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       {members?.length > 0 ? (
         <Table>
           <tbody>
-            {members.map((member, memberIndex) => (
-              <TableRow
-                key={member.key}
-                tone={
-                  member?.item?.validation?.length > 0
-                    ? getToneFromValidation(member.item.validation)
-                    : undefined
-                }
-              >
-                <TableCell style={{verticalAlign: 'bottom'}}>
-                  <Box paddingY={3} paddingRight={2}>
-                    {valueLanguageKeys.includes(member.key) ? (
-                      <Label muted size={1}>
-                        {member.key}
-                      </Label>
-                    ) : (
-                      <MenuButton
-                        button={<Button fontSize={1} text={`Change "${member.key}"`} />}
-                        id={`${member.key}-change-key`}
-                        menu={
-                          <Menu>
-                            {languages.map((language) => (
-                              <MenuItem
-                                disabled={valueLanguageKeys.includes(language.id)}
-                                fontSize={1}
-                                key={language.id}
-                                text={language.id.toLocaleUpperCase()}
-                                onClick={() =>
-                                  handleKeyChange({
-                                    from: member.key,
-                                    to: language.id,
-                                    index: memberIndex,
-                                  })
-                                }
-                              />
-                            ))}
-                          </Menu>
-                        }
-                        placement="right"
-                        popover={{portal: true}}
+            {members.map((member, memberIndex) =>
+              member.kind === 'item' ? (
+                <TableRow
+                  key={member.key}
+                  tone={
+                    member?.item?.validation?.length > 0
+                      ? getToneFromValidation(member.item.validation)
+                      : undefined
+                  }
+                >
+                  <TableCell style={{verticalAlign: 'bottom'}}>
+                    <Box paddingY={3} paddingRight={2}>
+                      {valueLanguageKeys.includes(member.key) ? (
+                        <Label muted size={1}>
+                          {member.key}
+                        </Label>
+                      ) : (
+                        <MenuButton
+                          button={<Button fontSize={1} text={`Change "${member.key}"`} />}
+                          id={`${member.key}-change-key`}
+                          menu={
+                            <Menu>
+                              {languages.map((language) => (
+                                <MenuItem
+                                  disabled={valueLanguageKeys.includes(language.id)}
+                                  fontSize={1}
+                                  key={language.id}
+                                  text={language.id.toLocaleUpperCase()}
+                                  onClick={() =>
+                                    handleKeyChange({
+                                      from: member.key,
+                                      to: language.id,
+                                      index: memberIndex,
+                                    })
+                                  }
+                                />
+                              ))}
+                            </Menu>
+                          }
+                          placement="right"
+                          popover={{portal: true}}
+                        />
+                      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell paddingRight={2} style={{width: `100%`}}>
+                    {/* This renders the entire field default with title */}
+                    <ArrayOfObjectsItem {...props} member={member} />
+                  </TableCell>
+                  <TableCell style={{verticalAlign: 'bottom'}}>
+                    <Flex align="center" justify="flex-end" gap={3}>
+                      <Button
+                        mode="ghost"
+                        icon={RemoveIcon}
+                        tone="critical"
+                        disabled={typeof readOnly === 'boolean' ? readOnly : false}
+                        onClick={() => handleUnsetByKey(member.key)}
                       />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell paddingRight={2} style={{width: `100%`}}>
-                  {/* This renders the entire field default with title */}
-                  <ArrayOfObjectsItem {...props} member={member} />
-                </TableCell>
-                <TableCell style={{verticalAlign: 'bottom'}}>
-                  <Flex align="center" justify="flex-end" gap={3}>
-                    <Button
-                      mode="ghost"
-                      icon={RemoveIcon}
-                      tone="critical"
-                      disabled={typeof readOnly === 'boolean' ? readOnly : false}
-                      onClick={() => handleUnsetByKey(member.key)}
-                    />
-                  </Flex>
-                </TableCell>
-              </TableRow>
-            ))}
+                    </Flex>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <Text>Error</Text>
+              )
+            )}
           </tbody>
         </Table>
       ) : null}

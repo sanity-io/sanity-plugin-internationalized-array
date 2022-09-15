@@ -21,6 +21,8 @@ export default (config: ArrayFactoryConfig): Schema.FieldDefinition<'array'> => 
     type: 'array',
     components: {input: InternationalizedArrayInput},
     options: {languages},
+    // TODO: Address this typing issue with the inner object
+    // @ts-ignore
     of: [defineField({name: objectName, type: objectName})],
     validation: (rule: Rule) =>
       rule.max(languages?.length).custom<Value[]>((value, context) => {
