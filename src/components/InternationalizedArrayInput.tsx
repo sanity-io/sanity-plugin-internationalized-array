@@ -1,18 +1,28 @@
 import React, {useCallback, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
-  MemberItem,
+  ArrayOfObjectsItem,
   unset,
   insert,
   set,
   setIfMissing,
-  FormFieldValidationStatus,
 } from 'sanity/form'
-import {Box, Button, Flex, Grid, Label, Stack, useToast} from '@sanity/ui'
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Label,
+  MenuButton,
+  Stack,
+  useToast,
+  Menu,
+  MenuItem,
+} from '@sanity/ui'
+import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
 
 import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
 import {Table, TableCell, TableRow} from './Table'
-import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
 import Feedback from './Feedback'
 import {getToneFromValidation} from './getToneFromValidation'
 
@@ -28,6 +38,10 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   const toast = useToast()
 
   const languages: Language[] = useMemo(() => options?.languages ?? [], [options])
+  const valueLanguageKeys = useMemo(
+    () => value?.map((v) => v._key).filter((key) => languages.find((l) => l.id === key)) ?? [],
+    [languages, value]
+  )
 
   const handleAddLanguage = useCallback(
     (languageId?: string) => {
@@ -90,8 +104,6 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       return
     }
 
-    console.log(value)
-
     // Create a new value array in the correct order
     // This would also strip out values that don't have a language as the key
     const updatedValue = value
@@ -133,6 +145,22 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       .filter(Boolean)
   }, [value, languages])
 
+  const handleKeyChange = useCallback(
+    (config: {from: string; to: string; index: number}) => {
+      if (!value) {
+        return
+      }
+
+      const {from, to, index} = config
+      const currentValue = value.find((v) => v._key === from)
+      const newValue = {...currentValue, _key: to}
+
+      // TODO: Make sure this gets the correct language index, currently replaces-in-place
+      onChange([insert([newValue], 'after', [index]), unset([{_key: from}])])
+    },
+    [onChange, value]
+  )
+
   const languagesAreValid = useMemo(
     () =>
       !languages?.length || (languages?.length && languages.every((item) => item.id && item.title)),
@@ -148,7 +176,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       {members?.length > 0 ? (
         <Table>
           <tbody>
-            {members.map((member) => (
+            {members.map((member, memberIndex) => (
               <TableRow
                 key={member.key}
                 tone={
@@ -159,23 +187,45 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
               >
                 <TableCell style={{verticalAlign: 'bottom'}}>
                   <Box paddingY={3} paddingRight={2}>
-                    <Label muted size={1}>
-                      {member.key}
-                    </Label>
+                    {valueLanguageKeys.includes(member.key) ? (
+                      <Label muted size={1}>
+                        {member.key}
+                      </Label>
+                    ) : (
+                      <MenuButton
+                        button={<Button fontSize={1} text={`Change "${member.key}"`} />}
+                        id={`${member.key}-change-key`}
+                        menu={
+                          <Menu>
+                            {languages.map((language) => (
+                              <MenuItem
+                                disabled={valueLanguageKeys.includes(language.id)}
+                                fontSize={1}
+                                key={language.id}
+                                text={language.id.toLocaleUpperCase()}
+                                onClick={() =>
+                                  handleKeyChange({
+                                    from: member.key,
+                                    to: language.id,
+                                    index: memberIndex,
+                                  })
+                                }
+                              />
+                            ))}
+                          </Menu>
+                        }
+                        placement="right"
+                        popover={{portal: true}}
+                      />
+                    )}
                   </Box>
                 </TableCell>
                 <TableCell paddingRight={2} style={{width: `100%`}}>
                   {/* This renders the entire field default with title */}
-                  <MemberItem {...props} member={member} />
+                  <ArrayOfObjectsItem {...props} member={member} />
                 </TableCell>
                 <TableCell style={{verticalAlign: 'bottom'}}>
                   <Flex align="center" justify="flex-end" gap={3}>
-                    {/* Possibly unncessary, validation shows up in <MemberItem /> */}
-                    {member?.item?.validation?.length > 0 ? (
-                      <Box paddingLeft={2}>
-                        <FormFieldValidationStatus validation={member.item.validation} />
-                      </Box>
-                    ) : null}
                     <Button
                       mode="ghost"
                       icon={RemoveIcon}
