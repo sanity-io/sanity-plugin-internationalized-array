@@ -1,6 +1,7 @@
 import {defineField, FieldDefinition} from 'sanity'
 
 import {createFieldName} from '../components/createFieldName'
+import InternationalizedField from '../components/InternationalizedField'
 import InternationalizedInput from '../components/InternationalizedInput'
 
 type ObjectFactoryConfig = {
@@ -19,7 +20,6 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     // TODO: Resolve this typing issue with the return type
     // @ts-ignore
     components: {
-      // item: InternationalizedInputWrapper,
       // TODO: Resolve this typing issue with the outer component
       // @ts-ignore
       item: InternationalizedInput,
@@ -31,10 +31,21 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
         ? // Define a basic field if all we have is the string name
           defineField({
             name: 'value',
-            type,
+            type: 'string',
+            components: {
+              // TODO: Address this typing issue with the inner object
+              // @ts-ignore
+              field: InternationalizedField,
+            },
           })
         : // Pass in the configured options, but overwrite the name
-          {...type, name: 'value'},
+          {
+            ...type,
+            name: 'value',
+            components: {
+              field: InternationalizedField,
+            },
+          },
     ],
     preview: {
       select: {

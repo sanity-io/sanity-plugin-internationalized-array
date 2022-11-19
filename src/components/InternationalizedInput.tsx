@@ -18,10 +18,10 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
 
   const inlineProps = {
     ...props.inputProps,
-    // This is the magic that makes inline editing work
+    // This is the magic that makes inline editing work?
     members: props.inputProps.members.filter((m) => m.kind === 'field' && m.name === 'value'),
     // This just overrides the type
-    // TODO: Remove this as it shouldn't be necessary
+    // TODO: Remove this as it shouldn't be necessary?
     value: props.value as InternationalizedValue,
   }
 
