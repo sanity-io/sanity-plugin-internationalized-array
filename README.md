@@ -1,16 +1,8 @@
-> This is a **Sanity Studio v3** plugin.
-
-> **NOTE**
->
 > This is the **Sanity Studio v3 version** of sanity-plugin-internationalized-array.
 >
-> For the v2 version, please refer to the [v2-branch](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array).
-
-## Usage
+> For the v2 version, please refer to the [v2-branch](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/tree/studio-v2).
 
 # sanity-plugin-internationalized-array
-
-> NOTE This is for the Studio v3 version of the plugin
 
 A helper function that renders a custom input component for writing localized fields of content into an array.
 
@@ -19,13 +11,13 @@ A helper function that renders a custom input component for writing localized fi
 ## Installation
 
 ```
-npm install --save sanity-plugin-internationalized-array@studio-v3
+npm install --save sanity-plugin-internationalized-array
 ```
 
 or
 
 ```
-yarn add sanity-plugin-internationalized-array-v3@studio-v3
+yarn add sanity-plugin-internationalized-array-v3
 ```
 
 ## Usage (simple)
