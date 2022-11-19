@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-internationalized-array",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Store localized fields in an array to save on attributes",
   "keywords": [
     "sanity",
@@ -37,13 +37,13 @@
     "sanity.json"
   ],
   "scripts": {
+    "prebuild": "npm run clean && plugin-kit verify-package --silent && pkg-utils",
+    "build": "pkg-utils build",
     "clean": "rimraf lib",
     "link-watch": "plugin-kit link-watch",
     "lint": "eslint .",
-    "prebuild": "npm run clean && plugin-kit verify-package --silent && pkg-utils",
     "prepare": "husky install",
     "prepublishOnly": "npm run build",
-    "build": "pkg-utils build",
     "watch": "pkg-utils watch"
   },
   "dependencies": {
