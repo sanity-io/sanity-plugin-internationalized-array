@@ -1,3 +1,13 @@
+> This is a **Sanity Studio v3** plugin.
+
+> **NOTE**
+>
+> This is the **Sanity Studio v3 version** of sanity-plugin-internationalized-array.
+>
+> For the v2 version, please refer to the [v2-branch](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array).
+
+## Usage
+
 # sanity-plugin-internationalized-array
 
 > NOTE This is for the Studio v3 version of the plugin
@@ -23,10 +33,10 @@ yarn add sanity-plugin-internationalized-array-v3@studio-v3
 Add it as a plugin in sanity.config.ts (or .js):
 
 ```ts
-import {createConfig} from 'sanity'
+import {defineConfig} from 'sanity'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
 
- export const createConfig({
+ export const defineConfig({
   // ...
   plugins: [
     internationalizedArray({
@@ -45,7 +55,7 @@ This will register two new fields to the schema, based on the settings passed in
 - `internationalizedArrayString` an array field of:
 - `internationalizedArrayStringValue` an object field, with a single `string` field inside called `value`
 
-You can pass in more registered schema type names to generate more internationalized arrays. Use them in your schema like this:
+You can pass in more registered schema-type names to generate more internationalized arrays. Use them in your schema like this:
 
 ```ts
 defineField({
@@ -59,10 +69,10 @@ defineField({
 For more control over the `value` field, you can pass a schema definition into the `fieldTypes` array.
 
 ```ts
-import {createConfig} from 'sanity'
+import {defineConfig} from 'sanity'
 import {internationalizedArray} from 'sanity-plugin-internationalized-array'
 
- export const createConfig({
+ export const defineConfig({
   // ...
   plugins: [
     internationalizedArray({
@@ -159,3 +169,26 @@ By using this plugin you can safely extend the number of languages without addin
 
 MIT © Simeon Griggs
 See LICENSE
+
+## License
+
+MIT-licensed. See LICENSE.
+
+## Develop & test
+
+This plugin uses [@sanity/plugin-kit](https://github.com/sanity-io/plugin-kit)
+with default configuration for build & watch scripts.
+
+See [Testing a plugin in Sanity Studio](https://github.com/sanity-io/plugin-kit#testing-a-plugin-in-sanity-studio)
+on how to run this plugin with hotreload in the studio.
+
+### Release new version
+
+Run ["CI & Release" workflow](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/actions/workflows/main.yml).
+Make sure to select the main branch and check "Release new version".
+
+Semantic release will only release on configured branches, so it is safe to run release on any branch.
+
+## License
+
+[MIT](LICENSE) © Simeon Griggs

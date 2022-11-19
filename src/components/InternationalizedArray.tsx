@@ -1,61 +1,45 @@
 import React, {useCallback, useMemo} from 'react'
 import {
-  ArrayOfObjectsInputProps,
-  ArrayOfObjectsItem,
-  unset,
   insert,
   set,
   setIfMissing,
-} from 'sanity/form'
-import {
-  Text,
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Label,
-  MenuButton,
-  Stack,
-  useToast,
-  Menu,
-  MenuItem,
-} from '@sanity/ui'
-import {AddIcon, RemoveIcon, RestoreIcon} from '@sanity/icons'
+  ArrayOfObjectsItemMember,
+  ArrayOfObjectsItem,
+  ArrayOfObjectsInputProps,
+} from 'sanity'
+import {Button, Grid, Stack, useToast} from '@sanity/ui'
+import {AddIcon, RestoreIcon} from '@sanity/icons'
 
 import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
-import {Table, TableCell, TableRow} from './Table'
 import Feedback from './Feedback'
-import {getToneFromValidation} from './getToneFromValidation'
 
-export type InternationalizedArrayInputProps = ArrayOfObjectsInputProps<
+export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
   ArraySchemaWithLanguageOptions
 >
 
-export default function InternationalizedArrayInput(props: InternationalizedArrayInputProps) {
+export default function InternationalizedArray(props: InternationalizedArrayProps) {
   const {members, value, schemaType, onChange} = props
   const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
   const toast = useToast()
 
   const languages: Language[] = useMemo(() => options?.languages ?? [], [options])
-  const valueLanguageKeys = useMemo(
-    () => value?.map((v) => v._key).filter((key) => languages.find((l) => l.id === key)) ?? [],
-    [languages, value]
-  )
 
   const handleAddLanguage = useCallback(
     (languageId?: string) => {
+      const itemBase = {_type: `${schemaType.name}Value`}
+
       // Create new items
       const newItems = languageId
         ? // Just one for this language
-          [{_key: languageId}]
+          [{...itemBase, _key: languageId}]
         : // Or one for every missing language
           languages
             .filter((language) =>
               value?.length ? !value.find((v) => v._key === language.id) : true
             )
-            .map((language) => ({_key: language.id}))
+            .map((language) => ({...itemBase, _key: language.id}))
 
       // Insert new items in the correct order
       const languagesInUse = value?.length ? value.map((v) => v) : []
@@ -92,13 +76,6 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
     [languages, onChange, value]
   )
 
-  const handleUnsetByKey = useCallback(
-    (_key: string) => {
-      onChange(unset([{_key}]))
-    },
-    [onChange]
-  )
-
   // TODO: This is lazy, reordering and re-setting the whole array – it could be surgical
   const handleRestoreOrder = useCallback(() => {
     if (!value?.length) {
@@ -119,7 +96,7 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
       }, [] as Value[])
       .filter(Boolean)
 
-    if (value.length !== updatedValue.length) {
+    if (value?.length !== updatedValue.length) {
       toast.push({
         title: 'There was an error reordering languages',
         status: 'warning',
@@ -134,33 +111,16 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   }, [value, languages])
 
   // Check languages are in the correct order
+  const languagesInUse = languages.filter((l) => value?.find((v) => v._key === l.id))
   const languagesOutOfOrder = useMemo(() => {
     if (!value?.length) {
       return []
     }
 
-    const languagesInUse = languages.filter((l) => value.find((v) => v._key === l.id))
-
     return value
       .map((v, vIndex) => (vIndex === languagesInUse.findIndex((l) => l.id === v._key) ? null : v))
       .filter(Boolean)
-  }, [value, languages])
-
-  const handleKeyChange = useCallback(
-    (config: {from: string; to: string; index: number}) => {
-      if (!value) {
-        return
-      }
-
-      const {from, to, index} = config
-      const currentValue = value.find((v) => v._key === from)
-      const newValue = {...currentValue, _key: to}
-
-      // TODO: Make sure this gets the correct language index, currently replaces-in-place
-      onChange([insert([newValue], 'after', [index]), unset([{_key: from}])])
-    },
-    [onChange, value]
-  )
+  }, [value, languagesInUse])
 
   const languagesAreValid = useMemo(
     () =>
@@ -175,77 +135,27 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
   return (
     <Stack space={2}>
       {members?.length > 0 ? (
-        <Table>
-          <tbody>
-            {members.map((member, memberIndex) =>
-              member.kind === 'item' ? (
-                <TableRow
+        <>
+          {/* TODO: Resolve type for ArrayOfObjectsItemMember */}
+          {/* @ts-ignore */}
+          {members.map((member: ArrayOfObjectsItemMember) => {
+            if (member.kind === 'item') {
+              return (
+                <ArrayOfObjectsItem
                   key={member.key}
-                  tone={
-                    member?.item?.validation?.length > 0
-                      ? getToneFromValidation(member.item.validation)
-                      : undefined
-                  }
-                >
-                  <TableCell style={{verticalAlign: 'bottom'}}>
-                    <Box paddingY={3} paddingRight={2}>
-                      {valueLanguageKeys.includes(member.key) ? (
-                        <Label muted size={1}>
-                          {member.key}
-                        </Label>
-                      ) : (
-                        <MenuButton
-                          button={<Button fontSize={1} text={`Change "${member.key}"`} />}
-                          id={`${member.key}-change-key`}
-                          menu={
-                            <Menu>
-                              {languages.map((language) => (
-                                <MenuItem
-                                  disabled={valueLanguageKeys.includes(language.id)}
-                                  fontSize={1}
-                                  key={language.id}
-                                  text={language.id.toLocaleUpperCase()}
-                                  onClick={() =>
-                                    handleKeyChange({
-                                      from: member.key,
-                                      to: language.id,
-                                      index: memberIndex,
-                                    })
-                                  }
-                                />
-                              ))}
-                            </Menu>
-                          }
-                          placement="right"
-                          popover={{portal: true}}
-                        />
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell paddingRight={2} style={{width: `100%`}}>
-                    {/* This renders the entire field default with title */}
-                    <ArrayOfObjectsItem {...props} member={member} />
-                  </TableCell>
-                  <TableCell style={{verticalAlign: 'bottom'}}>
-                    <Flex align="center" justify="flex-end" gap={3}>
-                      <Button
-                        mode="ghost"
-                        icon={RemoveIcon}
-                        tone="critical"
-                        disabled={typeof readOnly === 'boolean' ? readOnly : false}
-                        onClick={() => handleUnsetByKey(member.key)}
-                      />
-                    </Flex>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <Text>Error</Text>
+                  member={member}
+                  renderItem={props.renderItem}
+                  renderField={props.renderField}
+                  renderInput={props.renderInput}
+                  renderPreview={props.renderPreview}
+                />
               )
-            )}
-          </tbody>
-        </Table>
-      ) : null}
+            }
 
+            return null
+          })}
+        </>
+      ) : null}
       {languagesOutOfOrder.length > 0 && allKeysAreLanguages ? (
         <Button
           tone="caution"
@@ -255,7 +165,9 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
         />
       ) : null}
 
-      {languages?.length > 0 ? (
+      {/* Show buttons if languages are configured */}
+      {/* Hide them once languages have values */}
+      {languages?.length > 0 && languagesInUse.length < languages.length ? (
         <Stack space={2}>
           {/* No more than 5 columns */}
           <Grid columns={Math.min(languages.length, 5)} gap={2}>
@@ -277,7 +189,11 @@ export default function InternationalizedArrayInput(props: InternationalizedArra
             mode="ghost"
             disabled={readOnly || (value && value?.length >= languages?.length)}
             icon={AddIcon}
-            text={value?.length ? `Add missing languages` : `Add all languages`}
+            text={
+              value?.length
+                ? `Add missing ${languages.length - value.length === 1 ? `language` : `languages`}`
+                : `Add all languages`
+            }
             onClick={() => handleAddLanguage()}
           />
         </Stack>

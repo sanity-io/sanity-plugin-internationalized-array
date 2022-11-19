@@ -1,4 +1,4 @@
-import {Rule, ArraySchemaType, Schema} from 'sanity'
+import {Rule, ArraySchemaType, RuleTypeConstraint} from 'sanity'
 
 export type Language = {
   id: string
@@ -26,7 +26,7 @@ export type Value = {
 
 export type PluginConfig = {
   languages: Language[]
-  fieldTypes: (string | Schema.FieldDefinition)[]
+  fieldTypes: (string | RuleTypeConstraint)[]
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {

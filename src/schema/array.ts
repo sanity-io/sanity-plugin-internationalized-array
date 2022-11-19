@@ -1,15 +1,15 @@
-import {defineField, Rule, Schema} from 'sanity'
+import {defineField, FieldDefinition, Rule} from 'sanity'
 
 import {createFieldName} from '../components/createFieldName'
-import InternationalizedArrayInput from '../components/InternationalizedArrayInput'
+import InternationalizedArray from '../components/InternationalizedArray'
 import {Language, Value} from '../types'
 
 type ArrayFactoryConfig = {
   languages: Language[]
-  type: string | Schema.FieldDefinition
+  type: string | FieldDefinition
 }
 
-export default (config: ArrayFactoryConfig): Schema.FieldDefinition<'array'> => {
+export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
   const {languages, type} = config
   const typeName = typeof type === `string` ? type : type.name
   const arrayName = createFieldName(typeName)
@@ -19,11 +19,20 @@ export default (config: ArrayFactoryConfig): Schema.FieldDefinition<'array'> => 
     name: arrayName,
     title: 'Internationalized array',
     type: 'array',
-    components: {input: InternationalizedArrayInput},
-    options: {languages},
-    // TODO: Address this typing issue with the inner object
+    // TODO: Resolve this typing issue with the outer component
     // @ts-ignore
-    of: [defineField({name: objectName, type: objectName})],
+    components: {
+      input: InternationalizedArray,
+    },
+    options: {languages},
+    // TODO: Resolve this typing issue with the inner object
+    // @ts-ignore
+    of: [
+      defineField({
+        name: objectName,
+        type: objectName,
+      }),
+    ],
     validation: (rule: Rule) =>
       rule.max(languages?.length).custom<Value[]>((value, context) => {
         const {languages: contextLanguages}: {languages: Language[]} = context?.type?.options ?? {}

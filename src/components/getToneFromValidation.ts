@@ -1,9 +1,9 @@
-import {NodeValidation} from 'sanity/form'
 import {CardTone} from '@sanity/ui'
+import {FormNodeValidation} from 'sanity'
 
-export function getToneFromValidation(validations: NodeValidation[]): CardTone {
-  if (!validations.length) {
-    return `default`
+export function getToneFromValidation(validations: FormNodeValidation[]): CardTone | undefined {
+  if (!validations?.length) {
+    return undefined
   }
 
   const validationLevels = validations.map((v) => v.level)
@@ -14,5 +14,5 @@ export function getToneFromValidation(validations: NodeValidation[]): CardTone {
     return `caution`
   }
 
-  return `default`
+  return undefined
 }
