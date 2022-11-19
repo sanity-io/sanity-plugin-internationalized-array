@@ -17,7 +17,7 @@ npm install --save sanity-plugin-internationalized-array
 or
 
 ```
-yarn add sanity-plugin-internationalized-array-v3
+yarn add sanity-plugin-internationalized-array
 ```
 
 ## Usage (simple)
