@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.3.0...v1.3.1) (2022-11-19)
+
+### Bug Fixes
+
+- render 'value' inputs without title ([7e55384](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/7e55384ebe9ec536b4cf2de67b7495d6e2f578de))
+
 ## [1.3.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.2.0...v1.3.0) (2022-11-19)
 
 ### Features
