@@ -36,5 +36,11 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
         : // Pass in the configured options, but overwrite the name
           {...type, name: 'value'},
     ],
+    preview: {
+      select: {
+        title: 'value',
+        subtitle: '_key',
+      },
+    },
   })
 }
