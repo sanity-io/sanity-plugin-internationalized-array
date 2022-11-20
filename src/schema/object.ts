@@ -28,10 +28,12 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     // @ts-ignore
     fields: [
       typeof type === `string`
-        ? // Define a basic field if all we have is the string name
+        ? // Define a simple field if all we have is the name as a string
           defineField({
             name: 'value',
-            type: 'string',
+            type,
+            // TODO: Address this typing issue with components on a dynamic `type`
+            // @ts-ignore
             components: {
               // TODO: Address this typing issue with the inner object
               // @ts-ignore

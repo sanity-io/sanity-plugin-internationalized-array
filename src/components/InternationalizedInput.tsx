@@ -57,9 +57,9 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
 
   return (
     <Card tone={getToneFromValidation(validation)}>
-      <Flex align="flex-end" gap={1}>
+      <Flex align="center" gap={2}>
         <Card tone="inherit">
-          <Box paddingY={3} paddingRight={2}>
+          <Box>
             {keyIsValid ? (
               <Label muted size={1}>
                 {value._key}
@@ -72,7 +72,6 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
                   <Menu>
                     {languages.map((language) => (
                       <MenuItem
-                        // TODO: Prevent changing to a key that already exists in the array
                         disabled={languageKeysInUse.includes(language.id)}
                         fontSize={1}
                         key={language.id}
@@ -89,7 +88,7 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
           </Box>
         </Card>
 
-        <Card paddingRight={2} flex={1} tone="inherit">
+        <Card flex={1} tone="inherit">
           {props.inputProps.renderInput(props.inputProps)}
         </Card>
 
