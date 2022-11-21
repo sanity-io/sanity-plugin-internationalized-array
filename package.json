@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-internationalized-array",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Store localized fields in an array to save on attributes",
   "keywords": [
     "sanity",
