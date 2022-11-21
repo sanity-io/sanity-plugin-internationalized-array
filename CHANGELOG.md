@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.3.1...v1.3.2) (2022-11-21)
+
+### Bug Fixes
+
+- render reference value as a preview ([af2f2c5](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/af2f2c5df1b059c4b520377174cb2c49b943e9f7))
+
 ## [1.3.1](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.3.0...v1.3.1) (2022-11-19)
 
 ### Bug Fixes
