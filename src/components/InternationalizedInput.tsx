@@ -2,7 +2,7 @@ import {ObjectItemProps, useFormValue} from 'sanity'
 import React, {useCallback, useMemo} from 'react'
 import {unset, set} from 'sanity'
 import {Button, Flex, Label, MenuButton, Menu, MenuItem, Card, Spinner, Stack} from '@sanity/ui'
-import {RemoveIcon} from '@sanity/icons'
+import {RemoveCircleIcon} from '@sanity/icons'
 
 import {getToneFromValidation} from './getToneFromValidation'
 import {LanguageContext} from './languageContext'
@@ -91,8 +91,8 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
 
           <Card tone="inherit">
             <Button
-              mode="ghost"
-              icon={RemoveIcon}
+              mode="bleed"
+              icon={RemoveCircleIcon}
               tone="critical"
               disabled={readOnly}
               onClick={handleUnset}
