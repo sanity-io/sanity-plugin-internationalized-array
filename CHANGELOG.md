@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.4.0...v1.4.1) (2022-11-25)
+
+### Bug Fixes
+
+- change 'remove' button ([f4e9de8](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/f4e9de863a3f3c2c0a25d81f64357c3422892902))
+
 ## [1.4.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.3.3...v1.4.0) (2022-11-25)
 
 ### Features
