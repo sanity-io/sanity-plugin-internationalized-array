@@ -25,12 +25,13 @@ export type Value = {
 }
 
 export type PluginConfig = {
-  languages: Language[]
+  // array of languages or async function that returns array of languages
+  languages: Language[] | (() => Promise<Language[]>)
   fieldTypes: (string | RuleTypeConstraint)[]
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
   options: {
-    languages: Language[]
+    languages: Language[] | (() => Promise<Language[]>)
   }
 }

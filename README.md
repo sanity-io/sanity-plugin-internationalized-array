@@ -20,7 +20,7 @@ or
 yarn add sanity-plugin-internationalized-array
 ```
 
-## Usage (simple)
+## Usage for simple field types
 
 Add it as a plugin in sanity.config.ts (or .js):
 
@@ -56,7 +56,27 @@ defineField({
 }),
 ```
 
-## Usage (advanced)
+## Loading languages
+
+Languages must be an array of objects with an `id` and `title`.
+
+```ts
+languages: [
+  {id: 'en', title: 'English'},
+  {id: 'fr', title: 'French'}
+],
+```
+
+Or an asynchronous function that returns an array of objects with an `id` and `title`.
+
+```ts
+languages: async () => {
+  const response = await fetch('https://example.com/languages')
+  return response.json()
+}
+```
+
+## Using more complex field types
 
 For more control over the `value` field, you can pass a schema definition into the `fieldTypes` array.
 

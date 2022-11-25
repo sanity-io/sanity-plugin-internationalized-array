@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react'
+import React, {useCallback, useEffect, useMemo} from 'react'
 import {
   insert,
   set,
@@ -7,11 +7,13 @@ import {
   ArrayOfObjectsItem,
   ArrayOfObjectsInputProps,
 } from 'sanity'
-import {Button, Grid, Stack, useToast} from '@sanity/ui'
-import {AddIcon, RestoreIcon} from '@sanity/icons'
+import {Button, Grid, Spinner, Stack, useToast} from '@sanity/ui'
+import {AddIcon} from '@sanity/icons'
 
 import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
 import Feedback from './Feedback'
+// TODO: Move this provider to the root component
+import {LanguageProvider} from './languageContext'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
@@ -24,10 +26,28 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
   const {options} = schemaType
   const toast = useToast()
 
-  const languages: Language[] = useMemo(() => options?.languages ?? [], [options])
+  const [languages, setLanguages] = React.useState<Language[] | null>(
+    Array.isArray(options.languages) ? options.languages : null
+  )
+  // Resolve async languages
+  useEffect(() => {
+    async function resolveLanguages() {
+      const resolvedLanguages = Array.isArray(options.languages)
+        ? options.languages
+        : await options.languages()
+      setLanguages(resolvedLanguages)
+    }
+    if (!languages && !Array.isArray(options?.languages)) {
+      resolveLanguages()
+    }
+  }, [languages, options])
 
   const handleAddLanguage = useCallback(
     (languageId?: string) => {
+      if (!languages?.length) {
+        return
+      }
+
       const itemBase = {_type: `${schemaType.name}Value`}
 
       // Create new items
@@ -73,12 +93,12 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
 
       onChange([setIfMissing([]), ...insertions])
     },
-    [languages, onChange, value]
+    [languages, onChange, schemaType.name, value]
   )
 
   // TODO: This is lazy, reordering and re-setting the whole array – it could be surgical
   const handleRestoreOrder = useCallback(() => {
-    if (!value?.length) {
+    if (!value?.length || !languages?.length) {
       return
     }
 
@@ -107,13 +127,24 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
   }, [toast, languages, onChange, value])
 
   const allKeysAreLanguages = useMemo(() => {
+    if (!value?.length || !languages?.length) {
+      return true
+    }
+
     return value?.every((v) => languages.find((l) => l?.id === v?._key))
   }, [value, languages])
 
   // Check languages are in the correct order
-  const languagesInUse = languages.filter((l) => value?.find((v) => v._key === l.id))
+  const languagesInUse = useMemo(
+    () =>
+      languages && languages.length > 1
+        ? languages.filter((l) => value?.find((v) => v._key === l.id))
+        : [],
+    [languages, value]
+  )
+
   const languagesOutOfOrder = useMemo(() => {
-    if (!value?.length) {
+    if (!value?.length || !languagesInUse.length) {
       return []
     }
 
@@ -128,76 +159,98 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
     [languages]
   )
 
+  useEffect(() => {
+    if (languagesOutOfOrder.length > 0 && allKeysAreLanguages) {
+      handleRestoreOrder()
+    }
+  }, [languagesOutOfOrder, allKeysAreLanguages, handleRestoreOrder])
+
   if (!languagesAreValid) {
     return <Feedback />
   }
 
+  if (!languages) {
+    return <Spinner />
+  }
+
   return (
-    <Stack space={2}>
-      {members?.length > 0 ? (
-        <>
-          {/* TODO: Resolve type for ArrayOfObjectsItemMember */}
-          {/* @ts-ignore */}
-          {members.map((member: ArrayOfObjectsItemMember) => {
-            if (member.kind === 'item') {
-              return (
-                <ArrayOfObjectsItem
-                  key={member.key}
-                  member={member}
-                  renderItem={props.renderItem}
-                  renderField={props.renderField}
-                  renderInput={props.renderInput}
-                  renderPreview={props.renderPreview}
-                />
-              )
-            }
+    <LanguageProvider value={{languages}}>
+      <Stack space={2}>
+        {members?.length > 0 ? (
+          <>
+            {/* TODO: Resolve type for ArrayOfObjectsItemMember */}
+            {/* @ts-ignore */}
+            {members.map((member: ArrayOfObjectsItemMember) => {
+              if (member.kind === 'item') {
+                return (
+                  <ArrayOfObjectsItem
+                    key={member.key}
+                    member={member}
+                    renderItem={props.renderItem}
+                    renderField={props.renderField}
+                    renderInput={props.renderInput}
+                    renderPreview={props.renderPreview}
+                  />
+                )
+              }
 
-            return null
-          })}
-        </>
-      ) : null}
-      {languagesOutOfOrder.length > 0 && allKeysAreLanguages ? (
-        <Button
-          tone="caution"
-          icon={RestoreIcon}
-          onClick={() => handleRestoreOrder()}
-          text="Restore order of languages"
-        />
-      ) : null}
+              return null
+            })}
+          </>
+        ) : null}
 
-      {/* Show buttons if languages are configured */}
-      {/* Hide them once languages have values */}
-      {languages?.length > 0 && languagesInUse.length < languages.length ? (
-        <Stack space={2}>
-          {/* No more than 5 columns */}
-          <Grid columns={Math.min(languages.length, 5)} gap={2}>
-            {languages.map((language) => (
-              <Button
-                key={language.id}
-                tone="primary"
-                mode="ghost"
-                fontSize={1}
-                disabled={readOnly || Boolean(value?.find((item) => item._key === language.id))}
-                text={language.id.toUpperCase()}
-                icon={AddIcon}
-                onClick={() => handleAddLanguage(language.id)}
-              />
-            ))}
-          </Grid>
+        {/* This now happens automatically */}
+        {/* {languagesOutOfOrder.length > 0 && allKeysAreLanguages ? (
           <Button
-            tone="primary"
-            mode="ghost"
-            disabled={readOnly || (value && value?.length >= languages?.length)}
-            icon={AddIcon}
-            text={
-              value?.length
-                ? `Add missing ${languages.length - value.length === 1 ? `language` : `languages`}`
-                : `Add all languages`
-            }
-            onClick={() => handleAddLanguage()}
+            tone="caution"
+            icon={RestoreIcon}
+            onClick={() => handleRestoreOrder()}
+            text="Restore order of languages"
           />
-        </Stack>
-      ) : null}
-    </Stack>
+        ) : null} */}
+
+        {/* Show buttons if languages are configured */}
+        {/* Hide them if all languages have values */}
+        {languages?.length > 0 && languagesInUse.length < languages.length ? (
+          <Stack space={2}>
+            {/* Hide language-specific buttons if there's only one */}
+            {/* No more than 5 columns */}
+            {languages.length > 1 ? (
+              <Grid columns={Math.min(languages.length, 5)} gap={2}>
+                {languages.map((language) => (
+                  <Button
+                    key={language.id}
+                    tone="primary"
+                    mode="ghost"
+                    fontSize={1}
+                    disabled={readOnly || Boolean(value?.find((item) => item._key === language.id))}
+                    text={language.id.toUpperCase()}
+                    icon={AddIcon}
+                    onClick={() => handleAddLanguage(language.id)}
+                  />
+                ))}
+              </Grid>
+            ) : null}
+            <Button
+              tone="primary"
+              mode="ghost"
+              disabled={readOnly || (value && value?.length >= languages?.length)}
+              icon={AddIcon}
+              text={
+                // eslint-disable-next-line no-nested-ternary
+                value?.length
+                  ? `Add missing ${
+                      languages.length - value.length === 1 ? `language` : `languages`
+                    }`
+                  : languages.length === 1
+                  ? `Add ${languages[0].title} Field`
+                  : `Add all languages`
+              }
+              onClick={() => handleAddLanguage()}
+            />
+          </Stack>
+        ) : null}
+      </Stack>
+    </LanguageProvider>
   )
 }

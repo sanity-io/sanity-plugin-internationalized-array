@@ -1,11 +1,11 @@
 import {ObjectItemProps, useFormValue} from 'sanity'
 import React, {useCallback, useMemo} from 'react'
 import {unset, set} from 'sanity'
-import {Box, Button, Flex, Label, MenuButton, Menu, MenuItem, Card} from '@sanity/ui'
+import {Button, Flex, Label, MenuButton, Menu, MenuItem, Card, Spinner, Stack} from '@sanity/ui'
 import {RemoveIcon} from '@sanity/icons'
 
-import {Language} from '../types'
 import {getToneFromValidation} from './getToneFromValidation'
+import {LanguageContext} from './languageContext'
 
 type InternationalizedValue = {
   _type: string
@@ -28,20 +28,15 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  // TODO: fix TS support for overloading options
-  const languages: Language[] = useMemo(
-    // @ts-ignore
-    () => props?.parentSchemaType?.options?.languages ?? [],
-    // @ts-ignore
-    [props?.parentSchemaType?.options?.languages]
-  )
+  const {languages} = React.useContext(LanguageContext)
+
   const languageKeysInUse = useMemo(() => parentValue?.map((v) => v._key) ?? [], [parentValue])
-  const keyIsValid = languages.find((l) => l.id === value._key)
+  const keyIsValid = languages?.length ? languages.find((l) => l.id === value._key) : false
 
   // Changes the key of this item, ideally to a valid language
   const handleKeyChange = useCallback(
     (languageId: string) => {
-      if (!value || !languages.find((l) => l.id === languageId)) {
+      if (!value || !languages?.length || !languages.find((l) => l.id === languageId)) {
         return
       }
 
@@ -55,53 +50,56 @@ export default function InternationalizedInput(props: ObjectItemProps<Internatio
     onChange(unset())
   }, [onChange])
 
+  if (!languages) {
+    return <Spinner />
+  }
+
   return (
-    <Card tone={getToneFromValidation(validation)}>
-      <Flex align="center" gap={2}>
+    <Card paddingTop={2} tone={getToneFromValidation(validation)}>
+      <Stack space={2}>
         <Card tone="inherit">
-          <Box>
-            {keyIsValid ? (
-              <Label muted size={1}>
-                {value._key}
-              </Label>
-            ) : (
-              <MenuButton
-                button={<Button fontSize={1} text={`Change "${value._key}"`} />}
-                id={`${value._key}-change-key`}
-                menu={
-                  <Menu>
-                    {languages.map((language) => (
-                      <MenuItem
-                        disabled={languageKeysInUse.includes(language.id)}
-                        fontSize={1}
-                        key={language.id}
-                        text={language.id.toLocaleUpperCase()}
-                        onClick={() => handleKeyChange(language.id)}
-                      />
-                    ))}
-                  </Menu>
-                }
-                placement="right"
-                popover={{portal: true}}
-              />
-            )}
-          </Box>
+          {keyIsValid ? (
+            <Label muted size={1}>
+              {value._key}
+            </Label>
+          ) : (
+            <MenuButton
+              button={<Button fontSize={1} text={`Change "${value._key}"`} />}
+              id={`${value._key}-change-key`}
+              menu={
+                <Menu>
+                  {languages.map((language) => (
+                    <MenuItem
+                      disabled={languageKeysInUse.includes(language.id)}
+                      fontSize={1}
+                      key={language.id}
+                      text={language.id.toLocaleUpperCase()}
+                      onClick={() => handleKeyChange(language.id)}
+                    />
+                  ))}
+                </Menu>
+              }
+              placement="right"
+              popover={{portal: true}}
+            />
+          )}
         </Card>
+        <Flex align="center" gap={2}>
+          <Card flex={1} tone="inherit">
+            {props.inputProps.renderInput(props.inputProps)}
+          </Card>
 
-        <Card flex={1} tone="inherit">
-          {props.inputProps.renderInput(props.inputProps)}
-        </Card>
-
-        <Card tone="inherit">
-          <Button
-            mode="ghost"
-            icon={RemoveIcon}
-            tone="critical"
-            disabled={readOnly}
-            onClick={handleUnset}
-          />
-        </Card>
-      </Flex>
+          <Card tone="inherit">
+            <Button
+              mode="ghost"
+              icon={RemoveIcon}
+              tone="critical"
+              disabled={readOnly}
+              onClick={handleUnset}
+            />
+          </Card>
+        </Flex>
+      </Stack>
     </Card>
   )
 }

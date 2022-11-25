@@ -5,7 +5,7 @@ import InternationalizedArray from '../components/InternationalizedArray'
 import {Language, Value} from '../types'
 
 type ArrayFactoryConfig = {
-  languages: Language[]
+  languages: Language[] | (() => Promise<Language[]>)
   type: string | FieldDefinition
 }
 
@@ -34,8 +34,21 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
       }),
     ],
     validation: (rule: Rule) =>
-      rule.max(languages?.length).custom<Value[]>((value, context) => {
-        const {languages: contextLanguages}: {languages: Language[]} = context?.type?.options ?? {}
+      rule.custom<Value[]>(async (value, context) => {
+        if (!value) {
+          return true
+        }
+
+        const contextLanguages: Language[] = Array.isArray(context?.type?.options?.languages)
+          ? context?.type?.options.languages
+          : await context?.type?.options.languages()
+
+        if (value && value.length > contextLanguages.length) {
+          return `Cannot be more than ${
+            contextLanguages.length === 1 ? `1 item` : `${contextLanguages.length} items`
+          }`
+        }
+
         const nonLanguageKeys = value?.length
           ? value.filter((item) => !contextLanguages.find((language) => item._key === language.id))
           : []
