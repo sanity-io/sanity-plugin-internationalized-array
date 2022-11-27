@@ -1,7 +1,7 @@
-import {Rule, ArraySchemaType, RuleTypeConstraint} from 'sanity'
+import type {Rule, ArraySchemaType, RuleTypeConstraint, SanityClient} from 'sanity'
 
 export type Language = {
-  id: string
+  id: Intl.UnicodeBCP47LocaleIdentifier
   title: string
 }
 
@@ -25,13 +25,68 @@ export type Value = {
 }
 
 export type PluginConfig = {
-  // array of languages or async function that returns array of languages
-  languages: Language[] | (() => Promise<Language[]>)
+  /**
+   * https://www.sanity.io/docs/api-versioning
+   * @defaultValue '2022-11-27'
+   */
+  apiVersion?: string
+  /**
+   * You can give it an array of language definitions:
+   * ```tsx
+   * {
+   *   languages: [
+   *     {id: 'en', title: 'English'},
+   *     {id: 'fr', title: 'French'}
+   *   ]
+   * }
+   * ```
+   * You can load them async by passing a function that returns a promise:
+   * ```tsx
+   * {
+   *   languages: async () => {
+   *     const response = await fetch('https://example.com/languages')
+   *     return response.json()
+   *   }
+   * }
+   * ```
+   * You can query your dataset for languages::
+   * ```tsx
+   * {
+   *   languages: (client) =>
+   *     query.fetch(groq`*[_type == "language"]{id,title}`)
+   * }
+   * ```
+   */
+  languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
+  /**
+   * Can be a string matching core field types, as well as custom ones:
+   * ```tsx
+   * {
+   *   fieldTypes: [
+   *     "date", "datetime", "file", "image", "number", "string", "text", "url"
+   *   ]
+   * }
+   * ```
+   * You can also define a type directly:
+   * ```tsx
+   * {
+   *   fieldTypes: [
+   *     defineField({
+   *       name: 'featuredProduct',
+   *       type: 'reference',
+   *       to: [{type: 'product'}]
+   *       hidden: (({document}) => !document?.title)
+   *     })
+   *   ]
+   * }
+   * ```
+   */
   fieldTypes: (string | RuleTypeConstraint)[]
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
   options: {
-    languages: Language[] | (() => Promise<Language[]>)
+    languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
+    apiVersion: string
   }
 }

@@ -1,16 +1,19 @@
-import {defineField, FieldDefinition, Rule} from 'sanity'
+/* eslint-disable no-nested-ternary */
+import {defineField, type FieldDefinition, type Rule, type SanityClient} from 'sanity'
+import {peek} from '../cache'
 
 import {createFieldName} from '../components/createFieldName'
 import InternationalizedArray from '../components/InternationalizedArray'
 import {Language, Value} from '../types'
 
 type ArrayFactoryConfig = {
-  languages: Language[] | (() => Promise<Language[]>)
+  apiVersion: string
+  languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
   type: string | FieldDefinition
 }
 
 export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
-  const {languages, type} = config
+  const {apiVersion, languages, type} = config
   const typeName = typeof type === `string` ? type : type.name
   const arrayName = createFieldName(typeName)
   const objectName = createFieldName(typeName, true)
@@ -24,11 +27,12 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     components: {
       input: InternationalizedArray,
     },
-    options: {languages},
+    options: {apiVersion, languages},
     // TODO: Resolve this typing issue with the inner object
     // @ts-ignore
     of: [
       defineField({
+        ...(typeof type === 'string' ? {} : type),
         name: objectName,
         type: objectName,
       }),
@@ -39,9 +43,12 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
           return true
         }
 
+        const client = context.getClient({apiVersion})
         const contextLanguages: Language[] = Array.isArray(context?.type?.options?.languages)
-          ? context?.type?.options.languages
-          : await context?.type?.options.languages()
+          ? context!.type!.options.languages
+          : Array.isArray(peek())
+          ? peek()
+          : await context?.type?.options.languages(client)
 
         if (value && value.length > contextLanguages.length) {
           return `Cannot be more than ${

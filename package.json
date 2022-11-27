@@ -50,6 +50,7 @@
     "@sanity/icons": "^2.0.0",
     "@sanity/incompatible-plugin": "^1.0.4",
     "@sanity/ui": "^1.0.0",
+    "suspend-react": "^0.0.8"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
