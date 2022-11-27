@@ -49,7 +49,6 @@
   "dependencies": {
     "@sanity/icons": "^2.0.0",
     "@sanity/incompatible-plugin": "^1.0.4",
-    "styled-components": "^5.3.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
@@ -74,12 +73,14 @@
     "react": "^18",
     "rimraf": "^3.0.2",
     "sanity": "3.0.0-rc.3",
+    "styled-components": "^5.3.6",
     "typescript": "^4.9.3"
   },
   "peerDependencies": {
     "@sanity/ui": "1.0.0-beta.32",
     "react": "^18",
     "sanity": "dev-preview || 3.0.0-rc.2"
+    "styled-components": "^5.2"
   },
   "engines": {
     "node": ">=14"
