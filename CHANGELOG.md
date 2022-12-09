@@ -5,6 +5,22 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.4.1...v1.5.0) (2022-12-09)
+
+### Features
+
+- use suspense for data fetching ([72de31b](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/72de31bfc3de28c56b905e98754c154187f0f760))
+
+### Bug Fixes
+
+- `@sanity/ui` should be a regular dep ([9507a30](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/9507a30a600a345359829b301ad7250163d9be49))
+- add `clear` export from `cache` ([b706cc8](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/b706cc8072d478d3dfe2ed13adc926ae42a9f1a5))
+- add all exports ([cf537e7](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/cf537e770696f81f3bc8d6eca86fb8ec12471371))
+- bump dependencies ([c20cd24](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/c20cd24cb2de44cc18054a2c494f25531288731f))
+- preload the language list fetching ([9a1f8f4](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/9a1f8f426bd7bb0906332098b97befbd8ea1c324))
+- styled-components should be a peer dep ([c48b310](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/c48b310f1424bedf038027a737f9f302354772a5))
+- update semver range for `sanity` ([69a4441](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/69a44412f207414e847074ce3dfa8fd81594f346))
+
 ## [1.4.1](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.4.0...v1.4.1) (2022-11-25)
 
 ### Bug Fixes
