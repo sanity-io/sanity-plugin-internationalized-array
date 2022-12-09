@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react'
+import React, {Fragment, useCallback, useEffect, useMemo} from 'react'
 import {
   insert,
   set,
@@ -6,14 +6,17 @@ import {
   ArrayOfObjectsItemMember,
   ArrayOfObjectsItem,
   ArrayOfObjectsInputProps,
+  useClient,
 } from 'sanity'
-import {Button, Grid, Spinner, Stack, useToast} from '@sanity/ui'
+import {Button, Grid, Stack, useToast} from '@sanity/ui'
 import {AddIcon} from '@sanity/icons'
+import {suspend} from 'suspend-react'
 
-import {Language, Value, ArraySchemaWithLanguageOptions} from '../types'
+import type {Value, ArraySchemaWithLanguageOptions} from '../types'
 import Feedback from './Feedback'
 // TODO: Move this provider to the root component
 import {LanguageProvider} from './languageContext'
+import {namespace, version} from '../cache'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
@@ -26,21 +29,17 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
   const {options} = schemaType
   const toast = useToast()
 
-  const [languages, setLanguages] = React.useState<Language[] | null>(
-    Array.isArray(options.languages) ? options.languages : null
-  )
-  // Resolve async languages
-  useEffect(() => {
-    async function resolveLanguages() {
-      const resolvedLanguages = Array.isArray(options.languages)
-        ? options.languages
-        : await options.languages()
-      setLanguages(resolvedLanguages)
-    }
-    if (!languages && !Array.isArray(options?.languages)) {
-      resolveLanguages()
-    }
-  }, [languages, options])
+  const {apiVersion} = options
+  const client = useClient({apiVersion})
+  const languages = Array.isArray(options.languages)
+    ? options.languages
+    : // eslint-disable-next-line require-await
+      suspend(async () => {
+        if (typeof options.languages === 'function') {
+          return options.languages(client)
+        }
+        return options.languages
+      }, [version, namespace])
 
   const handleAddLanguage = useCallback(
     (languageId?: string) => {
@@ -167,10 +166,6 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
 
   if (!languagesAreValid) {
     return <Feedback />
-  }
-
-  if (!languages) {
-    return <Spinner />
   }
 
   return (
