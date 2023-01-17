@@ -1,4 +1,4 @@
-import type {Rule, ArraySchemaType, RuleTypeConstraint, SanityClient} from 'sanity'
+import type {Rule, ArraySchemaType, RuleTypeConstraint, SanityClient, FieldDefinition} from 'sanity'
 
 export type Language = {
   id: Intl.UnicodeBCP47LocaleIdentifier
@@ -81,7 +81,7 @@ export type PluginConfig = {
    * }
    * ```
    */
-  fieldTypes: (string | RuleTypeConstraint)[]
+  fieldTypes: (string | RuleTypeConstraint | FieldDefinition)[]
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
