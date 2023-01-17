@@ -1,19 +1,20 @@
 /* eslint-disable no-nested-ternary */
-import {defineField, type FieldDefinition, type Rule, type SanityClient} from 'sanity'
+import {defineField, type FieldDefinition, type Rule} from 'sanity'
 import {peek} from '../cache'
 
 import {createFieldName} from '../components/createFieldName'
 import InternationalizedArray from '../components/InternationalizedArray'
-import {Language, Value} from '../types'
+import {Language, LanguageCallback, Value} from '../types'
 
 type ArrayFactoryConfig = {
   apiVersion: string
-  languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
+  select?: Record<string, string>
+  languages: Language[] | LanguageCallback
   type: string | FieldDefinition
 }
 
 export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
-  const {apiVersion, languages, type} = config
+  const {apiVersion, select, languages, type} = config
   const typeName = typeof type === `string` ? type : type.name
   const arrayName = createFieldName(typeName)
   const objectName = createFieldName(typeName, true)
@@ -27,7 +28,7 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     components: {
       input: InternationalizedArray,
     },
-    options: {apiVersion, languages},
+    options: {apiVersion, select, languages},
     // TODO: Resolve this typing issue with the inner object
     // @ts-ignore
     of: [

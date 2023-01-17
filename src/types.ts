@@ -24,12 +24,30 @@ export type Value = {
   value?: string
 }
 
+export type LanguageCallback = (
+  client: SanityClient,
+  selectedValue: Record<string, unknown>
+) => Promise<Language[]>
+
 export type PluginConfig = {
   /**
    * https://www.sanity.io/docs/api-versioning
    * @defaultValue '2022-11-27'
    */
   apiVersion?: string
+  /**
+   * Specify fields that should be available in the language callback:
+   * ```tsx
+   * {
+   *   select: {
+   *     markets: 'markets'
+   *   },
+   *   languages: (client, {markets}) =>
+   *     query.fetch(groq`*[_type == "language" && market in $markets]{id,title}`, {markets})
+   * }
+   * ```
+   */
+  select?: Record<string, string>
   /**
    * You can give it an array of language definitions:
    * ```tsx
@@ -57,7 +75,7 @@ export type PluginConfig = {
    * }
    * ```
    */
-  languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
+  languages: Language[] | LanguageCallback
   /**
    * Can be a string matching core field types, as well as custom ones:
    * ```tsx
@@ -86,7 +104,8 @@ export type PluginConfig = {
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
   options: {
-    languages: Language[] | ((client: SanityClient) => Promise<Language[]>)
+    select?: Record<string, string>
+    languages: Language[] | LanguageCallback
     apiVersion: string
   }
 }
