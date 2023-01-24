@@ -15,4 +15,5 @@ export const preload = (fn: () => Promise<Language[]>) =>
 export const clear = () => suspend.clear([version, namespace])
 
 // https://github.com/pmndrs/suspend-react#peeking-into-entries-outside-of-suspense
-export const peek = () => suspend.peek([version, namespace]) as Language[] | undefined
+export const peek = (selectedValue: Record<string, unknown>) =>
+  suspend.peek([version, namespace, selectedValue]) as Language[] | undefined

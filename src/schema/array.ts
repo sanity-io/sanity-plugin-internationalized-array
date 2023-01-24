@@ -3,6 +3,7 @@ import {defineField, type FieldDefinition, type Rule} from 'sanity'
 import {peek} from '../cache'
 
 import {createFieldName} from '../components/createFieldName'
+import {getSelectedValue} from '../components/getSelectedValue'
 import InternationalizedArray from '../components/InternationalizedArray'
 import {Language, LanguageCallback, Value} from '../types'
 
@@ -44,12 +45,13 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
           return true
         }
 
+        const selectedValue = getSelectedValue(select, context.document)
         const client = context.getClient({apiVersion})
         const contextLanguages: Language[] = Array.isArray(context?.type?.options?.languages)
           ? context!.type!.options.languages
-          : Array.isArray(peek())
-          ? peek()
-          : await context?.type?.options.languages(client)
+          : Array.isArray(peek(selectedValue))
+          ? peek(selectedValue)
+          : await context?.type?.options.languages(client, selectedValue)
 
         if (value && value.length > contextLanguages.length) {
           return `Cannot be more than ${

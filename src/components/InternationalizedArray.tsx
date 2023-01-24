@@ -8,14 +8,10 @@ import {
   ArrayOfObjectsInputProps,
   useClient,
   useFormBuilder,
-  SchemaType,
-  ObjectFieldType,
-  Reference,
 } from 'sanity'
 import {Button, Grid, Stack, useToast} from '@sanity/ui'
 import {AddIcon} from '@sanity/icons'
 import {suspend} from 'suspend-react'
-import {get} from 'lodash'
 import equal from 'fast-deep-equal'
 
 import type {Value, ArraySchemaWithLanguageOptions} from '../types'
@@ -23,44 +19,20 @@ import Feedback from './Feedback'
 // TODO: Move this provider to the root component
 import {LanguageProvider} from './languageContext'
 import {namespace, version} from '../cache'
+import {getSelectedValue} from './getSelectedValue'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
   ArraySchemaWithLanguageOptions
 >
 
-const isReferenceArray = (schemaType: ObjectFieldType<SchemaType>) => {
-  return (
-    schemaType.type?.type?.name === 'array' &&
-    'of' in schemaType?.type &&
-    schemaType.type?.of.some((item) => item.type?.name === 'reference')
-  )
-}
-
 export default function InternationalizedArray(props: InternationalizedArrayProps) {
   const {members, value, schemaType, onChange} = props
   const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
   const toast = useToast()
-  const {schemaType: documentSchemaType, value: document} = useFormBuilder()
-
-  const selection: Record<string, string> = options.select || {}
-  const targetKeys = Object.keys(selection)
-  const selectedValue = targetKeys.reduce<Record<string, unknown>>((acc, key) => {
-    // Find the field the value belongs to
-    const typeWithFields = 'fields' in documentSchemaType ? documentSchemaType : null
-    const targetFieldName = selection[key]
-    const valueField = typeWithFields?.fields?.find((f) => f.name === targetFieldName)
-
-    if (valueField?.type && isReferenceArray(valueField?.type)) {
-      // Filter out empty values from a reference array.
-      // Prevents refetching languages when no reference is (yet) selected.
-      acc[key] = (get(document, selection[key]) as Reference[])?.filter((item) => item._ref)
-    } else {
-      acc[key] = get(document, selection[key])
-    }
-    return acc
-  }, {})
+  const {value: document} = useFormBuilder()
+  const selectedValue = getSelectedValue(options.select, document)
 
   const {apiVersion} = options
   const client = useClient({apiVersion})
