@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react'
+import React, {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
 import {
   insert,
   set,
@@ -32,7 +32,11 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
   const {options} = schemaType
   const toast = useToast()
   const {value: document} = useFormBuilder()
-  const selectedValue = getSelectedValue(options.select, document)
+  const deferredDocument = useDeferredValue(document)
+  const selectedValue = useMemo(
+    () => getSelectedValue(options.select, deferredDocument),
+    [options.select, deferredDocument]
+  )
 
   const {apiVersion} = options
   const client = useClient({apiVersion})
