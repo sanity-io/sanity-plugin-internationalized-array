@@ -1,4 +1,4 @@
-import React, {Fragment, useCallback, useEffect, useMemo} from 'react'
+import React, {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
 import {
   insert,
   set,
@@ -7,16 +7,19 @@ import {
   ArrayOfObjectsItem,
   ArrayOfObjectsInputProps,
   useClient,
+  useFormBuilder,
 } from 'sanity'
 import {Button, Grid, Stack, useToast} from '@sanity/ui'
 import {AddIcon} from '@sanity/icons'
 import {suspend} from 'suspend-react'
+import equal from 'fast-deep-equal'
 
 import type {Value, ArraySchemaWithLanguageOptions} from '../types'
 import Feedback from './Feedback'
 // TODO: Move this provider to the root component
 import {LanguageProvider} from './languageContext'
 import {namespace, version} from '../cache'
+import {getSelectedValue} from './getSelectedValue'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
@@ -28,18 +31,28 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
   const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
   const toast = useToast()
+  const {value: document} = useFormBuilder()
+  const deferredDocument = useDeferredValue(document)
+  const selectedValue = useMemo(
+    () => getSelectedValue(options.select, deferredDocument),
+    [options.select, deferredDocument]
+  )
 
   const {apiVersion} = options
   const client = useClient({apiVersion})
   const languages = Array.isArray(options.languages)
     ? options.languages
-    : // eslint-disable-next-line require-await
-      suspend(async () => {
-        if (typeof options.languages === 'function') {
-          return options.languages(client)
-        }
-        return options.languages
-      }, [version, namespace])
+    : suspend(
+        // eslint-disable-next-line require-await
+        async () => {
+          if (typeof options.languages === 'function') {
+            return options.languages(client, selectedValue)
+          }
+          return options.languages
+        },
+        [version, namespace, selectedValue],
+        {equal}
+      )
 
   const handleAddLanguage = useCallback(
     (languageId?: string) => {
