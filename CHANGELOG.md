@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.5.0...v1.6.0) (2023-01-25)
+
+### Features
+
+- dynamic languages based on document ([#7](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/issues/7)) ([ad9ae61](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/ad9ae6153821cd6f791f0eae23026dfb47ede8c5))
+
 ## [1.5.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.4.1...v1.5.0) (2022-12-09)
 
 ### Features
