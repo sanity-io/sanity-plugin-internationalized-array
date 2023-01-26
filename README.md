@@ -76,6 +76,32 @@ languages: async () => {
 }
 ```
 
+The async function contains a configured Sanity Client in the first parameter, allowing you to store Language options as documents. Your query should return an array of objects with an `id` and `title`.
+
+```ts
+languages: async (client) => {
+  const response = await client.fetch(`*[_type == "language"]{ id, title }`)
+  return response
+},
+```
+
+Additionally, you can "pick" fields from a document, to pass into the query. For example, if you have a concept of "Markets" where only certain language fields are required in certain markets.
+
+In this example, each language document has an array of strings called `markets` to declare where that language can be used. And the document being authored has a single `market` field.
+
+```ts
+select: {
+  market: 'market'
+},
+languages: async (client, {market = ``}) => {
+  const response = await client.fetch(
+    `*[_type == "language" && $market in markets]{ id, title }`,
+    {market}
+  )
+  return response
+},
+```
+
 ## Using more complex field types
 
 For more control over the `value` field, you can pass a schema definition into the `fieldTypes` array.
