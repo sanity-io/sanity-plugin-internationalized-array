@@ -5,6 +5,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.6.0...v1.6.1) (2023-04-13)
+
+### Bug Fixes
+
+- update husky ([8f243b5](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/8f243b52d59b5c4503c71d7ef743831b624fa59d))
+- update semver preset + packages ([4e8d930](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/commit/4e8d930958621c6bc6a1aead6de3e5f0ca5a35e7))
+
 ## [1.6.0](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/compare/v1.5.0...v1.6.0) (2023-01-25)
 
 ### Features
