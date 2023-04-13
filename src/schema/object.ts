@@ -17,26 +17,20 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     name: objectName,
     title: `Internationalized array ${type}`,
     type: 'object',
-    // TODO: Resolve this typing issue with the return type
-    // @ts-ignore
     components: {
-      // TODO: Resolve this typing issue with the outer component
-      // @ts-ignore
       item: InternationalizedInput,
     },
     // TODO: Address this typing issue with the inner object
-    // @ts-ignore
+    // @ts-expect-error
     fields: [
       typeof type === `string`
         ? // Define a simple field if all we have is the name as a string
           defineField({
             name: 'value',
             type,
-            // TODO: Address this typing issue with components on a dynamic `type`
-            // @ts-ignore
             components: {
               // TODO: Address this typing issue with the inner object
-              // @ts-ignore
+              // @ts-expect-error
               field: InternationalizedField,
             },
           })

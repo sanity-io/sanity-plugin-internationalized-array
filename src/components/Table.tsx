@@ -1,6 +1,6 @@
+import {Box, BoxProps, Card, CardProps} from '@sanity/ui'
 import React from 'react'
 import styled, {css} from 'styled-components'
-import {Box, BoxProps, Card, CardProps} from '@sanity/ui'
 
 // Wrappers required because of bug with passing down "as" prop
 // https://github.com/styled-components/styled-components/issues/2449

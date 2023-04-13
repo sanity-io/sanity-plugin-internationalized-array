@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import {defineField, type FieldDefinition, type Rule} from 'sanity'
-import {peek} from '../cache'
 
+import {peek} from '../cache'
 import {createFieldName} from '../components/createFieldName'
 import {getSelectedValue} from '../components/getSelectedValue'
 import InternationalizedArray from '../components/InternationalizedArray'
@@ -24,14 +24,12 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     name: arrayName,
     title: 'Internationalized array',
     type: 'array',
-    // TODO: Resolve this typing issue with the outer component
-    // @ts-ignore
     components: {
       input: InternationalizedArray,
     },
     options: {apiVersion, select, languages},
     // TODO: Resolve this typing issue with the inner object
-    // @ts-ignore
+    // @ts-expect-error
     of: [
       defineField({
         ...(typeof type === 'string' ? {} : type),
@@ -47,7 +45,9 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
 
         const selectedValue = getSelectedValue(select, context.document)
         const client = context.getClient({apiVersion})
-        const contextLanguages: Language[] = Array.isArray(context?.type?.options?.languages)
+        const contextLanguages: Language[] = Array.isArray(
+          context?.type?.options?.languages
+        )
           ? context!.type!.options.languages
           : Array.isArray(peek(selectedValue))
           ? peek(selectedValue)
@@ -55,12 +55,17 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
 
         if (value && value.length > contextLanguages.length) {
           return `Cannot be more than ${
-            contextLanguages.length === 1 ? `1 item` : `${contextLanguages.length} items`
+            contextLanguages.length === 1
+              ? `1 item`
+              : `${contextLanguages.length} items`
           }`
         }
 
         const nonLanguageKeys = value?.length
-          ? value.filter((item) => !contextLanguages.find((language) => item._key === language.id))
+          ? value.filter(
+              (item) =>
+                !contextLanguages.find((language) => item._key === language.id)
+            )
           : []
         if (nonLanguageKeys.length) {
           return {
