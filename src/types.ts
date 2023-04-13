@@ -1,4 +1,10 @@
-import type {Rule, ArraySchemaType, RuleTypeConstraint, SanityClient, FieldDefinition} from 'sanity'
+import type {
+  ArraySchemaType,
+  FieldDefinition,
+  Rule,
+  RuleTypeConstraint,
+  SanityClient,
+} from 'sanity'
 
 export type Language = {
   id: Intl.UnicodeBCP47LocaleIdentifier

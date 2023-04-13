@@ -19,7 +19,9 @@ export const getSelectedValue = (
     if (Array.isArray(value)) {
       // If there are references in the array, ensure they have `_ref` set, otherwise they are considered empty and can safely be ignored
       value = value.filter((item) =>
-        typeof item === 'object' ? item?._type === 'reference' && '_ref' in item : true
+        typeof item === 'object'
+          ? item?._type === 'reference' && '_ref' in item
+          : true
       )
     }
     selectedValue[key] = value

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import * as suspend from 'suspend-react'
+
 import type {Language} from './types'
 
 export const namespace = 'sanity-plugin-internationalized-array'

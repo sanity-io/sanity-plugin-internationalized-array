@@ -1,34 +1,37 @@
-import React, {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
+import {AddIcon} from '@sanity/icons'
+import {Button, Grid, Stack, useToast} from '@sanity/ui'
+import equal from 'fast-deep-equal'
+import {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
 import {
+  ArrayOfObjectsInputProps,
+  ArrayOfObjectsItem,
+  ArrayOfObjectsItemMember,
   insert,
   set,
   setIfMissing,
-  ArrayOfObjectsItemMember,
-  ArrayOfObjectsItem,
-  ArrayOfObjectsInputProps,
   useClient,
   useFormBuilder,
 } from 'sanity'
-import {Button, Grid, Stack, useToast} from '@sanity/ui'
-import {AddIcon} from '@sanity/icons'
 import {suspend} from 'suspend-react'
-import equal from 'fast-deep-equal'
 
-import type {Value, ArraySchemaWithLanguageOptions} from '../types'
+import {namespace, version} from '../cache'
+import type {ArraySchemaWithLanguageOptions, Value} from '../types'
 import Feedback from './Feedback'
+import {getSelectedValue} from './getSelectedValue'
 // TODO: Move this provider to the root component
 import {LanguageProvider} from './languageContext'
-import {namespace, version} from '../cache'
-import {getSelectedValue} from './getSelectedValue'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
   ArraySchemaWithLanguageOptions
 >
 
-export default function InternationalizedArray(props: InternationalizedArrayProps) {
+export default function InternationalizedArray(
+  props: InternationalizedArrayProps
+) {
   const {members, value, schemaType, onChange} = props
-  const readOnly = typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
+  const readOnly =
+    typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
   const toast = useToast()
   const {value: document} = useFormBuilder()
@@ -161,13 +164,16 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
     }
 
     return value
-      .map((v, vIndex) => (vIndex === languagesInUse.findIndex((l) => l.id === v._key) ? null : v))
+      .map((v, vIndex) =>
+        vIndex === languagesInUse.findIndex((l) => l.id === v._key) ? null : v
+      )
       .filter(Boolean)
   }, [value, languagesInUse])
 
   const languagesAreValid = useMemo(
     () =>
-      !languages?.length || (languages?.length && languages.every((item) => item.id && item.title)),
+      !languages?.length ||
+      (languages?.length && languages.every((item) => item.id && item.title)),
     [languages]
   )
 
@@ -231,7 +237,10 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
                     tone="primary"
                     mode="ghost"
                     fontSize={1}
-                    disabled={readOnly || Boolean(value?.find((item) => item._key === language.id))}
+                    disabled={
+                      readOnly ||
+                      Boolean(value?.find((item) => item._key === language.id))
+                    }
                     text={language.id.toUpperCase()}
                     icon={AddIcon}
                     onClick={() => handleAddLanguage(language.id)}
@@ -242,13 +251,17 @@ export default function InternationalizedArray(props: InternationalizedArrayProp
             <Button
               tone="primary"
               mode="ghost"
-              disabled={readOnly || (value && value?.length >= languages?.length)}
+              disabled={
+                readOnly || (value && value?.length >= languages?.length)
+              }
               icon={AddIcon}
               text={
                 // eslint-disable-next-line no-nested-ternary
                 value?.length
                   ? `Add missing ${
-                      languages.length - value.length === 1 ? `language` : `languages`
+                      languages.length - value.length === 1
+                        ? `language`
+                        : `languages`
                     }`
                   : languages.length === 1
                   ? `Add ${languages[0].title} Field`

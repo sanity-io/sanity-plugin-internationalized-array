@@ -1,7 +1,9 @@
 import {CardTone} from '@sanity/ui'
 import {FormNodeValidation} from 'sanity'
 
-export function getToneFromValidation(validations: FormNodeValidation[]): CardTone | undefined {
+export function getToneFromValidation(
+  validations: FormNodeValidation[]
+): CardTone | undefined {
   if (!validations?.length) {
     return undefined
   }
