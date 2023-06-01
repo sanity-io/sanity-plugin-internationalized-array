@@ -6,13 +6,13 @@
     "sanity",
     "sanity-plugin"
   ],
-  "homepage": "https://github.com/SimeonGriggs/sanity-plugin-internationalized-array#readme",
+  "homepage": "https://github.com/sanity-io/sanity-plugin-internationalized-array#readme",
   "bugs": {
-    "url": "https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/issues"
+    "url": "https://github.com/sanity-io/sanity-plugin-internationalized-array/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:SimeonGriggs/sanity-plugin-internationalized-array.git"
+    "url": "git@github.com:sanity-io/sanity-plugin-internationalized-array.git"
   },
   "license": "MIT",
   "author": "Sanity.io <hello@sanity.io>",
