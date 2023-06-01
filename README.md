@@ -1,6 +1,6 @@
 > This is the **Sanity Studio v3 version** of sanity-plugin-internationalized-array.
 >
-> For the v2 version, please refer to the [v2-branch](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/tree/studio-v2).
+> For the v2 version, please refer to the [v2-branch](https://github.com/sanity-io/sanity-plugin-internationalized-array/tree/studio-v2).
 
 # sanity-plugin-internationalized-array
 
@@ -161,7 +161,7 @@ Using GROQ filters you can query for a specific language key like so:
 
 ## Migrate from objects to arrays
 
-[See the migration script](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/blob/main/migrations/transformObjectToArray.js) inside `./migrations/transformObjectToArray.js` of this Repo.
+[See the migration script](https://github.com/sanity-io/sanity-plugin-internationalized-array/blob/main/migrations/transformObjectToArray.js) inside `./migrations/transformObjectToArray.js` of this Repo.
 
 Follow the instructions inside the script and set the `_type` and field name you wish to target.
 
@@ -222,7 +222,7 @@ on how to run this plugin with hotreload in the studio.
 
 ### Release new version
 
-Run ["CI & Release" workflow](https://github.com/SimeonGriggs/sanity-plugin-internationalized-array/actions/workflows/main.yml).
+Run ["CI & Release" workflow](https://github.com/sanity-io/sanity-plugin-internationalized-array/actions/workflows/main.yml).
 Make sure to select the main branch and check "Release new version".
 
 Semantic release will only release on configured branches, so it is safe to run release on any branch.
