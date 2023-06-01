@@ -6,7 +6,7 @@
 
 A helper function that renders a custom input component for writing localized fields of content into an array.
 
-![Screenshot of an internationalized input](./img/screenshot.png)
+![Screenshot of an internationalized input](./img/internationalized-array.png)
 
 ## Installation
 
