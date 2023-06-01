@@ -1,4 +1,3 @@
-import React from 'react'
 import {definePlugin} from 'sanity'
 
 import Preload from './components/Preload'
