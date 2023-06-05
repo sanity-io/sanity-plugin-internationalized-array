@@ -138,6 +138,57 @@ This would also create two new fields in your schema.
 
 Note that the `name` key in the field gets rewritten to `value` and is instead used to name the object field.
 
+## Creating internationalized objects
+
+Due to how fields are created, you cannot use anonymous objects in the `fieldTypes` array. You must register the object type in your Studio's schema as an "alias type".
+
+```ts
+// ./schemas/seoType.ts
+
+import {defineField} from 'sanity'
+
+export const seoType = defineField({
+  name: 'seo',
+  title: 'SEO',
+  type: 'object',
+  fields: [
+    defineField({name: 'title', type: 'string'}),
+    defineField({name: 'description', type: 'string'}),
+  ],
+})
+```
+
+Then in your plugin configuration settings, add the name of your alias type to the `fieldTypes` setting.
+
+```ts
+internationalizedArray({
+  languages: [
+    //...languages
+  ],
+  fieldTypes: ['seo'],
+})
+```
+
+Lastly, add the field to your schema.
+
+```ts
+// ./schemas/post.ts
+
+import {defineField, defineType} from 'sanity'
+
+export default defineType({
+  name: 'post',
+  title: 'Post',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'seo',
+      type: 'internationalizedArraySeo',
+    }),
+  ],
+})
+```
+
 ## Shape of stored data
 
 The custom input contains buttons which will add new array items with the language as the `_key` value. Data returned from this array will look like this:
