@@ -1,12 +1,23 @@
 import {AddIcon} from '@sanity/icons'
 import {Button, Grid, Stack, useToast} from '@sanity/ui'
 import equal from 'fast-deep-equal'
-import {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
 import {
+  MouseEventHandler,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+} from 'react'
+import React from 'react'
+import {
+  ArrayOfObjectsInputMember,
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
   ArrayOfObjectsItemMember,
+  FormInput,
   insert,
+  isArraySchemaType,
+  isObjectSchemaType,
   set,
   setIfMissing,
   useClient,
@@ -41,6 +52,24 @@ export default function InternationalizedArray(
     [options.select, deferredDocument]
   )
 
+  const valueFieldIsPortableTextEditor = useMemo(() => {
+    if (isObjectSchemaType(props.schemaType.of[0].type)) {
+      const valueField = props.schemaType.of[0].type.fields.find(
+        (field) => field.name === 'value'
+      )
+
+      return (
+        valueField &&
+        isArraySchemaType(valueField.type) &&
+        valueField.type.of.find(
+          (field) => field.type && field.type.name === 'block'
+        )
+      )
+    }
+
+    return false
+  }, [props.schemaType.of])
+
   const {apiVersion} = options
   const client = useClient({apiVersion})
   const languages = Array.isArray(options.languages)
@@ -57,12 +86,13 @@ export default function InternationalizedArray(
         {equal}
       )
 
-  const handleAddLanguage = useCallback(
-    (languageId?: string) => {
+  const handleAddLanguage: MouseEventHandler<HTMLButtonElement> = useCallback(
+    (event) => {
       if (!languages?.length) {
         return
       }
 
+      const languageId = event.currentTarget.value
       const itemBase = {_type: `${schemaType.name}Value`}
 
       // Create new items
@@ -111,7 +141,7 @@ export default function InternationalizedArray(
     [languages, onChange, schemaType.name, value]
   )
 
-  // TODO: This is lazy, reordering and re-setting the whole array – it could be surgical
+  // TODO: This is reordering and re-setting the whole array – it could be surgical
   const handleRestoreOrder = useCallback(() => {
     if (!value?.length || !languages?.length) {
       return
@@ -192,19 +222,32 @@ export default function InternationalizedArray(
       <Stack space={2}>
         {members?.length > 0 ? (
           <>
-            {/* TODO: Resolve type for ArrayOfObjectsItemMember */}
-            {/* @ts-ignore */}
-            {members.map((member: ArrayOfObjectsItemMember) => {
+            {members.map((member) => {
               if (member.kind === 'item') {
                 return (
-                  <ArrayOfObjectsItem
-                    key={member.key}
-                    member={member}
-                    renderItem={props.renderItem}
-                    renderField={props.renderField}
-                    renderInput={props.renderInput}
-                    renderPreview={props.renderPreview}
-                  />
+                  <React.Fragment key={member.key}>
+                    {valueFieldIsPortableTextEditor ? (
+                      // <>{props.renderDefault(props)}</>
+                      <>
+                        <ArrayOfObjectsInputMember
+                          member={member}
+                          renderItem={props.renderItem}
+                          renderField={props.renderField}
+                          renderInput={props.renderInput}
+                          renderPreview={props.renderPreview}
+                        />
+                      </>
+                    ) : (
+                      // <div>hey</div>
+                      <ArrayOfObjectsItem
+                        member={member}
+                        renderItem={props.renderItem}
+                        renderField={props.renderField}
+                        renderInput={props.renderInput}
+                        renderPreview={props.renderPreview}
+                      />
+                    )}
+                  </React.Fragment>
                 )
               }
 
@@ -212,16 +255,6 @@ export default function InternationalizedArray(
             })}
           </>
         ) : null}
-
-        {/* This now happens automatically */}
-        {/* {languagesOutOfOrder.length > 0 && allKeysAreLanguages ? (
-          <Button
-            tone="caution"
-            icon={RestoreIcon}
-            onClick={() => handleRestoreOrder()}
-            text="Restore order of languages"
-          />
-        ) : null} */}
 
         {/* Show buttons if languages are configured */}
         {/* Hide them if all languages have values */}
@@ -243,7 +276,8 @@ export default function InternationalizedArray(
                     }
                     text={language.id.toUpperCase()}
                     icon={AddIcon}
-                    onClick={() => handleAddLanguage(language.id)}
+                    value={language.id}
+                    onClick={handleAddLanguage}
                   />
                 ))}
               </Grid>
@@ -267,7 +301,8 @@ export default function InternationalizedArray(
                   ? `Add ${languages[0].title} Field`
                   : `Add all languages`
               }
-              onClick={() => handleAddLanguage()}
+              value=""
+              onClick={handleAddLanguage}
             />
           </Stack>
         ) : null}

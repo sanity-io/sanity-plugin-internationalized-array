@@ -34,7 +34,7 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
               field: InternationalizedField,
             },
           })
-        : // Pass in the configured options, but overwrite the name
+        : // Pass in the configured options, but overwrite the name + components
           {
             ...type,
             name: 'value',

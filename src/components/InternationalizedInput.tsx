@@ -10,8 +10,13 @@ import {
   Spinner,
   Stack,
 } from '@sanity/ui'
-import React, {useCallback, useMemo} from 'react'
-import {ObjectItemProps, useFormValue} from 'sanity'
+import React, {useCallback, useContext, useMemo} from 'react'
+import {
+  FormInput,
+  isObjectSchemaType,
+  ObjectItemProps,
+  useFormValue,
+} from 'sanity'
 import {set, unset} from 'sanity'
 
 import {getToneFromValidation} from './getToneFromValidation'
@@ -20,7 +25,7 @@ import {LanguageContext} from './languageContext'
 type InternationalizedValue = {
   _type: string
   _key: string
-  value: string
+  value: any
 }
 
 export default function InternationalizedInput(
@@ -44,7 +49,7 @@ export default function InternationalizedInput(
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages} = React.useContext(LanguageContext)
+  const {languages} = useContext(LanguageContext)
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -79,6 +84,11 @@ export default function InternationalizedInput(
     return <Spinner />
   }
 
+  const isTestField = [
+    // 'internationalizedArrayStringValue',
+    'internationalizedArrayBlockContentValue',
+  ].includes(props.schemaType.name)
+
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
       <Stack space={2}>
@@ -104,14 +114,39 @@ export default function InternationalizedInput(
                   ))}
                 </Menu>
               }
-              placement="right"
               popover={{portal: true}}
             />
           )}
         </Card>
         <Flex align="center" gap={2}>
           <Card flex={1} tone="inherit">
-            {props.inputProps.renderInput(props.inputProps)}
+            {isTestField &&
+            // isObjectSchemaType(props.schemaType) &&
+            props.inputProps?.members ? (
+              props.inputProps.members.map((member) => {
+                if (member.kind === 'error') {
+                  return null
+                } else if (member.kind === 'fieldSet') {
+                  return null
+                }
+
+                console.log(props)
+
+                return (
+                  <React.Fragment key={member.key}>
+                    {/* <div>FormInput:</div>
+                    <FormInput
+                      {...props}
+                      {...props.inputProps}
+                      absolutePath={member.field.path}
+                    /> */}
+                    <>{props.inputProps.renderInput(props.inputProps)}</>
+                  </React.Fragment>
+                )
+              })
+            ) : (
+              <>{props.inputProps.renderInput(props.inputProps)}</>
+            )}
           </Card>
 
           <Card tone="inherit">
