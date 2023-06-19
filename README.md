@@ -36,6 +36,7 @@ import {internationalizedArray} from 'sanity-plugin-internationalized-array'
         {id: 'en', title: 'English'},
         {id: 'fr', title: 'French'}
       ],
+      defaultLanguages: ['en'],
       fieldTypes: ['string'],
     })
   ]
@@ -46,6 +47,8 @@ This will register two new fields to the schema, based on the settings passed in
 
 - `internationalizedArrayString` an array field of:
 - `internationalizedArrayStringValue` an object field, with a single `string` field inside called `value`
+
+The above config will also create an empty array item in new documents for each language in `defaultLanguages`. This is configured globally for all internationalized array fields.
 
 You can pass in more registered schema-type names to generate more internationalized arrays. Use them in your schema like this:
 
@@ -184,6 +187,58 @@ export default defineType({
     defineField({
       name: 'seo',
       type: 'internationalizedArraySeo',
+    }),
+  ],
+})
+```
+
+## Usage with @sanity/language-filter
+
+If you have many languages and authors that predominately write in only a few, [@sanity/language-filter](https://github.com/sanity-io/language-filter) can be used to reduce the number of language fields shown in the document form.
+
+![Internationalized array field filtered with language-filter](https://github.com/sanity-io/language-filter/assets/9684022/4b402520-4128-4e6e-af07-960a10be397e)
+
+Configure both plugins in your sanity.config.ts file:
+
+```ts
+// ./sanity.config.ts
+
+import {languageFilter} from '@sanity/language-filter'
+
+export default defineConfig({
+  // ... other config
+  plugins: [
+    // ... other plugins
+    languageFilter({
+      // Use the same languages as the internationalized array plugin
+      supportedLanguages: SUPPORTED_LANGUAGES,
+      defaultLanguages: [],
+      documentTypes: ['post'],
+      filterField: (enclosingType, member, selectedLanguageIds) => {
+        // Filter internationalized arrays
+        if (
+          enclosingType.jsonType === 'object' &&
+          enclosingType.name.startsWith('internationalizedArray') &&
+          'kind' in member
+        ) {
+          const language = isKeyedObject(member.field.path[1])
+            ? member.field.path[1]._key
+            : null
+
+          return language ? selectedLanguageIds.includes(language) : false
+        }
+
+        // Filter internationalized objects if you have them
+        // `localeString` must be registered as a custom schema type
+        if (
+          enclosingType.jsonType === 'object' &&
+          enclosingType.name.startsWith('locale')
+        ) {
+          return selectedLanguageIds.includes(member.name)
+        }
+
+        return true
+      },
     }),
   ],
 })

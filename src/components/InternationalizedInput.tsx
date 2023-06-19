@@ -10,7 +10,7 @@ import {
   Spinner,
   Stack,
 } from '@sanity/ui'
-import React, {useCallback, useMemo} from 'react'
+import React, {useCallback, useContext, useMemo} from 'react'
 import {ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
@@ -44,7 +44,7 @@ export default function InternationalizedInput(
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages} = React.useContext(LanguageContext)
+  const {languages} = useContext(LanguageContext)
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -56,7 +56,9 @@ export default function InternationalizedInput(
 
   // Changes the key of this item, ideally to a valid language
   const handleKeyChange = useCallback(
-    (languageId: string) => {
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      const languageId = event?.currentTarget?.value
+
       if (
         !value ||
         !languages?.length ||
@@ -99,12 +101,13 @@ export default function InternationalizedInput(
                       fontSize={1}
                       key={language.id}
                       text={language.id.toLocaleUpperCase()}
-                      onClick={() => handleKeyChange(language.id)}
+                      value={language.id}
+                      // @ts-expect-error
+                      onClick={handleKeyChange}
                     />
                   ))}
                 </Menu>
               }
-              placement="right"
               popover={{portal: true}}
             />
           )}

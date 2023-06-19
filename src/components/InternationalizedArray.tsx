@@ -1,20 +1,22 @@
 import {AddIcon} from '@sanity/icons'
+import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Button, Grid, Stack, useToast} from '@sanity/ui'
 import equal from 'fast-deep-equal'
-import {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
+import React, {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
-  ArrayOfObjectsItemMember,
   insert,
   set,
   setIfMissing,
   useClient,
   useFormBuilder,
+  useFormValue,
 } from 'sanity'
 import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
+import {MAX_COLUMNS} from '../constants'
 import type {ArraySchemaWithLanguageOptions, Value} from '../types'
 import Feedback from './Feedback'
 import {getSelectedValue} from './getSelectedValue'
@@ -30,6 +32,7 @@ export default function InternationalizedArray(
   props: InternationalizedArrayProps
 ) {
   const {members, value, schemaType, onChange} = props
+
   const readOnly =
     typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
@@ -41,7 +44,7 @@ export default function InternationalizedArray(
     [options.select, deferredDocument]
   )
 
-  const {apiVersion} = options
+  const {apiVersion, defaultLanguages} = options
   const client = useClient({apiVersion})
   const languages = Array.isArray(options.languages)
     ? options.languages
@@ -57,24 +60,76 @@ export default function InternationalizedArray(
         {equal}
       )
 
+  // Support updating the UI if languageFilter is installed
+  const {selectedLanguageIds, options: languageFilterOptions} =
+    useLanguageFilterStudioContext()
+  const documentType = useFormValue(['_type'])
+  const languageFilterEnabled =
+    typeof documentType === 'string' &&
+    languageFilterOptions.documentTypes.includes(documentType)
+
+  const filteredMembers = useMemo(
+    () =>
+      languageFilterEnabled
+        ? members.filter((member) => {
+            // This member is the outer object created by the plugin
+            // Satisfy TS
+            if (member.kind !== 'item') {
+              return false
+            }
+
+            // This is the inner "value" field member created by this plugin
+            const valueMember = member.item.members[0]
+
+            // Satisfy TS
+            if (valueMember.kind !== 'field') {
+              return false
+            }
+
+            return languageFilterOptions.filterField(
+              member.item.schemaType,
+              valueMember,
+              selectedLanguageIds
+            )
+          })
+        : members,
+    [languageFilterEnabled, members, languageFilterOptions, selectedLanguageIds]
+  )
+
+  const filteredLanguages = useMemo(
+    () =>
+      languageFilterEnabled
+        ? languages.filter((language) =>
+            selectedLanguageIds.includes(language.id)
+          )
+        : languages,
+    [languageFilterEnabled, languages, selectedLanguageIds]
+  )
+
   const handleAddLanguage = useCallback(
-    (languageId?: string) => {
-      if (!languages?.length) {
+    (param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]) => {
+      if (!filteredLanguages?.length) {
         return
       }
 
+      const languageIds: string[] = Array.isArray(param)
+        ? param
+        : ([param?.currentTarget?.value].filter(Boolean) as string[])
       const itemBase = {_type: `${schemaType.name}Value`}
 
       // Create new items
-      const newItems = languageId
-        ? // Just one for this language
-          [{...itemBase, _key: languageId}]
-        : // Or one for every missing language
-          languages
-            .filter((language) =>
-              value?.length ? !value.find((v) => v._key === language.id) : true
-            )
-            .map((language) => ({...itemBase, _key: language.id}))
+      const newItems =
+        Array.isArray(languageIds) && languageIds.length > 0
+          ? // Just one for this language
+            languageIds.map((id) => ({...itemBase, _key: id}))
+          : // Or one for every missing language
+            filteredLanguages
+              .filter((language) =>
+                value?.length
+                  ? !value.find((v) => v._key === language.id)
+                  : true
+              )
+              .map((language) => ({...itemBase, _key: language.id}))
 
       // Insert new items in the correct order
       const languagesInUse = value?.length ? value.map((v) => v) : []
@@ -108,10 +163,25 @@ export default function InternationalizedArray(
 
       onChange([setIfMissing([]), ...insertions])
     },
-    [languages, onChange, schemaType.name, value]
+    [filteredLanguages, onChange, schemaType.name, value]
   )
 
-  // TODO: This is lazy, reordering and re-setting the whole array – it could be surgical
+  // Create default fields if the document is not yet created
+  const documentCreatedAt = useFormValue(['_createdAt'])
+
+  if (
+    // Array field is empty
+    !value &&
+    // Document form is in "not yet created" state
+    !documentCreatedAt &&
+    // Plugin config included default languages
+    defaultLanguages &&
+    defaultLanguages?.length > 0
+  ) {
+    handleAddLanguage(defaultLanguages)
+  }
+
+  // TODO: This is reordering and re-setting the whole array, it could be surgical
   const handleRestoreOrder = useCallback(() => {
     if (!value?.length || !languages?.length) {
       return
@@ -177,24 +247,34 @@ export default function InternationalizedArray(
     [languages]
   )
 
+  // Automatically restore order of fields
   useEffect(() => {
     if (languagesOutOfOrder.length > 0 && allKeysAreLanguages) {
       handleRestoreOrder()
     }
   }, [languagesOutOfOrder, allKeysAreLanguages, handleRestoreOrder])
 
+  // compare value keys with possible languages
+  const allLanguagesArePresent = useMemo(() => {
+    const filteredLanguageIds = filteredLanguages.map((l) => l.id)
+    const languagesInUseIds = value ? value.map((v) => v._key) : []
+
+    return (
+      languagesInUseIds.length === filteredLanguageIds.length &&
+      languagesInUseIds.every((l) => filteredLanguageIds.includes(l))
+    )
+  }, [filteredLanguages, value])
+
   if (!languagesAreValid) {
     return <Feedback />
   }
 
   return (
-    <LanguageProvider value={{languages}}>
+    <LanguageProvider value={{languages: filteredLanguages}}>
       <Stack space={2}>
         {members?.length > 0 ? (
           <>
-            {/* TODO: Resolve type for ArrayOfObjectsItemMember */}
-            {/* @ts-ignore */}
-            {members.map((member: ArrayOfObjectsItemMember) => {
+            {filteredMembers.map((member) => {
               if (member.kind === 'item') {
                 return (
                   <ArrayOfObjectsItem
@@ -213,25 +293,18 @@ export default function InternationalizedArray(
           </>
         ) : null}
 
-        {/* This now happens automatically */}
-        {/* {languagesOutOfOrder.length > 0 && allKeysAreLanguages ? (
-          <Button
-            tone="caution"
-            icon={RestoreIcon}
-            onClick={() => handleRestoreOrder()}
-            text="Restore order of languages"
-          />
-        ) : null} */}
-
         {/* Show buttons if languages are configured */}
         {/* Hide them if all languages have values */}
-        {languages?.length > 0 && languagesInUse.length < languages.length ? (
+        {filteredLanguages?.length > 0 && !allLanguagesArePresent ? (
           <Stack space={2}>
             {/* Hide language-specific buttons if there's only one */}
-            {/* No more than 5 columns */}
-            {languages.length > 1 ? (
-              <Grid columns={Math.min(languages.length, 5)} gap={2}>
-                {languages.map((language) => (
+            {/* No more than 7 columns */}
+            {filteredLanguages.length > 1 ? (
+              <Grid
+                columns={Math.min(filteredLanguages.length, MAX_COLUMNS)}
+                gap={2}
+              >
+                {filteredLanguages.map((language) => (
                   <Button
                     key={language.id}
                     tone="primary"
@@ -242,8 +315,14 @@ export default function InternationalizedArray(
                       Boolean(value?.find((item) => item._key === language.id))
                     }
                     text={language.id.toUpperCase()}
-                    icon={AddIcon}
-                    onClick={() => handleAddLanguage(language.id)}
+                    // Only show plus icon if there's one row or less
+                    icon={
+                      filteredLanguages.length > MAX_COLUMNS
+                        ? undefined
+                        : AddIcon
+                    }
+                    value={language.id}
+                    onClick={handleAddLanguage}
                   />
                 ))}
               </Grid>
@@ -251,23 +330,21 @@ export default function InternationalizedArray(
             <Button
               tone="primary"
               mode="ghost"
-              disabled={
-                readOnly || (value && value?.length >= languages?.length)
-              }
+              disabled={readOnly || allLanguagesArePresent}
               icon={AddIcon}
               text={
                 // eslint-disable-next-line no-nested-ternary
                 value?.length
                   ? `Add missing ${
-                      languages.length - value.length === 1
+                      filteredLanguages.length - value.length === 1
                         ? `language`
                         : `languages`
                     }`
-                  : languages.length === 1
-                  ? `Add ${languages[0].title} Field`
+                  : filteredLanguages.length === 1
+                  ? `Add ${filteredLanguages[0].title} Field`
                   : `Add all languages`
               }
-              onClick={() => handleAddLanguage()}
+              onClick={handleAddLanguage}
             />
           </Stack>
         ) : null}

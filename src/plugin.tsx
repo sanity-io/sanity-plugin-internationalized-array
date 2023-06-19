@@ -7,6 +7,7 @@ import {PluginConfig} from './types'
 
 const CONFIG_DEFAULT: PluginConfig = {
   languages: [],
+  defaultLanguages: [],
   fieldTypes: [],
 }
 
@@ -17,6 +18,7 @@ export const internationalizedArray = definePlugin<PluginConfig>(
       select,
       languages,
       fieldTypes,
+      defaultLanguages,
     } = {...CONFIG_DEFAULT, ...config}
 
     return {
@@ -37,7 +39,7 @@ export const internationalizedArray = definePlugin<PluginConfig>(
       schema: {
         types: [
           ...fieldTypes.map((type) =>
-            array({type, apiVersion, select, languages})
+            array({type, apiVersion, select, languages, defaultLanguages})
           ),
           ...fieldTypes.map((type) => object({type})),
         ],
