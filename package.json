@@ -98,7 +98,8 @@
   },
   "sanityPlugin": {
     "verifyPackage": {
-      "eslintImports": false
+      "eslintImports": false,
+      "dependencies": false
     }
   }
 }

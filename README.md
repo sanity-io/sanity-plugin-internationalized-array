@@ -198,9 +198,13 @@ If you have many languages and authors that predominately write in only a few, [
 
 ![Internationalized array field filtered with language-filter](https://github.com/sanity-io/language-filter/assets/9684022/4b402520-4128-4e6e-af07-960a10be397e)
 
-Config it in your sanity.config.ts file
+Configure both plugins in your sanity.config.ts file:
 
 ```ts
+// ./sanity.config.ts
+
+import {languageFilter} from '@sanity/language-filter'
+
 export default defineConfig({
   // ... other config
   plugins: [
