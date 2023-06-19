@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.6.2...v1.7.0) (2023-06-19)
+
+### Features
+
+- support language-filter and defaultLanguages ([dae1dea](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/dae1dea5f27ef86861ea128ab37b6c1498597551))
+
 ## [1.6.2](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.6.1...v1.6.2) (2023-06-01)
 
 ### Bug Fixes
