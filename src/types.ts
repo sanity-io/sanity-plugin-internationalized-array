@@ -83,6 +83,15 @@ export type PluginConfig = {
    */
   languages: Language[] | LanguageCallback
   /**
+   * You can specify a list of language IDs that should be pre-filled when creating a new document
+   * ```tsx
+   * {
+   *  defaultLanguages: ['en']
+   * }
+   * ```
+   */
+  defaultLanguages?: string[]
+  /**
    * Can be a string matching core field types, as well as custom ones:
    * ```tsx
    * {
@@ -113,5 +122,6 @@ export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
     select?: Record<string, string>
     languages: Language[] | LanguageCallback
     apiVersion: string
+    defaultLanguages?: string[]
   }
 }
