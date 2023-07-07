@@ -40,7 +40,7 @@ export type PluginConfig = {
    * https://www.sanity.io/docs/api-versioning
    * @defaultValue '2022-11-27'
    */
-  apiVersion?: string
+  apiVersion: string
   /**
    * Specify fields that should be available in the language callback:
    * ```tsx

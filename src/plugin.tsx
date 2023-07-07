@@ -9,17 +9,15 @@ const CONFIG_DEFAULT: PluginConfig = {
   languages: [],
   defaultLanguages: [],
   fieldTypes: [],
+  apiVersion: '2023-06-30',
 }
 
 export const internationalizedArray = definePlugin<PluginConfig>(
   (config = CONFIG_DEFAULT) => {
-    const {
-      apiVersion = '2022-11-27',
-      select,
-      languages,
-      fieldTypes,
-      defaultLanguages,
-    } = {...CONFIG_DEFAULT, ...config}
+    const {apiVersion, select, languages, fieldTypes, defaultLanguages} = {
+      ...CONFIG_DEFAULT,
+      ...config,
+    }
 
     return {
       name: 'sanity-plugin-internationalized-array',
