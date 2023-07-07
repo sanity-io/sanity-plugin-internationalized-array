@@ -163,7 +163,7 @@ export default function InternationalizedArray(
 
       onChange([setIfMissing([]), ...insertions])
     },
-    [filteredLanguages, onChange, schemaType.name, value]
+    [filteredLanguages, languages, onChange, schemaType.name, value]
   )
 
   // Create default fields if the document is not yet created

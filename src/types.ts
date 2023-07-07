@@ -38,9 +38,9 @@ export type LanguageCallback = (
 export type PluginConfig = {
   /**
    * https://www.sanity.io/docs/api-versioning
-   * @defaultValue '2022-11-27'
+   * @defaultValue '2023-06-30'
    */
-  apiVersion: string
+  apiVersion?: string
   /**
    * Specify fields that should be available in the language callback:
    * ```tsx
@@ -115,6 +115,16 @@ export type PluginConfig = {
    * ```
    */
   fieldTypes: (string | RuleTypeConstraint | FieldDefinition)[]
+  /**
+   * You can specify a custom location for the "add language" buttons:
+   * * @defaultValue 'field'
+   *
+   * ```tsx
+   * {
+   *  buttonsLocation: 'document'
+   * }
+   */
+  buttonsLocation: 'field' | 'document'
 }
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
