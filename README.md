@@ -107,7 +107,7 @@ languages: async (client, {market = ``}) => {
 
 ## Configuring the "Add translation" buttons
 
-The "Add translation" buttons can be positioned below the field, inside Field Actions (currently unstable) or both with `buttonLocations`.
+The "Add translation" buttons can be positioned below the field, inside Field Actions (⚠️ currently unstable ⚠️) or both with `buttonLocations`.
 
 The "Add all languages" button can be hidden with `buttonAddAll`.
 

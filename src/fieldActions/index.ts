@@ -63,23 +63,6 @@ const createTranslateFieldActions: (
     }
   })
 
-const DividerFieldAction: (
-  fieldActionProps: DocumentFieldActionProps,
-  context: {filteredLanguages: Language[]; buttonAddAll: boolean}
-) => DocumentFieldActionDivider = (
-  fieldActionProps,
-  {filteredLanguages, buttonAddAll = CONFIG_DEFAULT.buttonAddAll}
-) => {
-  const value = useFormValue(fieldActionProps.path) as Value[]
-  const hidden =
-    !buttonAddAll || checkAllLanguagesArePresent(filteredLanguages, value)
-
-  return {
-    type: 'divider',
-    hidden,
-  }
-}
-
 const AddMissingTranslationsFieldAction: (
   fieldActionProps: DocumentFieldActionProps,
   context: {languages: Language[]; filteredLanguages: Language[]}
@@ -126,8 +109,7 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       fieldActionProps?.schemaType?.type?.name.startsWith(
         'internationalizedArray'
       )
-    const {languages, filteredLanguages, buttonAddAll} =
-      useInternationalizedArrayContext()
+    const {languages, filteredLanguages} = useInternationalizedArrayContext()
 
     const translateFieldActions = createTranslateFieldActions(
       fieldActionProps,
@@ -142,10 +124,6 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       children: isInternationalizedArrayField
         ? [
             ...translateFieldActions,
-            DividerFieldAction(fieldActionProps, {
-              filteredLanguages,
-              buttonAddAll,
-            }),
             AddMissingTranslationsFieldAction(fieldActionProps, {
               languages,
               filteredLanguages,
