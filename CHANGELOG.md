@@ -5,6 +5,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.7.0...v1.8.0) (2023-07-10)
+
+### Features
+
+- add 'add all' button to field actions ([f99bea1](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/f99bea10a9f4f9c7d6aeeaaea769fc7a6684f427))
+- setup field actions ([6193375](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/6193375cdd1d0d13e305c2ffb14f78e639752120))
+- update dividers and 'all' button in field actions ([1a5010b](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/1a5010b50f5d351a784a238e18202e2102d40ddc))
+
+### Bug Fixes
+
+- remove divider action ([0fb57e5](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/0fb57e5a3b2cf141df7eb10ffe82799ed9ba921f))
+
 ## [1.7.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.6.2...v1.7.0) (2023-06-19)
 
 ### Features
