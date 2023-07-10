@@ -1,5 +1,4 @@
 import type {
-  ArraySchemaType,
   FieldDefinition,
   Rule,
   RuleTypeConstraint,
@@ -115,13 +114,14 @@ export type PluginConfig = {
    * ```
    */
   fieldTypes: (string | RuleTypeConstraint | FieldDefinition)[]
-}
-
-export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
-  options: {
-    select?: Record<string, string>
-    languages: Language[] | LanguageCallback
-    apiVersion: string
-    defaultLanguages?: string[]
-  }
+  /**
+   * Locations where the "+ EN" add language buttons are visible
+   * @defaultValue ['field']
+   * */
+  buttonLocations: ('field' | 'unstable__fieldAction')[]
+  /**
+   * Show or hide the "Add missing languages" button
+   * @defaultValue true
+   * */
+  buttonAddAll: boolean
 }

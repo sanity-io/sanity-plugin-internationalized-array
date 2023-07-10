@@ -10,12 +10,12 @@ import {
   Spinner,
   Stack,
 } from '@sanity/ui'
-import React, {useCallback, useContext, useMemo} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import {ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
 import {getToneFromValidation} from './getToneFromValidation'
-import {LanguageContext} from './languageContext'
+import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 type InternationalizedValue = {
   _type: string
@@ -44,7 +44,7 @@ export default function InternationalizedInput(
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages} = useContext(LanguageContext)
+  const {languages} = useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
