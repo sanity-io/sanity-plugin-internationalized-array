@@ -1,5 +1,4 @@
 import type {
-  ArraySchemaType,
   FieldDefinition,
   Rule,
   RuleTypeConstraint,

@@ -105,7 +105,29 @@ languages: async (client, {market = ``}) => {
 },
 ```
 
-## Using more complex field types
+## Configuring the "Add translation" buttons
+
+The "Add translation" buttons can be positioned below the field, inside Field Actions (currently unstable) or both with `buttonLocations`.
+
+The "Add all languages" button can be hidden with `buttonAddAll`.
+
+```ts
+import {defineConfig} from 'sanity'
+import {internationalizedArray} from 'sanity-plugin-internationalized-array'
+
+ export const defineConfig({
+  // ...
+  plugins: [
+    internationalizedArray({
+      // ...other config
+      buttonLocations: ['field', 'unstable__fieldAction'] // default ['field']
+      buttonAddAll: false // default true
+    })
+  ]
+})
+```
+
+## Using complex field configurations
 
 For more control over the `value` field, you can pass a schema definition into the `fieldTypes` array.
 

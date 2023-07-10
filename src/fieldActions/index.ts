@@ -1,24 +1,29 @@
 import {AddIcon, TranslateIcon} from '@sanity/icons'
-import {useCallback} from 'react'
+import {useCallback, useDeferredValue} from 'react'
 import {
   defineDocumentFieldAction,
+  DocumentFieldActionDivider,
+  DocumentFieldActionItem,
   DocumentFieldActionNode,
   DocumentFieldActionProps,
   PatchEvent,
   setIfMissing,
+  useFormBuilder,
   useFormValue,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/desk'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
+import {CONFIG_DEFAULT} from '../constants'
 import {Language, Value} from '../types'
+import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 
 const createTranslateFieldActions: (
   fieldActionProps: DocumentFieldActionProps,
   context: {languages: Language[]; filteredLanguages: Language[]}
-) => DocumentFieldActionNode[] = (
+) => DocumentFieldActionItem[] = (
   fieldActionProps,
   {languages, filteredLanguages}
 ) =>
@@ -58,15 +63,33 @@ const createTranslateFieldActions: (
     }
   })
 
+const DividerFieldAction: (
+  fieldActionProps: DocumentFieldActionProps,
+  context: {filteredLanguages: Language[]; buttonAddAll: boolean}
+) => DocumentFieldActionDivider = (
+  fieldActionProps,
+  {filteredLanguages, buttonAddAll = CONFIG_DEFAULT.buttonAddAll}
+) => {
+  const value = useFormValue(fieldActionProps.path) as Value[]
+  const hidden =
+    !buttonAddAll || checkAllLanguagesArePresent(filteredLanguages, value)
+
+  return {
+    type: 'divider',
+    hidden,
+  }
+}
+
 const AddMissingTranslationsFieldAction: (
   fieldActionProps: DocumentFieldActionProps,
   context: {languages: Language[]; filteredLanguages: Language[]}
-) => DocumentFieldActionNode = (
+) => DocumentFieldActionItem = (
   fieldActionProps,
   {languages, filteredLanguages}
 ) => {
   const value = useFormValue(fieldActionProps.path) as Value[]
   const disabled = value.length === filteredLanguages.length
+  const hidden = checkAllLanguagesArePresent(filteredLanguages, value)
 
   const {onChange} = useDocumentPane()
 
@@ -92,6 +115,7 @@ const AddMissingTranslationsFieldAction: (
     onAction,
     title: createAddAllTitle(value, filteredLanguages),
     disabled,
+    hidden,
   }
 }
 
@@ -102,7 +126,8 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       fieldActionProps?.schemaType?.type?.name.startsWith(
         'internationalizedArray'
       )
-    const {languages, filteredLanguages} = useInternationalizedArrayContext()
+    const {languages, filteredLanguages, buttonAddAll} =
+      useInternationalizedArrayContext()
 
     const translateFieldActions = createTranslateFieldActions(
       fieldActionProps,
@@ -117,7 +142,10 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       children: isInternationalizedArrayField
         ? [
             ...translateFieldActions,
-            {type: 'divider'},
+            DividerFieldAction(fieldActionProps, {
+              filteredLanguages,
+              buttonAddAll,
+            }),
             AddMissingTranslationsFieldAction(fieldActionProps, {
               languages,
               filteredLanguages,

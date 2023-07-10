@@ -13,6 +13,7 @@ import {
 
 import {MAX_COLUMNS} from '../constants'
 import type {Value} from '../types'
+import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 import Feedback from './Feedback'
@@ -32,8 +33,13 @@ export default function InternationalizedArray(
     typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const toast = useToast()
 
-  const {languages, filteredLanguages, defaultLanguages} =
-    useInternationalizedArrayContext()
+  const {
+    languages,
+    filteredLanguages,
+    defaultLanguages,
+    buttonAddAll,
+    buttonLocations,
+  } = useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed
   const {selectedLanguageIds, options: languageFilterOptions} =
@@ -183,19 +189,22 @@ export default function InternationalizedArray(
   }, [languagesOutOfOrder, allKeysAreLanguages, handleRestoreOrder])
 
   // compare value keys with possible languages
-  const allLanguagesArePresent = useMemo(() => {
-    const filteredLanguageIds = filteredLanguages.map((l) => l.id)
-    const languagesInUseIds = value ? value.map((v) => v._key) : []
-
-    return (
-      languagesInUseIds.length === filteredLanguageIds.length &&
-      languagesInUseIds.every((l) => filteredLanguageIds.includes(l))
-    )
-  }, [filteredLanguages, value])
+  const allLanguagesArePresent = useMemo(
+    () => checkAllLanguagesArePresent(filteredLanguages, value),
+    [filteredLanguages, value]
+  )
 
   if (!languagesAreValid) {
     return <Feedback />
   }
+
+  const addButtonsAreVisible =
+    // Plugin was configured to display buttons here (default!)
+    buttonLocations.includes('field') &&
+    // There's at least one language visible
+    filteredLanguages?.length > 0 &&
+    // Not every language has a value yet
+    !allLanguagesArePresent
 
   return (
     <Stack space={2}>
@@ -220,9 +229,7 @@ export default function InternationalizedArray(
         </>
       ) : null}
 
-      {/* Show buttons if languages are configured */}
-      {/* Hide them if all languages have values */}
-      {filteredLanguages?.length > 0 && !allLanguagesArePresent ? (
+      {addButtonsAreVisible ? (
         <Stack space={2}>
           {/* Hide language-specific buttons if there's only one */}
           {/* No more than 7 columns */}
@@ -252,14 +259,16 @@ export default function InternationalizedArray(
               ))}
             </Grid>
           ) : null}
-          <Button
-            tone="primary"
-            mode="ghost"
-            disabled={readOnly || allLanguagesArePresent}
-            icon={AddIcon}
-            text={createAddAllTitle(value, filteredLanguages)}
-            onClick={handleAddLanguage}
-          />
+          {buttonAddAll ? (
+            <Button
+              tone="primary"
+              mode="ghost"
+              disabled={readOnly || allLanguagesArePresent}
+              icon={AddIcon}
+              text={createAddAllTitle(value, filteredLanguages)}
+              onClick={handleAddLanguage}
+            />
+          ) : null}
         </Stack>
       ) : null}
     </Stack>

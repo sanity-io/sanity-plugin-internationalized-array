@@ -16,7 +16,7 @@ type ArrayFactoryConfig = {
 }
 
 export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
-  const {apiVersion, select, languages, defaultLanguages, type} = config
+  const {apiVersion, select, languages, type} = config
   const typeName = typeof type === `string` ? type : type.name
   const arrayName = createFieldName(typeName)
   const objectName = createFieldName(typeName, true)
@@ -28,7 +28,8 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     components: {
       input: InternationalizedArray,
     },
-    options: {apiVersion, select, languages, defaultLanguages},
+    // These options are required for validation rules – not the custom input component
+    options: {apiVersion, select, languages},
     // TODO: Resolve this typing issue with the inner object
     // @ts-expect-error
     of: [
