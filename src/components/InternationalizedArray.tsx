@@ -1,27 +1,20 @@
 import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Button, Grid, Stack, useToast} from '@sanity/ui'
-import equal from 'fast-deep-equal'
-import React, {useCallback, useDeferredValue, useEffect, useMemo} from 'react'
+import React, {useCallback, useEffect, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
   insert,
   set,
   setIfMissing,
-  useClient,
-  useFormBuilder,
   useFormValue,
 } from 'sanity'
-import {suspend} from 'suspend-react'
 
-import {namespace, version} from '../cache'
 import {MAX_COLUMNS} from '../constants'
 import type {ArraySchemaWithLanguageOptions, Value} from '../types'
 import Feedback from './Feedback'
-import {getSelectedValue} from './getSelectedValue'
-// TODO: Move this provider to the root component
-import {LanguageProvider} from './languageContext'
+import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
@@ -37,28 +30,10 @@ export default function InternationalizedArray(
     typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
   const {options} = schemaType
   const toast = useToast()
-  const {value: document} = useFormBuilder()
-  const deferredDocument = useDeferredValue(document)
-  const selectedValue = useMemo(
-    () => getSelectedValue(options.select, deferredDocument),
-    [options.select, deferredDocument]
-  )
 
-  const {apiVersion, defaultLanguages} = options
-  const client = useClient({apiVersion})
-  const languages = Array.isArray(options.languages)
-    ? options.languages
-    : suspend(
-        // eslint-disable-next-line require-await
-        async () => {
-          if (typeof options.languages === 'function') {
-            return options.languages(client, selectedValue)
-          }
-          return options.languages
-        },
-        [version, namespace, selectedValue],
-        {equal}
-      )
+  const {languages, filteredLanguages} = useInternationalizedArrayContext()
+
+  const {defaultLanguages} = options
 
   // Support updating the UI if languageFilter is installed
   const {selectedLanguageIds, options: languageFilterOptions} =
@@ -94,16 +69,6 @@ export default function InternationalizedArray(
           })
         : members,
     [languageFilterEnabled, members, languageFilterOptions, selectedLanguageIds]
-  )
-
-  const filteredLanguages = useMemo(
-    () =>
-      languageFilterEnabled
-        ? languages.filter((language) =>
-            selectedLanguageIds.includes(language.id)
-          )
-        : languages,
-    [languageFilterEnabled, languages, selectedLanguageIds]
   )
 
   const handleAddLanguage = useCallback(
@@ -163,7 +128,7 @@ export default function InternationalizedArray(
 
       onChange([setIfMissing([]), ...insertions])
     },
-    [filteredLanguages, onChange, schemaType.name, value]
+    [filteredLanguages, languages, onChange, schemaType.name, value]
   )
 
   // Create default fields if the document is not yet created
@@ -270,85 +235,81 @@ export default function InternationalizedArray(
   }
 
   return (
-    <LanguageProvider value={{languages: filteredLanguages}}>
-      <Stack space={2}>
-        {members?.length > 0 ? (
-          <>
-            {filteredMembers.map((member) => {
-              if (member.kind === 'item') {
-                return (
-                  <ArrayOfObjectsItem
-                    key={member.key}
-                    member={member}
-                    renderItem={props.renderItem}
-                    renderField={props.renderField}
-                    renderInput={props.renderInput}
-                    renderPreview={props.renderPreview}
-                  />
-                )
-              }
+    <Stack space={2}>
+      {members?.length > 0 ? (
+        <>
+          {filteredMembers.map((member) => {
+            if (member.kind === 'item') {
+              return (
+                <ArrayOfObjectsItem
+                  key={member.key}
+                  member={member}
+                  renderItem={props.renderItem}
+                  renderField={props.renderField}
+                  renderInput={props.renderInput}
+                  renderPreview={props.renderPreview}
+                />
+              )
+            }
 
-              return null
-            })}
-          </>
-        ) : null}
+            return null
+          })}
+        </>
+      ) : null}
 
-        {/* Show buttons if languages are configured */}
-        {/* Hide them if all languages have values */}
-        {filteredLanguages?.length > 0 && !allLanguagesArePresent ? (
-          <Stack space={2}>
-            {/* Hide language-specific buttons if there's only one */}
-            {/* No more than 7 columns */}
-            {filteredLanguages.length > 1 ? (
-              <Grid
-                columns={Math.min(filteredLanguages.length, MAX_COLUMNS)}
-                gap={2}
-              >
-                {filteredLanguages.map((language) => (
-                  <Button
-                    key={language.id}
-                    tone="primary"
-                    mode="ghost"
-                    fontSize={1}
-                    disabled={
-                      readOnly ||
-                      Boolean(value?.find((item) => item._key === language.id))
-                    }
-                    text={language.id.toUpperCase()}
-                    // Only show plus icon if there's one row or less
-                    icon={
-                      filteredLanguages.length > MAX_COLUMNS
-                        ? undefined
-                        : AddIcon
-                    }
-                    value={language.id}
-                    onClick={handleAddLanguage}
-                  />
-                ))}
-              </Grid>
-            ) : null}
-            <Button
-              tone="primary"
-              mode="ghost"
-              disabled={readOnly || allLanguagesArePresent}
-              icon={AddIcon}
-              text={
-                // eslint-disable-next-line no-nested-ternary
-                value?.length
-                  ? `Add missing ${
-                      filteredLanguages.length - value.length === 1
-                        ? `language`
-                        : `languages`
-                    }`
-                  : filteredLanguages.length === 1
-                  ? `Add ${filteredLanguages[0].title} Field`
-                  : `Add all languages`
-              }
-              onClick={handleAddLanguage}
-            />
-          </Stack>
-        ) : null}
-      </Stack>
-    </LanguageProvider>
+      {/* Show buttons if languages are configured */}
+      {/* Hide them if all languages have values */}
+      {filteredLanguages?.length > 0 && !allLanguagesArePresent ? (
+        <Stack space={2}>
+          {/* Hide language-specific buttons if there's only one */}
+          {/* No more than 7 columns */}
+          {filteredLanguages.length > 1 ? (
+            <Grid
+              columns={Math.min(filteredLanguages.length, MAX_COLUMNS)}
+              gap={2}
+            >
+              {filteredLanguages.map((language) => (
+                <Button
+                  key={language.id}
+                  tone="primary"
+                  mode="ghost"
+                  fontSize={1}
+                  disabled={
+                    readOnly ||
+                    Boolean(value?.find((item) => item._key === language.id))
+                  }
+                  text={language.id.toUpperCase()}
+                  // Only show plus icon if there's one row or less
+                  icon={
+                    filteredLanguages.length > MAX_COLUMNS ? undefined : AddIcon
+                  }
+                  value={language.id}
+                  onClick={handleAddLanguage}
+                />
+              ))}
+            </Grid>
+          ) : null}
+          <Button
+            tone="primary"
+            mode="ghost"
+            disabled={readOnly || allLanguagesArePresent}
+            icon={AddIcon}
+            text={
+              // eslint-disable-next-line no-nested-ternary
+              value?.length
+                ? `Add missing ${
+                    filteredLanguages.length - value.length === 1
+                      ? `language`
+                      : `languages`
+                  }`
+                : filteredLanguages.length === 1
+                ? `Add ${filteredLanguages[0].title} Field`
+                : `Add all languages`
+            }
+            onClick={handleAddLanguage}
+          />
+        </Stack>
+      ) : null}
+    </Stack>
   )
 }
