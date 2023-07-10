@@ -5,16 +5,21 @@ import {ObjectInputProps, useClient, useFormBuilder} from 'sanity'
 import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
+import {CONFIG_DEFAULT} from '../constants'
 import {Language, PluginConfig} from '../types'
 import {getSelectedValue} from './getSelectedValue'
 
-type InternationalizedArrayContextProps = {
+// This provider makes the plugin config available to all components in the document form
+// But with languages resolved and filtered languages updated base on @sanity/language-filter
+
+type InternationalizedArrayContextProps = Required<PluginConfig> & {
   languages: Language[]
   filteredLanguages: Language[]
 }
 
 export const InternationalizedArrayContext =
   createContext<InternationalizedArrayContextProps>({
+    ...CONFIG_DEFAULT,
     languages: [],
     filteredLanguages: [],
   })
@@ -74,7 +79,11 @@ export function InternationalizedArrayProvider(
 
   return (
     <InternationalizedArrayContext.Provider
-      value={{languages, filteredLanguages}}
+      value={{
+        ...internationalizedArray,
+        languages,
+        filteredLanguages,
+      }}
     >
       {props.renderDefault(props)}
     </InternationalizedArrayContext.Provider>

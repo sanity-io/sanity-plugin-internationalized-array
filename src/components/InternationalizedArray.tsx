@@ -5,13 +5,14 @@ import React, {useCallback, useEffect, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
+  ArraySchemaType,
   set,
   setIfMissing,
   useFormValue,
 } from 'sanity'
 
 import {MAX_COLUMNS} from '../constants'
-import type {ArraySchemaWithLanguageOptions, Value} from '../types'
+import type {Value} from '../types'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 import Feedback from './Feedback'
@@ -19,7 +20,7 @@ import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
   Value,
-  ArraySchemaWithLanguageOptions
+  ArraySchemaType
 >
 
 export default function InternationalizedArray(
@@ -29,13 +30,10 @@ export default function InternationalizedArray(
 
   const readOnly =
     typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
-  const {options} = schemaType
   const toast = useToast()
 
-  const {languages, filteredLanguages} = useInternationalizedArrayContext()
-
-  // TODO: Move this to context instead of schema options
-  const {defaultLanguages} = options
+  const {languages, filteredLanguages, defaultLanguages} =
+    useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed
   const {selectedLanguageIds, options: languageFilterOptions} =

@@ -84,7 +84,7 @@ const AddMissingTranslationsFieldAction: (
     })
 
     onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
-  }, [fieldActionProps, filteredLanguages, languages, value])
+  }, [fieldActionProps, filteredLanguages, languages, onChange, value])
 
   return {
     type: 'action',
