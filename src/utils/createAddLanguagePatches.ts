@@ -1,4 +1,4 @@
-import {insert, Path, SchemaType} from 'sanity'
+import {FormInsertPatch, insert, Path, SchemaType} from 'sanity'
 
 import {Language, Value} from '../types'
 
@@ -17,7 +17,7 @@ type AddConfig = {
   path?: Path
 }
 
-export function createAddLanguagePatches(config: AddConfig) {
+export function createAddLanguagePatches(config: AddConfig): FormInsertPatch[] {
   const {
     addLanguageKeys,
     schemaType,
