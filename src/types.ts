@@ -119,9 +119,6 @@ export type PluginConfig = {
 
 export type ArraySchemaWithLanguageOptions = ArraySchemaType & {
   options: {
-    select?: Record<string, string>
-    languages: Language[] | LanguageCallback
-    apiVersion: string
     defaultLanguages?: string[]
   }
 }

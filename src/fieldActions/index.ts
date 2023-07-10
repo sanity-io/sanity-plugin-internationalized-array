@@ -4,12 +4,16 @@ import {
   defineDocumentFieldAction,
   DocumentFieldActionNode,
   DocumentFieldActionProps,
-  KeyedObject,
+  PatchEvent,
+  setIfMissing,
   useFormValue,
 } from 'sanity'
+import {useDocumentPane} from 'sanity/desk'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import {Language} from '../types'
+import {Language, Value} from '../types'
+import {createAddAllTitle} from '../utils/createAddAllTitle'
+import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 
 const createTranslateFieldActions: (
   fieldActionProps: DocumentFieldActionProps,
@@ -19,32 +23,76 @@ const createTranslateFieldActions: (
   {languages, filteredLanguages}
 ) =>
   languages.map((language) => {
+    const value = useFormValue(fieldActionProps.path) as Value[]
+    const disabled =
+      value && Array.isArray(value)
+        ? Boolean(value?.find((item) => item._key === language.id))
+        : true
+    const hidden = !filteredLanguages.some((f) => f.id === language.id)
+
+    const {onChange} = useDocumentPane()
+
     const onAction = useCallback(() => {
-      console.log('ADD', fieldActionProps)
-    }, [])
-    const value = useFormValue(fieldActionProps.path) as KeyedObject[]
+      const {schemaType, path} = fieldActionProps
+
+      const addLanguageKeys = [language.id]
+      const patches = createAddLanguagePatches({
+        addLanguageKeys,
+        schemaType,
+        languages,
+        filteredLanguages,
+        value,
+        path,
+      })
+
+      onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
+    }, [language.id, value, onChange])
 
     return {
       type: 'action',
       icon: AddIcon,
       onAction,
       title: language.id.toLocaleUpperCase(),
-      hidden: !filteredLanguages.some(
-        (filtered) => filtered.id === language.id
-      ),
-      disabled: Array.isArray(value)
-        ? value.some((item) => item._key === language.id)
-        : true,
+      hidden,
+      disabled,
     }
   })
 
-const addMissingTranslationsFieldAction: DocumentFieldActionNode = {
-  type: 'action',
-  icon: AddIcon,
-  onAction: () => {
-    console.log('ADD MISSING')
-  },
-  title: 'Add Missing',
+const AddMissingTranslationsFieldAction: (
+  fieldActionProps: DocumentFieldActionProps,
+  context: {languages: Language[]; filteredLanguages: Language[]}
+) => DocumentFieldActionNode = (
+  fieldActionProps,
+  {languages, filteredLanguages}
+) => {
+  const value = useFormValue(fieldActionProps.path) as Value[]
+  const disabled = value.length === filteredLanguages.length
+
+  const {onChange} = useDocumentPane()
+
+  const onAction = useCallback(() => {
+    const {schemaType, path} = fieldActionProps
+
+    const addLanguageKeys: string[] = []
+    const patches = createAddLanguagePatches({
+      addLanguageKeys,
+      schemaType,
+      languages,
+      filteredLanguages,
+      value,
+      path,
+    })
+
+    onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
+  }, [fieldActionProps, filteredLanguages, languages, value])
+
+  return {
+    type: 'action',
+    icon: AddIcon,
+    onAction,
+    title: createAddAllTitle(value, filteredLanguages),
+    disabled,
+  }
 }
 
 export const internationalizedArrayFieldAction = defineDocumentFieldAction({
@@ -55,6 +103,7 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
         'internationalizedArray'
       )
     const {languages, filteredLanguages} = useInternationalizedArrayContext()
+
     const translateFieldActions = createTranslateFieldActions(
       fieldActionProps,
       {languages, filteredLanguages}
@@ -69,7 +118,10 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
         ? [
             ...translateFieldActions,
             {type: 'divider'},
-            addMissingTranslationsFieldAction,
+            AddMissingTranslationsFieldAction(fieldActionProps, {
+              languages,
+              filteredLanguages,
+            }),
           ]
         : [],
       hidden: !isInternationalizedArrayField,

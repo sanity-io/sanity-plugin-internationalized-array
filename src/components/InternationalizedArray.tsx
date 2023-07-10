@@ -5,7 +5,6 @@ import React, {useCallback, useEffect, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
-  insert,
   set,
   setIfMissing,
   useFormValue,
@@ -13,6 +12,8 @@ import {
 
 import {MAX_COLUMNS} from '../constants'
 import type {ArraySchemaWithLanguageOptions, Value} from '../types'
+import {createAddAllTitle} from '../utils/createAddAllTitle'
+import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 import Feedback from './Feedback'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -33,6 +34,7 @@ export default function InternationalizedArray(
 
   const {languages, filteredLanguages} = useInternationalizedArrayContext()
 
+  // TODO: Move this to context instead of schema options
   const {defaultLanguages} = options
 
   // Support updating the UI if languageFilter is installed
@@ -77,58 +79,21 @@ export default function InternationalizedArray(
         return
       }
 
-      const languageIds: string[] = Array.isArray(param)
+      const addLanguageKeys: string[] = Array.isArray(param)
         ? param
         : ([param?.currentTarget?.value].filter(Boolean) as string[])
-      const itemBase = {_type: `${schemaType.name}Value`}
 
-      // Create new items
-      const newItems =
-        Array.isArray(languageIds) && languageIds.length > 0
-          ? // Just one for this language
-            languageIds.map((id) => ({...itemBase, _key: id}))
-          : // Or one for every missing language
-            filteredLanguages
-              .filter((language) =>
-                value?.length
-                  ? !value.find((v) => v._key === language.id)
-                  : true
-              )
-              .map((language) => ({...itemBase, _key: language.id}))
-
-      // Insert new items in the correct order
-      const languagesInUse = value?.length ? value.map((v) => v) : []
-
-      const insertions = newItems.map((item) => {
-        // What's the original index of this language?
-        const languageIndex = languages.findIndex((l) => item._key === l.id)
-
-        // What languages are there beyond that index?
-        const remainingLanguages = languages.slice(languageIndex + 1)
-
-        // So what is the index in the current value array of the next language in the language array?
-        const nextLanguageIndex = languagesInUse.findIndex((l) =>
-          // eslint-disable-next-line max-nested-callbacks
-          remainingLanguages.find((r) => r.id === l._key)
-        )
-
-        // Keep local state up to date incase multiple insertions are being made
-        if (nextLanguageIndex < 0) {
-          languagesInUse.push(item)
-        } else {
-          languagesInUse.splice(nextLanguageIndex, 0, item)
-        }
-
-        return nextLanguageIndex < 0
-          ? // No next language (-1), add to end of array
-            insert([item], 'after', [nextLanguageIndex])
-          : // Next language found, insert before that
-            insert([item], 'before', [nextLanguageIndex])
+      const patches = createAddLanguagePatches({
+        addLanguageKeys,
+        schemaType,
+        languages,
+        filteredLanguages,
+        value,
       })
 
-      onChange([setIfMissing([]), ...insertions])
+      onChange([setIfMissing([]), ...patches])
     },
-    [filteredLanguages, languages, onChange, schemaType.name, value]
+    [filteredLanguages, languages, onChange, schemaType, value]
   )
 
   // Create default fields if the document is not yet created
@@ -294,18 +259,7 @@ export default function InternationalizedArray(
             mode="ghost"
             disabled={readOnly || allLanguagesArePresent}
             icon={AddIcon}
-            text={
-              // eslint-disable-next-line no-nested-ternary
-              value?.length
-                ? `Add missing ${
-                    filteredLanguages.length - value.length === 1
-                      ? `language`
-                      : `languages`
-                  }`
-                : filteredLanguages.length === 1
-                ? `Add ${filteredLanguages[0].title} Field`
-                : `Add all languages`
-            }
+            text={createAddAllTitle(value, filteredLanguages)}
             onClick={handleAddLanguage}
           />
         </Stack>
