@@ -128,7 +128,7 @@ import {internationalizedArray} from 'sanity-plugin-internationalized-array'
   plugins: [
     internationalizedArray({
       // ...other config
-      buttonLocations: ['field', 'unstable__fieldAction', 'document'] // default ['field']
+      buttonLocations: ['field', 'unstable__fieldAction', 'document'], // default ['field']
       buttonAddAll: false // default true
     })
   ]
