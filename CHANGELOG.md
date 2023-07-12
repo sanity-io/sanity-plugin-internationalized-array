@@ -5,6 +5,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.1](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.9.0...v1.9.1) (2023-07-12)
+
+### Bug Fixes
+
+- better guidance for internationalized array filter ([56da117](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/56da1170727feb839c481963ee126b585a17e58b))
+- dynamic languages ([ced82c1](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/ced82c17140ae215f3d70fc0924c416d02a05903))
+- perform recursive search for intArray fields ([3441ce1](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/3441ce1b0814cfddf8bc4c10ba2e6f264f14091c))
+
 ## [1.9.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.8.0...v1.9.0) (2023-07-12)
 
 ### Features
