@@ -53,10 +53,14 @@ The above config will also create an empty array item in new documents for each 
 You can pass in more registered schema-type names to generate more internationalized arrays. Use them in your schema like this:
 
 ```ts
-defineField({
-  name: 'greeting',
-  type: 'internationalizedArrayString',
-}),
+// For example, in postType.ts
+
+fields: [
+  defineField({
+    name: 'greeting',
+    type: 'internationalizedArrayString',
+  }),
+]
 ```
 
 ## Loading languages
@@ -107,7 +111,11 @@ languages: async (client, {market = ``}) => {
 
 ## Configuring the "Add translation" buttons
 
-The "Add translation" buttons can be positioned below the field, inside Field Actions (⚠️ currently unstable ⚠️) or both with `buttonLocations`.
+The "Add translation" buttons can be positioned in one or multiple locations by configuring `buttonLocations`:
+
+- `field` (default) Below the internationalized array field
+- `unstable__fieldAction` Inside a Field Action (currently unstable)
+- `document` Above the document fields, these buttons will add a new language item to every internationalized array field that can be found at the **root of the document**. Nested internationalized arrays are not yet supported.
 
 The "Add all languages" button can be hidden with `buttonAddAll`.
 
@@ -120,7 +128,7 @@ import {internationalizedArray} from 'sanity-plugin-internationalized-array'
   plugins: [
     internationalizedArray({
       // ...other config
-      buttonLocations: ['field', 'unstable__fieldAction'] // default ['field']
+      buttonLocations: ['field', 'unstable__fieldAction', 'document'] // default ['field']
       buttonAddAll: false // default true
     })
   ]
