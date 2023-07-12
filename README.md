@@ -233,6 +233,7 @@ Configure both plugins in your sanity.config.ts file:
 ```ts
 // ./sanity.config.ts
 
+import {defineConfig, isKeySegment} from 'sanity'
 import {languageFilter} from '@sanity/language-filter'
 
 export default defineConfig({
@@ -251,9 +252,15 @@ export default defineConfig({
           enclosingType.name.startsWith('internationalizedArray') &&
           'kind' in member
         ) {
-          const language = isKeyedObject(member.field.path[1])
-            ? member.field.path[1]._key
-            : null
+          // Get last two segments of the field's path
+          const pathEnd = member.field.path.slice(-2)
+          // If the second-last segment is a _key, and the last segment is `value`,
+          // It's an internationalized array value
+          // And the array _key is the language of the field
+          const language =
+            pathEnd[1] === 'value' && isKeySegment(pathEnd[0])
+              ? pathEnd[0]._key
+              : null
 
           return language ? selectedLanguageIds.includes(language) : false
         }
