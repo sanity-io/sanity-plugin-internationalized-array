@@ -1,4 +1,5 @@
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
+import {Stack} from '@sanity/ui'
 import equal from 'fast-deep-equal'
 import {createContext, useContext, useDeferredValue, useMemo} from 'react'
 import {ObjectInputProps, useClient, useFormBuilder} from 'sanity'
@@ -7,6 +8,7 @@ import {suspend} from 'suspend-react'
 import {namespace, version} from '../cache'
 import {CONFIG_DEFAULT} from '../constants'
 import {Language, PluginConfig} from '../types'
+import DocumentAddButtons from './DocumentAddButtons'
 import {getSelectedValue} from './getSelectedValue'
 
 // This provider makes the plugin config available to all components in the document form
@@ -77,6 +79,9 @@ export function InternationalizedArrayProvider(
       : languages
   }, [deferredDocument, languageFilterOptions, languages, selectedLanguageIds])
 
+  const showDocumentButtons =
+    internationalizedArray.buttonLocations.includes('document')
+
   return (
     <InternationalizedArrayContext.Provider
       value={{
@@ -85,7 +90,17 @@ export function InternationalizedArrayProvider(
         filteredLanguages,
       }}
     >
-      {props.renderDefault(props)}
+      {showDocumentButtons ? (
+        <Stack space={5}>
+          <DocumentAddButtons
+            schemaType={props.schemaType}
+            value={props.value}
+          />
+          {props.renderDefault(props)}
+        </Stack>
+      ) : (
+        props.renderDefault(props)
+      )}
     </InternationalizedArrayContext.Provider>
   )
 }
