@@ -1,6 +1,6 @@
 import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
-import {Button, Grid, Stack, useToast} from '@sanity/ui'
+import {Button, Card, Grid, Stack, Text, useToast} from '@sanity/ui'
 import React, {useCallback, useEffect, useMemo} from 'react'
 import {
   ArrayOfObjectsInputProps,
@@ -16,6 +16,7 @@ import type {Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
+import AddButtons from './AddButtons'
 import Feedback from './Feedback'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -205,10 +206,11 @@ export default function InternationalizedArray(
     filteredLanguages?.length > 0 &&
     // Not every language has a value yet
     !allLanguagesArePresent
+  const fieldHasMembers = members?.length > 0
 
   return (
     <Stack space={2}>
-      {members?.length > 0 ? (
+      {fieldHasMembers ? (
         <>
           {filteredMembers.map((member) => {
             if (member.kind === 'item') {
@@ -229,36 +231,23 @@ export default function InternationalizedArray(
         </>
       ) : null}
 
+      {/* Give some feedback in the UI so the field doesn't look "missing" */}
+      {!addButtonsAreVisible && !fieldHasMembers ? (
+        <Card border tone="transparent" padding={3} radius={2}>
+          <Text size={1}>
+            This internationalized field currently has no translations.
+          </Text>
+        </Card>
+      ) : null}
+
       {addButtonsAreVisible ? (
         <Stack space={2}>
-          {/* Hide language-specific buttons if there's only one */}
-          {/* No more than 7 columns */}
-          {filteredLanguages.length > 1 ? (
-            <Grid
-              columns={Math.min(filteredLanguages.length, MAX_COLUMNS)}
-              gap={2}
-            >
-              {filteredLanguages.map((language) => (
-                <Button
-                  key={language.id}
-                  tone="primary"
-                  mode="ghost"
-                  fontSize={1}
-                  disabled={
-                    readOnly ||
-                    Boolean(value?.find((item) => item._key === language.id))
-                  }
-                  text={language.id.toUpperCase()}
-                  // Only show plus icon if there's one row or less
-                  icon={
-                    filteredLanguages.length > MAX_COLUMNS ? undefined : AddIcon
-                  }
-                  value={language.id}
-                  onClick={handleAddLanguage}
-                />
-              ))}
-            </Grid>
-          ) : null}
+          <AddButtons
+            languages={filteredLanguages}
+            value={value}
+            readOnly={readOnly}
+            onClick={handleAddLanguage}
+          />
           {buttonAddAll ? (
             <Button
               tone="primary"

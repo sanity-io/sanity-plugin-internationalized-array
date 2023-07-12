@@ -28,7 +28,7 @@ const createTranslateFieldActions: (
     const disabled =
       value && Array.isArray(value)
         ? Boolean(value?.find((item) => item._key === language.id))
-        : true
+        : false
     const hidden = !filteredLanguages.some((f) => f.id === language.id)
 
     const {onChange} = useDocumentPane()
@@ -67,7 +67,7 @@ const AddMissingTranslationsFieldAction: (
   {languages, filteredLanguages}
 ) => {
   const value = useFormValue(fieldActionProps.path) as Value[]
-  const disabled = value.length === filteredLanguages.length
+  const disabled = value && value.length === filteredLanguages.length
   const hidden = checkAllLanguagesArePresent(filteredLanguages, value)
 
   const {onChange} = useDocumentPane()
