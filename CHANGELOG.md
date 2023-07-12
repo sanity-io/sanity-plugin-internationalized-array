@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.8.0...v1.9.0) (2023-07-12)
+
+### Features
+
+- add document-level button action ([0b9412f](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/0b9412fb28a775145cc73a7a261c8e972f10d433))
+
 ## [1.8.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.7.0...v1.8.0) (2023-07-10)
 
 ### Features
