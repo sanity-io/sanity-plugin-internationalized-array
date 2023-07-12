@@ -118,10 +118,10 @@ export type PluginConfig = {
    * Locations where the "+ EN" add language buttons are visible
    * @defaultValue ['field']
    * */
-  buttonLocations: ('field' | 'unstable__fieldAction' | 'document')[]
+  buttonLocations?: ('field' | 'unstable__fieldAction' | 'document')[]
   /**
    * Show or hide the "Add missing languages" button
    * @defaultValue true
    * */
-  buttonAddAll: boolean
+  buttonAddAll?: boolean
 }

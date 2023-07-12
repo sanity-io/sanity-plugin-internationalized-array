@@ -58,7 +58,7 @@ export function InternationalizedArrayProvider(
           }
           return internationalizedArray.languages
         },
-        [version, namespace],
+        [version, namespace, selectedValue],
         {equal}
       )
 
