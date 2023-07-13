@@ -9,6 +9,7 @@ import {
   set,
   setIfMissing,
   useFormValue,
+  MemberItemError
 } from 'sanity'
 
 import {MAX_COLUMNS} from '../constants'
@@ -216,17 +217,14 @@ export default function InternationalizedArray(
             if (member.kind === 'item') {
               return (
                 <ArrayOfObjectsItem
+                  {...props}
                   key={member.key}
                   member={member}
-                  renderItem={props.renderItem}
-                  renderField={props.renderField}
-                  renderInput={props.renderInput}
-                  renderPreview={props.renderPreview}
                 />
               )
             }
 
-            return null
+            return <MemberItemError key={member.key} member={member} />
           })}
         </>
       ) : null}
