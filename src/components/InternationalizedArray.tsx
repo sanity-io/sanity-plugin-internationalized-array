@@ -9,6 +9,7 @@ import {
   set,
   setIfMissing,
   useFormValue,
+  MemberItemError
 } from 'sanity'
 
 import {MAX_COLUMNS} from '../constants'
@@ -223,7 +224,7 @@ export default function InternationalizedArray(
               )
             }
 
-            return null
+            return <MemberItemError key={member.key} member={member} />
           })}
         </>
       ) : null}
