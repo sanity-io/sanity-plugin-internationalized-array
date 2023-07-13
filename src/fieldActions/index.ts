@@ -53,7 +53,7 @@ const createTranslateFieldActions: (
       type: 'action',
       icon: AddIcon,
       onAction,
-      title: language.id.toLocaleUpperCase(),
+      title: language.title,
       hidden,
       disabled,
     }
