@@ -216,12 +216,9 @@ export default function InternationalizedArray(
             if (member.kind === 'item') {
               return (
                 <ArrayOfObjectsItem
+                  {...props}
                   key={member.key}
                   member={member}
-                  renderItem={props.renderItem}
-                  renderField={props.renderField}
-                  renderInput={props.renderInput}
-                  renderPreview={props.renderPreview}
                 />
               )
             }
