@@ -5,6 +5,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.9.1...v1.10.0) (2023-07-13)
+
+### Features
+
+- render item error instead of returning null ([1653e2e](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/1653e2eda4f6983293f7121a65c6fe68440f5b2c))
+
+### Bug Fixes
+
+- forward all props to ArrayOfObjectsItem to solve portable text issue ([#15](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/15)) ([5389761](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/53897619a6d5d8c1c251d693ddea05b4857d7396))
+
 ## [1.9.1](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.9.0...v1.9.1) (2023-07-12)
 
 ### Bug Fixes
