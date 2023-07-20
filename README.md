@@ -258,7 +258,7 @@ export default defineConfig({
           // It's an internationalized array value
           // And the array _key is the language of the field
           const language =
-            pathEnd[1] === 'value' && isKeySegment(pathEnd[0])****
+            pathEnd[1] === 'value' && isKeySegment(pathEnd[0])
               ? pathEnd[0]._key
               : null
 
