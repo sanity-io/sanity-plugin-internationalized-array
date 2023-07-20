@@ -1,18 +1,17 @@
 import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
-import {Button, Card, Grid, Stack, Text, useToast} from '@sanity/ui'
-import React, {useCallback, useEffect, useMemo} from 'react'
+import {Button, Card, Stack, Text, useToast} from '@sanity/ui'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
   ArraySchemaType,
+  MemberItemError,
   set,
   setIfMissing,
   useFormValue,
-  MemberItemError
 } from 'sanity'
 
-import {MAX_COLUMNS} from '../constants'
 import type {Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
@@ -104,18 +103,33 @@ export default function InternationalizedArray(
 
   // Create default fields if the document is not yet created
   const documentCreatedAt = useFormValue(['_createdAt'])
+  const [hasAddedDefaultLanguages, setHasAddedDefaultLanguages] =
+    useState(false)
 
-  if (
-    // Array field is empty
-    !value &&
-    // Document form is in "not yet created" state
-    !documentCreatedAt &&
-    // Plugin config included default languages
-    defaultLanguages &&
-    defaultLanguages?.length > 0
-  ) {
-    handleAddLanguage(defaultLanguages)
-  }
+  // Write default languages
+  useEffect(() => {
+    if (
+      // Hasn't already added default languages
+      // (This prevents the document being recreated when deleted)
+      !hasAddedDefaultLanguages &&
+      // This array field is empty
+      !value &&
+      // Document form is in "not yet created" state
+      !documentCreatedAt &&
+      // Plugin config included default languages
+      defaultLanguages &&
+      defaultLanguages?.length > 0
+    ) {
+      handleAddLanguage(defaultLanguages)
+      setHasAddedDefaultLanguages(true)
+    }
+  }, [
+    defaultLanguages,
+    documentCreatedAt,
+    handleAddLanguage,
+    hasAddedDefaultLanguages,
+    value,
+  ])
 
   // TODO: This is reordering and re-setting the whole array, it could be surgical
   const handleRestoreOrder = useCallback(() => {
