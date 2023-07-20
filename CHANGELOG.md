@@ -5,6 +5,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.1](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.0...v1.10.1) (2023-07-20)
+
+### Bug Fixes
+
+- field actions display name not id ([b4c4435](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/b4c44356b1985fe0565e914afe377362dd04acae))
+- prevent defaultLanguages from recreating a document when deleted ([9f06e11](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/9f06e11fde19a0050192425a8de35ddc8ddf61f7))
+
 ## [1.10.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.9.1...v1.10.0) (2023-07-13)
 
 ### Features
