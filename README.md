@@ -4,7 +4,7 @@
 
 # sanity-plugin-internationalized-array
 
-A helper function that renders a custom input component for writing localized fields of content into an array.
+A plugin to register array fields with a custom input component to store field values in multiple languages, queryable by using the language ID as an array `_key`.
 
 ![Screenshot of an internationalized input](./img/internationalized-array.png)
 
