@@ -1,10 +1,4 @@
-import {
-  isArraySchemaType,
-  isDocumentSchemaType,
-  ObjectField,
-  Path,
-  SchemaType,
-} from 'sanity'
+import {isDocumentSchemaType, ObjectField, Path, SchemaType} from 'sanity'
 
 type ObjectFieldWithPath = ObjectField<SchemaType> & {path: Path}
 
