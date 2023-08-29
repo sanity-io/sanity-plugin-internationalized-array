@@ -42,6 +42,7 @@ export default function InternationalizedInput(
   }
 
   const {validation, value, onChange, readOnly} = inlineProps
+  const tone = useMemo(() => getToneFromValidation(validation), [validation])
 
   // The parent array contains the languages from the plugin config
   const {languages} = useInternationalizedArrayContext()
@@ -82,7 +83,7 @@ export default function InternationalizedInput(
   }
 
   return (
-    <Card paddingTop={2} tone={getToneFromValidation(validation)}>
+    <Card paddingTop={2} tone={tone}>
       <Stack space={2}>
         <Card tone="inherit">
           {keyIsValid ? (
