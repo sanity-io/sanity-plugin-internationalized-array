@@ -1,10 +1,4 @@
-import {
-  isArraySchemaType,
-  isDocumentSchemaType,
-  ObjectField,
-  Path,
-  SchemaType,
-} from 'sanity'
+import {isDocumentSchemaType, ObjectField, Path, SchemaType} from 'sanity'
 
 type ObjectFieldWithPath = ObjectField<SchemaType> & {path: Path}
 
@@ -42,11 +36,15 @@ function extractInnerFields(
       )
 
       return [...acc, thisFieldWithPath, ...innerFields]
-    } else if (field.type.jsonType === 'array' && isArraySchemaType(field)) {
+    } else if (
+      field.type.jsonType === 'array' &&
+      field.type.of.length &&
+      field.type.of.some((item) => 'fields' in item)
+    ) {
       const innerFields = extractInnerFields(
         // TODO: Fix TS assertion for array fields
         // @ts-expect-error
-        field.type.of,
+        field.type.of[0].fields,
         [...path, field.name],
         maxDepth
       )
