@@ -42,11 +42,11 @@ function extractInnerFields(
       )
 
       return [...acc, thisFieldWithPath, ...innerFields]
-    } else if (field.type.jsonType === 'array' && isArraySchemaType(field)) {
+    } else if (field.type.jsonType === 'array' && field.type.of.length) {
       const innerFields = extractInnerFields(
         // TODO: Fix TS assertion for array fields
         // @ts-expect-error
-        field.type.of,
+        field.type.of[0].fields,
         [...path, field.name],
         maxDepth
       )
