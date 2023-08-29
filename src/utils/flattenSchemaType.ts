@@ -36,7 +36,11 @@ function extractInnerFields(
       )
 
       return [...acc, thisFieldWithPath, ...innerFields]
-    } else if (field.type.jsonType === 'array' && field.type.of.length) {
+    } else if (
+      field.type.jsonType === 'array' &&
+      field.type.of.length &&
+      field.type.of.some((item) => 'fields' in item)
+    ) {
       const innerFields = extractInnerFields(
         // TODO: Fix TS assertion for array fields
         // @ts-expect-error
