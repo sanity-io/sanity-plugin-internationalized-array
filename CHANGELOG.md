@@ -5,6 +5,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.1...v1.10.2) (2023-08-30)
+
+### Bug Fixes
+
+- ensure 'fields' is present in array ([a8447f2](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/a8447f24e4451dec181cd12c562d8a5ed528c52e))
+- recursive array fields check ([f1c895a](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/f1c895ab8b0b9c376f799f9f106ec29c0c2cb283))
+
 ## [1.10.1](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.0...v1.10.1) (2023-07-20)
 
 ### Bug Fixes
