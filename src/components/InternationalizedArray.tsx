@@ -40,6 +40,7 @@ export default function InternationalizedArray(
     defaultLanguages,
     buttonAddAll,
     buttonLocations,
+    addLanguagePatchTransform,
   } = useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed
@@ -96,7 +97,11 @@ export default function InternationalizedArray(
         value,
       })
 
-      onChange([setIfMissing([]), ...patches])
+      const finalPatches = addLanguagePatchTransform
+        ? patches.map((patch) => addLanguagePatchTransform(patch, value))
+        : patches
+
+      onChange([setIfMissing([]), ...finalPatches])
     },
     [filteredLanguages, languages, onChange, schemaType, value]
   )

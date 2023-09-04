@@ -1,5 +1,6 @@
 import type {
   FieldDefinition,
+  FormInsertPatch,
   Rule,
   RuleTypeConstraint,
   SanityClient,
@@ -124,4 +125,12 @@ export type PluginConfig = {
    * @defaultValue true
    * */
   buttonAddAll?: boolean
+  /**
+   * Can be used to transform the add language patch
+   * ie to copy existing content from other languages automatically
+   */
+  addLanguagePatchTransform?: (
+    patch: FormInsertPatch,
+    value: unknown
+  ) => FormInsertPatch
 }

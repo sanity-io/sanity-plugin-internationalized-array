@@ -10,18 +10,24 @@ import {
 } from 'sanity'
 import {useDocumentPane} from 'sanity/desk'
 
-import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import {Language, Value} from '../types'
+import {
+  InternationalizedArrayContextProps,
+  useInternationalizedArrayContext,
+} from '../components/InternationalizedArrayContext'
+import {Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 
 const createTranslateFieldActions: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: Pick<
+    InternationalizedArrayContextProps,
+    'languages' | 'filteredLanguages' | 'addLanguagePatchTransform'
+  >
 ) => DocumentFieldActionItem[] = (
   fieldActionProps,
-  {languages, filteredLanguages}
+  {languages, filteredLanguages, addLanguagePatchTransform}
 ) =>
   languages.map((language) => {
     const value = useFormValue(fieldActionProps.path) as Value[]
@@ -46,7 +52,11 @@ const createTranslateFieldActions: (
         path,
       })
 
-      onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
+      const finalPatches = addLanguagePatchTransform
+        ? patches.map((patch) => addLanguagePatchTransform(patch, value))
+        : patches
+
+      onChange(PatchEvent.from([setIfMissing([], path), ...finalPatches]))
     }, [language.id, value, onChange])
 
     return {
@@ -61,10 +71,13 @@ const createTranslateFieldActions: (
 
 const AddMissingTranslationsFieldAction: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: Pick<
+    InternationalizedArrayContextProps,
+    'languages' | 'filteredLanguages' | 'addLanguagePatchTransform'
+  >
 ) => DocumentFieldActionItem = (
   fieldActionProps,
-  {languages, filteredLanguages}
+  {languages, filteredLanguages, addLanguagePatchTransform}
 ) => {
   const value = useFormValue(fieldActionProps.path) as Value[]
   const disabled = value && value.length === filteredLanguages.length
@@ -85,8 +98,19 @@ const AddMissingTranslationsFieldAction: (
       path,
     })
 
-    onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
-  }, [fieldActionProps, filteredLanguages, languages, onChange, value])
+    const finalPatches = addLanguagePatchTransform
+      ? patches.map((patch) => addLanguagePatchTransform(patch, value))
+      : patches
+
+    onChange(PatchEvent.from([setIfMissing([], path), ...finalPatches]))
+  }, [
+    fieldActionProps,
+    filteredLanguages,
+    languages,
+    onChange,
+    addLanguagePatchTransform,
+    value,
+  ])
 
   return {
     type: 'action',
@@ -105,11 +129,12 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       fieldActionProps?.schemaType?.type?.name.startsWith(
         'internationalizedArray'
       )
-    const {languages, filteredLanguages} = useInternationalizedArrayContext()
+    const {languages, filteredLanguages, addLanguagePatchTransform} =
+      useInternationalizedArrayContext()
 
     const translateFieldActions = createTranslateFieldActions(
       fieldActionProps,
-      {languages, filteredLanguages}
+      {languages, filteredLanguages, addLanguagePatchTransform}
     )
 
     return {
@@ -123,6 +148,7 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
             AddMissingTranslationsFieldAction(fieldActionProps, {
               languages,
               filteredLanguages,
+              addLanguagePatchTransform,
             }),
           ]
         : [],

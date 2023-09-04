@@ -14,7 +14,7 @@ import {getSelectedValue} from './getSelectedValue'
 // This provider makes the plugin config available to all components in the document form
 // But with languages resolved and filtered languages updated base on @sanity/language-filter
 
-type InternationalizedArrayContextProps = Required<PluginConfig> & {
+export type InternationalizedArrayContextProps = Required<PluginConfig> & {
   languages: Language[]
   filteredLanguages: Language[]
 }
