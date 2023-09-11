@@ -104,7 +104,7 @@ export default function InternationalizedArray(
   // Create default fields if the document is not yet created
   const documentCreatedAt = useFormValue(['_createdAt'])
   const [hasAddedDefaultLanguages, setHasAddedDefaultLanguages] =
-    useState(false)
+    useState(Boolean(documentCreatedAt))
 
   // Write default languages
   useEffect(() => {
