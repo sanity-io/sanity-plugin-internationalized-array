@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.4](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.3...v1.10.4) (2024-01-05)
+
+### Bug Fixes
+
+- **deps:** widen @sanity/ui peer dependency range ([737a274](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/737a274128d0eef2a7354149e185355bef8cc8cb))
+
 ## [1.10.3](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.2...v1.10.3) (2023-09-11)
 
 ### Bug Fixes
