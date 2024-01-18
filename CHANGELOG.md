@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.5](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.4...v1.10.5) (2024-01-18)
+
+### Bug Fixes
+
+- recursive lookup for field options ([20d449a](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/20d449a948907f79ee0708b0af635618b596fdbb))
+
 ## [1.10.4](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.3...v1.10.4) (2024-01-05)
 
 ### Bug Fixes
