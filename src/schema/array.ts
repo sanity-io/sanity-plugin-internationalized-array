@@ -6,6 +6,7 @@ import {createFieldName} from '../components/createFieldName'
 import {getSelectedValue} from '../components/getSelectedValue'
 import InternationalizedArray from '../components/InternationalizedArray'
 import {Language, LanguageCallback, Value} from '../types'
+import {getLanguagesFieldOption} from '../utils/getLanguagesFieldOption'
 
 type ArrayFactoryConfig = {
   apiVersion: string
@@ -14,6 +15,11 @@ type ArrayFactoryConfig = {
   defaultLanguages?: string[]
   type: string | FieldDefinition
 }
+
+export type ArrayFieldOptions = Pick<
+  ArrayFactoryConfig,
+  'apiVersion' | 'select' | 'languages'
+>
 
 export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
   const {apiVersion, select, languages, type} = config
@@ -47,13 +53,17 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
 
         const selectedValue = getSelectedValue(select, context.document)
         const client = context.getClient({apiVersion})
-        const contextLanguages: Language[] = Array.isArray(
-          context?.type?.options?.languages
-        )
-          ? context!.type!.options.languages
-          : Array.isArray(peek(selectedValue))
-          ? peek(selectedValue)
-          : await context?.type?.options.languages(client, selectedValue)
+
+        let contextLanguages: Language[] = []
+        const languagesFieldOption = getLanguagesFieldOption(context?.type)
+
+        if (Array.isArray(languagesFieldOption)) {
+          contextLanguages = languagesFieldOption
+        } else if (Array.isArray(peek(selectedValue))) {
+          contextLanguages = peek(selectedValue) || []
+        } else if (typeof languagesFieldOption === 'function') {
+          contextLanguages = await languagesFieldOption(client, selectedValue)
+        }
 
         if (value && value.length > contextLanguages.length) {
           return `Cannot be more than ${
