@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.8](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.7...v1.10.8) (2024-01-25)
+
+### Bug Fixes
+
+- restore field action ([bb2c354](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/bb2c3541d9361e688717e48eccdd55f96a5d2ab2))
+
 ## [1.10.7](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.6...v1.10.7) (2024-01-19)
 
 ### Bug Fixes
