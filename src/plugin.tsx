@@ -36,11 +36,11 @@ export const internationalizedArray = definePlugin<PluginConfig>((config) => {
           },
         },
     // Optional: render "add language" buttons as field actions
-    // document: {
-    //   unstable_fieldActions: buttonLocations.includes('unstable__fieldAction')
-    //     ? (prev) => [...prev, internationalizedArrayFieldAction]
-    //     : undefined,
-    // },
+    document: {
+      unstable_fieldActions: buttonLocations.includes('unstable__fieldAction')
+        ? (prev) => [...prev, internationalizedArrayFieldAction]
+        : undefined,
+    },
     // Wrap document editor with a language provider
     form: {
       components: {
