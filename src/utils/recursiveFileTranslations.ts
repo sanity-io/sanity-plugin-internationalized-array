@@ -1,24 +1,17 @@
-export type Translator = (
-  text: string,
-  targetLang: string,
-  sourceLang?: string
-) => Promise<string>
+import {Translator} from '../types'
 
 interface TranslationParams {
   value: unknown
-  target: string
+  targetLang: string
   translator: Translator
   excludeValues: string[]
   sourceLang?: string
 }
 
-export const getTranslations = async ({
-  value,
-  target,
-  translator,
-  excludeValues = [],
-  sourceLang,
-}: TranslationParams): Promise<unknown> => {
+export const getTranslations = async (
+  params: TranslationParams
+): Promise<unknown> => {
+  const {value, targetLang, translator, excludeValues = [], sourceLang} = params
   if (!value) {
     return value
   }
@@ -26,11 +19,8 @@ export const getTranslations = async ({
     const translationResult = await Promise.all(
       value.map(async (result) => {
         const translationResults = await getTranslations({
+          ...params,
           value: result,
-          target,
-          translator,
-          excludeValues,
-          sourceLang,
         })
         return translationResults
       })
@@ -57,19 +47,7 @@ export const getTranslations = async ({
       const result = value[typeKey]
       if (
         !key.search(startsWithUnderscoreRegex) ||
-        excludeValues.includes(key) ||
-        key === 'migration' ||
-        key === 'icon' ||
-        key === 'program_variation' ||
-        key === 'program_status' ||
-        key === 'matching_algorithm' ||
-        key === 'text_area_size' ||
-        key === 'metadata' ||
-        key === 'media' ||
-        key === 'url' ||
-        key === 'color_palette_config' ||
-        key === 'basic_info' ||
-        key === 'migration'
+        excludeValues.includes(key)
       ) {
         translatedObject = {...translatedObject, [key]: result}
         continue
@@ -77,13 +55,7 @@ export const getTranslations = async ({
 
       translatedObject = {
         ...translatedObject,
-        [key]: await getTranslations({
-          value: result,
-          target,
-          translator,
-          excludeValues,
-          sourceLang,
-        }),
+        [key]: await getTranslations({...params, value: result}),
       }
     }
 
@@ -91,7 +63,7 @@ export const getTranslations = async ({
   }
 
   if (typeof value === 'string') {
-    const translatedString = await translator(value, target, sourceLang)
+    const translatedString = await translator({value, targetLang, sourceLang})
     return translatedString
   }
   if (typeof value === 'number') {

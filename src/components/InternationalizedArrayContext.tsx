@@ -7,16 +7,19 @@ import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
 import {CONFIG_DEFAULT} from '../constants'
-import {Language, PluginConfig} from '../types'
+import {Language, PluginConfig, Translator} from '../types'
 import DocumentAddButtons from './DocumentAddButtons'
 import {getSelectedValue} from './getSelectedValue'
 
 // This provider makes the plugin config available to all components in the document form
 // But with languages resolved and filtered languages updated base on @sanity/language-filter
 
-type InternationalizedArrayContextProps = Required<PluginConfig> & {
+type InternationalizedArrayContextProps = Required<
+  Omit<PluginConfig, 'translator'>
+> & {
   languages: Language[]
   filteredLanguages: Language[]
+  translator?: Translator
 }
 
 export const InternationalizedArrayContext =
@@ -24,6 +27,7 @@ export const InternationalizedArrayContext =
     ...CONFIG_DEFAULT,
     languages: [],
     filteredLanguages: [],
+    translator: undefined,
   })
 
 export function useInternationalizedArrayContext() {
@@ -31,7 +35,9 @@ export function useInternationalizedArrayContext() {
 }
 
 type InternationalizedArrayProviderProps = ObjectInputProps & {
-  internationalizedArray: Required<PluginConfig>
+  internationalizedArray: Required<Omit<PluginConfig, 'translator'>> & {
+    translator?: Translator
+  }
 }
 
 export function InternationalizedArrayProvider(

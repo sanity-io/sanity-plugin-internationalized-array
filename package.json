@@ -1,7 +1,7 @@
 {
   "name": "sanity-plugin-internationalized-array",
   "version": "1.10.8",
-  "description": "Store localized fields in an array to save on attributes",
+  "description": "Forked: Store localized fields in an array to save on attributes",
   "keywords": [
     "sanity",
     "sanity-plugin"
@@ -9,10 +9,6 @@
   "homepage": "https://github.com/sanity-io/sanity-plugin-internationalized-array#readme",
   "bugs": {
     "url": "https://github.com/sanity-io/sanity-plugin-internationalized-array/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:sanity-io/sanity-plugin-internationalized-array.git"
   },
   "license": "MIT",
   "author": "Sanity.io <hello@sanity.io>",

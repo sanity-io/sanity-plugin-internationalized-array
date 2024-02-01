@@ -40,6 +40,7 @@ export default function InternationalizedArray(
     defaultLanguages,
     buttonAddAll,
     buttonLocations,
+    translator,
   } = useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed
@@ -79,7 +80,9 @@ export default function InternationalizedArray(
   )
 
   const handleAddLanguage = useCallback(
-    (param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]) => {
+    async (
+      param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]
+    ) => {
       if (!filteredLanguages?.length) {
         return
       }
@@ -88,17 +91,18 @@ export default function InternationalizedArray(
         ? param
         : ([param?.currentTarget?.value].filter(Boolean) as string[])
 
-      const patches = createAddLanguagePatches({
+      const patches = await createAddLanguagePatches({
         addLanguageKeys,
         schemaType,
         languages,
         filteredLanguages,
         value,
+        translator,
       })
 
       onChange([setIfMissing([]), ...patches])
     },
-    [filteredLanguages, languages, onChange, schemaType, value]
+    [filteredLanguages, languages, onChange, schemaType, translator, value]
   )
 
   // Create default fields if the document is not yet created
