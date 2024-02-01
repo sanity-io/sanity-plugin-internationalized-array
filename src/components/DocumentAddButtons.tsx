@@ -10,6 +10,8 @@ import {
 import {useDocumentPane} from 'sanity/desk'
 
 import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
+import {createSchema} from '../utils/recursiveFileCheck'
+import {getTranslations} from '../utils/recursiveFileTranslations'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -19,10 +21,14 @@ type DocumentAddButtonsProps = {
 }
 
 export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
-  const {filteredLanguages} = useInternationalizedArrayContext()
+  const {filteredLanguages, translator, excludeValues} =
+    useInternationalizedArrayContext()
   const {fields} = props.schemaType
-  const value = isSanityDocument(props.value) ? props.value : undefined
+  console.log('test pa schemaType', props.schemaType)
+  const testPaths = createSchema(props.schemaType, [])
+  console.log('test pa testPaths', testPaths)
 
+  const value = isSanityDocument(props.value) ? props.value : undefined
   const toast = useToast()
   const {onChange} = useDocumentPane()
 
@@ -36,8 +42,13 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
     [fields]
   )
 
+  console.log(
+    'test pa internationalizedArrayFields',
+    internationalizedArrayFields
+  )
+
   const handleDocumentButtonClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       const languageId = event.currentTarget.value
       if (!languageId) {
         toast.push({
@@ -69,10 +80,34 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
       )
 
       // Write a new patch for each empty field
-      const patches = emptyLanguageFields
-        .map((field) => {
+      const patches = await Promise.all(
+        emptyLanguageFields.map(async (field) => {
           const fieldKey = field.name
 
+          if (translator) {
+            const translations = await getTranslations({
+              value,
+              targetLang: languageId,
+              translator,
+              excludeValues,
+              sourceLang: undefined,
+            })
+            console.log('test pa', translations)
+            return [
+              setIfMissing([], [fieldKey]),
+              insert(
+                [
+                  {
+                    _key: languageId,
+                    _type: createValueSchemaTypeName(field.type),
+                    // value: translations,
+                  },
+                ],
+                'after',
+                [fieldKey, -1]
+              ),
+            ]
+          }
           return [
             setIfMissing([], [fieldKey]),
             insert(
@@ -87,11 +122,18 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
             ),
           ]
         })
-        .flat()
+      )
 
-      onChange(PatchEvent.from(patches))
+      onChange(PatchEvent.from(patches.flat()))
     },
-    [internationalizedArrayFields, onChange, toast, value]
+    [
+      excludeValues,
+      internationalizedArrayFields,
+      onChange,
+      toast,
+      translator,
+      value,
+    ]
   )
 
   return (
