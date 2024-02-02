@@ -10,8 +10,8 @@ import {
 import {useDocumentPane} from 'sanity/desk'
 
 import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
-import {createSchema} from '../utils/recursiveFileCheck'
 import {getTranslations} from '../utils/recursiveFileTranslations'
+import {recursiveSchemaCreate} from '../utils/recursiveSchemaCreate'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -25,7 +25,7 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
     useInternationalizedArrayContext()
   const {fields} = props.schemaType
   console.log('test pa schemaType', props.schemaType)
-  const testPaths = createSchema(props.schemaType, [])
+  const testPaths = recursiveSchemaCreate(props.schemaType, [])
   console.log('test pa testPaths', testPaths)
 
   const value = isSanityDocument(props.value) ? props.value : undefined

@@ -6,7 +6,7 @@ interface Schema {
   children?: Schema[]
   path: (string | number)[]
 }
-export const createSchema = (
+export const recursiveSchemaCreate = (
   schemaType: SchemaType,
   path: (string | number)[] = []
 ): Schema => {
@@ -17,7 +17,7 @@ export const createSchema = (
     const arraySchemaResults = ofArraySchemas.map((ofArraySchema, index) => {
       const fieldName = ofArraySchema.name
       const arrayItemPath = [...arrayRootPath, index, fieldName]
-      const arraySchema = createSchema(ofArraySchema, arrayItemPath)
+      const arraySchema = recursiveSchemaCreate(ofArraySchema, arrayItemPath)
       return {
         name: fieldName,
         type: arraySchema.type,
@@ -39,7 +39,10 @@ export const createSchema = (
       const objectSchemaField = objectField.type
       const fieldName = objectField.name
       const objectItemPath = [...objectRootPath, index, fieldName]
-      const objectSchema = createSchema(objectSchemaField, objectItemPath)
+      const objectSchema = recursiveSchemaCreate(
+        objectSchemaField,
+        objectItemPath
+      )
       return {
         name: fieldName,
         type: objectSchema.type,
