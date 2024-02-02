@@ -1,6 +1,8 @@
 import {Box, Stack, Text, useToast} from '@sanity/ui'
 import React, {useCallback, useMemo} from 'react'
 import {
+  FormInsertPatch,
+  FormSetIfMissingPatch,
   insert,
   isSanityDocument,
   ObjectSchemaType,
@@ -11,7 +13,10 @@ import {useDocumentPane} from 'sanity/desk'
 
 import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
 import {getTranslations} from '../utils/recursiveFileTranslations'
-import {recursiveSchemaCreate} from '../utils/recursiveSchemaCreate'
+import {
+  createInternationalizedArrayFields,
+  recursiveSchemaCreate,
+} from '../utils/recursiveSchemaCreate'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -24,9 +29,14 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const {filteredLanguages, translator, excludeValues} =
     useInternationalizedArrayContext()
   const {fields} = props.schemaType
-  console.log('test pa schemaType', props.schemaType)
-  const testPaths = recursiveSchemaCreate(props.schemaType, [])
-  console.log('test pa testPaths', testPaths)
+  // console.log('test pa schemaType', props.schemaType)
+  // const testPaths = recursiveSchemaCreate(props.schemaType, [])
+  // console.log('test pa testPaths', testPaths)
+
+  const internationalizedArrayFields = createInternationalizedArrayFields(
+    props.schemaType,
+    [props.schemaType.name]
+  )
 
   const value = isSanityDocument(props.value) ? props.value : undefined
   const toast = useToast()
@@ -34,18 +44,18 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
   // Find every internationalizedArray field at the document root
   // TODO: This should be a recursive search through nested fields
-  const internationalizedArrayFields = useMemo(
-    () =>
-      fields.filter((field) =>
-        field.type.name.startsWith('internationalizedArray')
-      ),
-    [fields]
-  )
+  // const internationalizedArrayFields = useMemo(
+  //   () =>
+  //     fields.filter((field) =>
+  //       field.type.name.startsWith('internationalizedArray')
+  //     ),
+  //   [fields]
+  // )
 
-  console.log(
-    'test pa internationalizedArrayFields',
-    internationalizedArrayFields
-  )
+  // console.log(
+  //   'test pa internationalizedArrayFields',
+  //   internationalizedArrayFields
+  // )
 
   const handleDocumentButtonClick = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -81,12 +91,15 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
       // Write a new patch for each empty field
       const patches = await Promise.all(
-        emptyLanguageFields.map(async (field) => {
+        emptyLanguageFields.reduce<any>(async (acc, field) => {
           const fieldKey = field.name
 
+          if (!field?.type) {
+            return acc
+          }
           if (translator) {
             const translations = await getTranslations({
-              value,
+              value: field,
               targetLang: languageId,
               translator,
               excludeValues,
@@ -94,21 +107,23 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
             })
             console.log('test pa', translations)
             return [
-              setIfMissing([], [fieldKey]),
+              ...acc,
+              setIfMissing([], field.path),
               insert(
                 [
                   {
                     _key: languageId,
                     _type: createValueSchemaTypeName(field.type),
-                    // value: translations,
+                    value: translations,
                   },
                 ],
                 'after',
-                [fieldKey, -1]
+                [...field.path, -1]
               ),
             ]
           }
           return [
+            ...acc,
             setIfMissing([], [fieldKey]),
             insert(
               [
@@ -121,7 +136,7 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
               [fieldKey, -1]
             ),
           ]
-        })
+        }, [])
       )
 
       onChange(PatchEvent.from(patches.flat()))
