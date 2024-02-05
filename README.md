@@ -11,13 +11,13 @@ A plugin to register array fields with a custom input component to store field v
 ## Installation
 
 ```
-npm install --save sanity-plugin-internationalized-array
+npm install --save @guider-global/sanity-plugin-internationalized-array
 ```
 
 or
 
 ```
-yarn add sanity-plugin-internationalized-array
+yarn add @guider-global/sanity-plugin-internationalized-array
 ```
 
 ## Usage for simple field types
