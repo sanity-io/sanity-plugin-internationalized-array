@@ -5,21 +5,20 @@ import {
   FormSetIfMissingPatch,
   insert,
   isSanityDocument,
-  ObjectSchemaType,
   PatchEvent,
   setIfMissing,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/desk'
 
 import {Translator} from '../types'
-import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
-import {getNestedValue} from '../utils/getNestedDocument'
+import {
+  DocumentsToTranslate,
+  getDocumentsToTranslate,
+} from '../utils/getDocumentsToTranslate'
 import {getTranslations} from '../utils/recursiveFileTranslations'
-import {createInternationalizedArrayFields} from '../utils/recursiveSchemaCreate'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 type DocumentAddButtonsProps = {
-  schemaType: ObjectSchemaType
   value: Record<string, any> | undefined
   translator: Translator | undefined
   excludeValues?: string[]
@@ -31,13 +30,10 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const toast = useToast()
   const {onChange} = useDocumentPane()
 
-  const internationalizedArrayFields = createInternationalizedArrayFields(
-    props.schemaType,
-    []
-  )
-  console.log('test', {internationalizedArrayFields, schema: props.schemaType})
+  const documentsToTranslation = getDocumentsToTranslate(value, [])
+
   const handleDocumentButtonClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       const languageId = event.currentTarget.value
       if (!languageId) {
         toast.push({
@@ -46,7 +42,30 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
         })
         return
       }
-      if (internationalizedArrayFields.length === 0) {
+      const alreadyTranslated = documentsToTranslation.filter(
+        (translation) => translation?._key === languageId
+      )
+      const removeDuplicates = documentsToTranslation.reduce<
+        DocumentsToTranslate[]
+      >((filteredTranslations, translation) => {
+        if (
+          alreadyTranslated.filter(
+            (alreadyTranslation) =>
+              alreadyTranslation.pathString === translation.pathString
+          ).length > 0
+        ) {
+          return filteredTranslations
+        }
+        const translationAlreadyExists = filteredTranslations.filter(
+          (filteredTranslation) => filteredTranslation.path === translation.path
+        )
+
+        if (translationAlreadyExists.length > 0) {
+          return filteredTranslations
+        }
+        return [...filteredTranslations, translation]
+      }, [])
+      if (removeDuplicates.length === 0) {
         toast.push({
           status: 'error',
           title: 'No internationalizedArray fields found in document root',
@@ -55,77 +74,45 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
       }
 
       // Write a new patch for each empty field
-      const patches: (FormSetIfMissingPatch | FormInsertPatch)[] =
-        internationalizedArrayFields.reduce<
-          (FormSetIfMissingPatch | FormInsertPatch)[]
-        >((acc, field) => {
-          const path = field.path
-          if (!field.type) return acc ?? []
-          console.log('test pa', {path})
+      const patches: (FormSetIfMissingPatch | FormInsertPatch)[] = []
 
-          const currentTranslations = value
-            ? getNestedValue<
-                {
-                  _key: string
-                  _type: string
-                  value: unknown
-                }[]
-              >(path, value)
-            : []
+      for (const toTranslate of removeDuplicates) {
+        const path = toTranslate.path
+        const sourceLang = toTranslate._key
+        const translations =
+          props.translator && toTranslate?.value
+            ? await getTranslations({
+                value: toTranslate?.value,
+                targetLang: languageId,
+                translator: props.translator,
+                excludeValues: props.excludeValues ?? [],
+                sourceLang,
+              })
+            : undefined
+        const ifMissing = setIfMissing([], path)
+        const insertValue = insert(
+          [
+            {
+              _key: languageId,
+              _type: toTranslate._type,
+              value: translations,
+            },
+          ],
+          'after',
+          [...path, -1]
+        )
+        patches.push(ifMissing)
+        patches.push(insertValue)
+      }
 
-          if (!Array.isArray(currentTranslations)) {
-            return acc
-          }
-          console.log('test pa', {currentTranslations, path})
-
-          const translationsAlreadyExists = currentTranslations.find(
-            (translation) => translation._key === languageId
-          )
-
-          if (translationsAlreadyExists && translationsAlreadyExists.value) {
-            return acc
-          }
-          const translationSource = currentTranslations.find(
-            (translation) => translation._key !== languageId
-          )
-          const sourceLang = translationSource?._key
-          const translations =
-            props.translator && translationSource?.value
-              ? getTranslations({
-                  value: translationSource?.value,
-                  targetLang: languageId,
-                  translator: props.translator,
-                  excludeValues: props.excludeValues ?? [],
-                  sourceLang,
-                })
-              : undefined
-
-          return [
-            ...acc,
-            setIfMissing([], path),
-            insert(
-              [
-                {
-                  _key: languageId,
-                  _type: createValueSchemaTypeName(field.type),
-                  value: translations,
-                },
-              ],
-              'after',
-              [...path, -1]
-            ),
-          ]
-        }, [])
-      console.log('test pa', patches)
       onChange(PatchEvent.from(patches.flat()))
     },
     [
-      internationalizedArrayFields,
+      documentsToTranslation,
       onChange,
       props.excludeValues,
       props.translator,
       toast,
-      value,
     ]
   )
   return (

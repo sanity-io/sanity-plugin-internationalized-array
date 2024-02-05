@@ -99,7 +99,6 @@ export function InternationalizedArrayProvider(
       {showDocumentButtons ? (
         <Stack space={5}>
           <DocumentAddButtons
-            schemaType={props.schemaType}
             value={props.value}
             translator={internationalizedArray.translator}
             excludeValues={internationalizedArray.excludeValues}
