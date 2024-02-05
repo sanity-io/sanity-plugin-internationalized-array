@@ -1,6 +1,8 @@
 import {Box, Stack, Text, useToast} from '@sanity/ui'
-import React, {useCallback, useMemo} from 'react'
+import React, {useCallback} from 'react'
 import {
+  FormInsertPatch,
+  FormSetIfMissingPatch,
   insert,
   isSanityDocument,
   ObjectSchemaType,
@@ -9,28 +11,31 @@ import {
 } from 'sanity'
 import {useDocumentPane} from 'sanity/desk'
 
+import {Translator} from '../types'
 import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
+import {getNestedValue} from '../utils/getNestedDocument'
+import {getTranslations} from '../utils/recursiveFileTranslations'
+import {createInternationalizedArrayFields} from '../utils/recursiveSchemaCreate'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 type DocumentAddButtonsProps = {
   schemaType: ObjectSchemaType
   value: Record<string, any> | undefined
+  translator: Translator | undefined
+  excludeValues?: string[]
 }
 export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const {filteredLanguages} = useInternationalizedArrayContext()
-  const {fields} = props.schemaType
   const value = isSanityDocument(props.value) ? props.value : undefined
+
   const toast = useToast()
   const {onChange} = useDocumentPane()
-  // Find every internationalizedArray field at the document root
-  // TODO: This should be a recursive search through nested fields
-  const internationalizedArrayFields = useMemo(
-    () =>
-      fields.filter((field) =>
-        field.type.name.startsWith('internationalizedArray')
-      ),
-    [fields]
+
+  const internationalizedArrayFields = createInternationalizedArrayFields(
+    props.schemaType,
+    []
   )
+  console.log('test', {internationalizedArrayFields, schema: props.schemaType})
   const handleDocumentButtonClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       const languageId = event.currentTarget.value
@@ -48,39 +53,80 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
         })
         return
       }
-      // Find every internationalizedArray field that is empty for the selected language
-      const emptyLanguageFields = internationalizedArrayFields.filter(
-        (field) => {
-          const fieldValue = value?.[field.name]
-          const fieldValueLanguage =
-            fieldValue && Array.isArray(fieldValue)
-              ? fieldValue.find((v) => v._key === languageId)
-              : undefined
-          return !fieldValueLanguage
-        }
-      )
+
       // Write a new patch for each empty field
-      const patches = emptyLanguageFields
-        .map((field) => {
-          const fieldKey = field.name
+      const patches: (FormSetIfMissingPatch | FormInsertPatch)[] =
+        internationalizedArrayFields.reduce<
+          (FormSetIfMissingPatch | FormInsertPatch)[]
+        >((acc, field) => {
+          const path = field.path
+          if (!field.type) return acc ?? []
+          console.log('test pa', {path})
+
+          const currentTranslations = value
+            ? getNestedValue<
+                {
+                  _key: string
+                  _type: string
+                  value: unknown
+                }[]
+              >(path, value)
+            : []
+
+          if (!Array.isArray(currentTranslations)) {
+            return acc
+          }
+          console.log('test pa', {currentTranslations, path})
+
+          const translationsAlreadyExists = currentTranslations.find(
+            (translation) => translation._key === languageId
+          )
+
+          if (translationsAlreadyExists && translationsAlreadyExists.value) {
+            return acc
+          }
+          const translationSource = currentTranslations.find(
+            (translation) => translation._key !== languageId
+          )
+          const sourceLang = translationSource?._key
+          const translations =
+            props.translator && translationSource?.value
+              ? getTranslations({
+                  value: translationSource?.value,
+                  targetLang: languageId,
+                  translator: props.translator,
+                  excludeValues: props.excludeValues ?? [],
+                  sourceLang,
+                })
+              : undefined
+
           return [
-            setIfMissing([], [fieldKey]),
+            ...acc,
+            setIfMissing([], path),
             insert(
               [
                 {
                   _key: languageId,
                   _type: createValueSchemaTypeName(field.type),
+                  value: translations,
                 },
               ],
               'after',
-              [fieldKey, -1]
+              [...path, -1]
             ),
           ]
-        })
-        .flat()
-      onChange(PatchEvent.from(patches))
+        }, [])
+      console.log('test pa', patches)
+      onChange(PatchEvent.from(patches.flat()))
     },
-    [internationalizedArrayFields, onChange, toast, value]
+    [
+      internationalizedArrayFields,
+      onChange,
+      props.excludeValues,
+      props.translator,
+      toast,
+      value,
+    ]
   )
   return (
     <Stack space={3}>

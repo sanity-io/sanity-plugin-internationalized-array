@@ -101,6 +101,8 @@ export function InternationalizedArrayProvider(
           <DocumentAddButtons
             schemaType={props.schemaType}
             value={props.value}
+            translator={internationalizedArray.translator}
+            excludeValues={internationalizedArray.excludeValues}
           />
           {props.renderDefault(props)}
         </Stack>
