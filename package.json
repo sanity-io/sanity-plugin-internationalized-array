@@ -1,6 +1,6 @@
 {
   "name": "@guider-global/sanity-plugin-internationalized-array",
-  "version": "1.10.8",
+  "version": "1.10.9",
   "description": "Forked: Store localized fields in an array to save on attributes",
   "keywords": [
     "sanity",
