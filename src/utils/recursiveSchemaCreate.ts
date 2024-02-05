@@ -63,3 +63,71 @@ export const recursiveSchemaCreate = (
     path: [...path, schemaType.name],
   }
 }
+type CreateInternationalizedArrayFieldsResult = SchemaType & {
+  path: (string | number)[]
+}
+export const createInternationalizedArrayFields = (
+  schemaType: SchemaType,
+  path: (string | number)[] = []
+): CreateInternationalizedArrayFieldsResult[] => {
+  if (schemaType.jsonType === 'array') {
+    const arrayRootPath = [...path]
+
+    const ofArraySchemas = schemaType.of
+    const arraySchemaResults = ofArraySchemas.reduce<
+      CreateInternationalizedArrayFieldsResult[]
+    >((acc, ofArraySchema, index) => {
+      const fieldName = ofArraySchema.name
+      const arrayItemPath = [...arrayRootPath, index]
+      const arraySchema = createInternationalizedArrayFields(
+        ofArraySchema,
+        arrayItemPath
+      )
+      if (fieldName.startsWith('internationalizedArray')) {
+        return [
+          ...acc,
+          {...ofArraySchema, path: arrayItemPath, name: fieldName},
+          ...arraySchema,
+        ]
+      }
+      return [...acc, ...arraySchema]
+    }, [])
+    if (schemaType.name.startsWith('internationalizedArray')) {
+      return [{...schemaType, path: arrayRootPath}, ...arraySchemaResults]
+    }
+    return arraySchemaResults
+  }
+  if (schemaType.jsonType === 'object') {
+    const objectSchemaFields = schemaType.fields
+    const objectRootPath = [...path]
+    const objectSchemaResults = objectSchemaFields.reduce<
+      CreateInternationalizedArrayFieldsResult[]
+    >((acc, objectField) => {
+      const objectSchemaField = objectField.type
+      const fieldName = objectField.name
+      const objectItemPath = [...objectRootPath, fieldName]
+      const objectSchema = createInternationalizedArrayFields(
+        objectSchemaField,
+        objectItemPath
+      )
+      if (fieldName.startsWith('internationalizedArray')) {
+        return [
+          ...acc,
+          {...objectSchemaField, path: objectItemPath, name: fieldName},
+          ...objectSchema,
+        ]
+      }
+      return [...acc, ...objectSchema]
+    }, [])
+
+    if (schemaType.name.startsWith('internationalizedArray')) {
+      return [{...schemaType, path: objectRootPath}, ...objectSchemaResults]
+    }
+    return objectSchemaResults
+  }
+
+  if (schemaType.name.startsWith('internationalizedArray')) {
+    return [{...schemaType, path: [...path, schemaType.name]}]
+  }
+  return []
+}
