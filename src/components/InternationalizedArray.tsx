@@ -119,7 +119,7 @@ export default function InternationalizedArray(
       !documentCreatedAt &&
       // Plugin config included default languages
       Array.isArray(defaultLanguages) &&
-      defaultLanguages?.length > 0
+      defaultLanguages.length > 0
     ) {
       handleAddLanguage(defaultLanguages)
       setHasAddedDefaultLanguages(true)
