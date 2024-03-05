@@ -109,18 +109,14 @@ export default function InternationalizedArray(
 
   // Write default languages
   useEffect(() => {
-    if (
-      // Hasn't already added default languages
-      // (This prevents the document being recreated when deleted)
+    const shouldAddDefaultLanguages =
       !hasAddedDefaultLanguages &&
-      // This array field is empty
       !value &&
-      // Document form is in "not yet created" state
       !documentCreatedAt &&
-      // Plugin config included default languages
       Array.isArray(defaultLanguages) &&
       defaultLanguages.length > 0
-    ) {
+
+    if (shouldAddDefaultLanguages) {
       handleAddLanguage(defaultLanguages)
       setHasAddedDefaultLanguages(true)
     }
