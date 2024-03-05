@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.9](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.8...v1.10.9) (2024-03-05)
+
+### Bug Fixes
+
+- address issues outlined in [#47](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/47) ([0183721](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/0183721513ad69c1354317316207e7912e94d2c0))
+
 ## [1.10.8](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.7...v1.10.8) (2024-01-25)
 
 ### Bug Fixes
