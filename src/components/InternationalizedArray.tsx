@@ -1,7 +1,7 @@
 import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Button, Card, Stack, Text, useToast} from '@sanity/ui'
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef} from 'react'
 import {
   ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
@@ -103,14 +103,12 @@ export default function InternationalizedArray(
 
   // Create default fields if the document is not yet created
   const documentCreatedAt = useFormValue(['_createdAt'])
-  const [hasAddedDefaultLanguages, setHasAddedDefaultLanguages] = useState(
-    Boolean(documentCreatedAt)
-  )
+  const hasAddedDefaultLanguages = useRef(Boolean(documentCreatedAt))
 
   // Write default languages
   useEffect(() => {
     const shouldAddDefaultLanguages =
-      !hasAddedDefaultLanguages &&
+      !hasAddedDefaultLanguages.current &&
       !value &&
       !documentCreatedAt &&
       Array.isArray(defaultLanguages) &&
@@ -118,15 +116,14 @@ export default function InternationalizedArray(
 
     if (shouldAddDefaultLanguages) {
       handleAddLanguage(defaultLanguages)
-      setHasAddedDefaultLanguages(true)
     }
-  }, [
-    defaultLanguages,
-    documentCreatedAt,
-    handleAddLanguage,
-    hasAddedDefaultLanguages,
-    value,
-  ])
+
+    return () => {
+      if (shouldAddDefaultLanguages) {
+        hasAddedDefaultLanguages.current = true
+      }
+    }
+  }, [defaultLanguages, documentCreatedAt, handleAddLanguage, value])
 
   // TODO: This is reordering and re-setting the whole array, it could be surgical
   const handleRestoreOrder = useCallback(() => {
