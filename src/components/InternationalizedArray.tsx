@@ -118,7 +118,7 @@ export default function InternationalizedArray(
       // Document form is in "not yet created" state
       !documentCreatedAt &&
       // Plugin config included default languages
-      defaultLanguages &&
+      Array.isArray(defaultLanguages) &&
       defaultLanguages?.length > 0
     ) {
       handleAddLanguage(defaultLanguages)
