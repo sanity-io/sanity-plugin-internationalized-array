@@ -8,6 +8,24 @@ A plugin to register array fields with a custom input component to store field v
 
 ![Screenshot of an internationalized input](./img/internationalized-array.png)
 
+- [sanity-plugin-internationalized-array](#sanity-plugin-internationalized-array)
+  - [Installation](#installation)
+  - [Usage for simple field types](#usage-for-simple-field-types)
+  - [Loading languages](#loading-languages)
+  - [Configuring the "Add translation" buttons](#configuring-the-add-translation-buttons)
+  - [Using complex field configurations](#using-complex-field-configurations)
+  - [Creating internationalized objects](#creating-internationalized-objects)
+  - [Validation of individual array items](#validation-of-individual-array-items)
+  - [Usage with @sanity/language-filter](#usage-with-sanitylanguage-filter)
+  - [Shape of stored data](#shape-of-stored-data)
+  - [Querying data](#querying-data)
+  - [Migrate from objects to arrays](#migrate-from-objects-to-arrays)
+    - [Why store localized field data like this?](#why-store-localized-field-data-like-this)
+  - [License](#license)
+  - [Develop \& test](#develop--test)
+    - [Release new version](#release-new-version)
+  - [License](#license-1)
+
 ## Installation
 
 ```
@@ -220,6 +238,37 @@ export default defineType({
     }),
   ],
 })
+```
+
+## Validation of individual array items
+
+You may wish to validate individual language fields for various reasons. From the internationalized array field, add a validation rule that can look through all the array items, and return item-specific validation messages at the path of that array item.
+
+```ts
+defineField({
+  name: 'title',
+  type: 'internationalizedArrayString',
+  description: `Use fewer than 5 words.`,
+  validation: (rule) =>
+    rule.custom<{value: string; _type: string; _key: string}[]>((value) => {
+      if (!value) {
+        return 'Title is required'
+      }
+
+      const invalidItems = value.filter(
+        (item) => item.value.split(' ').length > 5,
+      )
+
+      if (invalidItems.length) {
+        return invalidItems.map((item) => ({
+          message: `Title is too long. Must be 5 words or fewer.`,
+          path: [{_key: item._key}, 'value'],
+        }))
+      }
+
+      return true
+    }),
+}),
 ```
 
 ## Usage with @sanity/language-filter
