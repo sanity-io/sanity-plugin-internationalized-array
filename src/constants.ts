@@ -10,4 +10,5 @@ export const CONFIG_DEFAULT: Required<PluginConfig> = {
   apiVersion: '2022-11-27',
   buttonLocations: ['field'],
   buttonAddAll: true,
+  addLanguagePatchTransform: (patch) => patch,
 }
