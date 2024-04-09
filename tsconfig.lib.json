@@ -10,7 +10,6 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "./lib",
-    "jsx": "preserve",
     "emitDeclarationOnly": true
   }
 }

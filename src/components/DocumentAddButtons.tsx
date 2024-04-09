@@ -1,9 +1,10 @@
 import {Box, Stack, Text, useToast} from '@sanity/ui'
-import React, {useCallback, useMemo} from 'react'
+import type React from 'react'
+import {useCallback, useMemo} from 'react'
 import {
   insert,
   isSanityDocument,
-  ObjectSchemaType,
+  type ObjectSchemaType,
   PatchEvent,
   setIfMissing,
 } from 'sanity'
@@ -15,6 +16,7 @@ import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 type DocumentAddButtonsProps = {
   schemaType: ObjectSchemaType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any> | undefined
 }
 
