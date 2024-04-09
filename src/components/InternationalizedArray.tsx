@@ -1,11 +1,12 @@
 import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Button, Card, Stack, Text, useToast} from '@sanity/ui'
-import React, {useCallback, useEffect, useMemo, useRef} from 'react'
+import type React from 'react'
+import {useCallback, useEffect, useMemo, useRef} from 'react'
 import {
-  ArrayOfObjectsInputProps,
+  type ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
-  ArraySchemaType,
+  type ArraySchemaType,
   MemberItemError,
   set,
   setIfMissing,

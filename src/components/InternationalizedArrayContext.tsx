@@ -2,12 +2,17 @@ import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Stack} from '@sanity/ui'
 import equal from 'fast-deep-equal'
 import {createContext, useContext, useDeferredValue, useMemo} from 'react'
-import {ObjectInputProps, useClient, useFormBuilder, useWorkspace} from 'sanity'
+import {
+  type ObjectInputProps,
+  useClient,
+  useFormBuilder,
+  useWorkspace,
+} from 'sanity'
 import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
 import {CONFIG_DEFAULT} from '../constants'
-import {Language, PluginConfig} from '../types'
+import type {Language, PluginConfig} from '../types'
 import DocumentAddButtons from './DocumentAddButtons'
 import {getSelectedValue} from './getSelectedValue'
 

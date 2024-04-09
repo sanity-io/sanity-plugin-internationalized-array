@@ -1,9 +1,9 @@
 import {AddIcon} from '@sanity/icons'
 import {Button, Grid} from '@sanity/ui'
-import React from 'react'
+import type React from 'react'
 
 import {MAX_COLUMNS} from '../constants'
-import {Language, Value} from '../types'
+import type {Language, Value} from '../types'
 
 type AddButtonsProps = {
   languages: Language[]
