@@ -5,6 +5,22 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.9...v2.0.0) (2024-04-09)
+
+### ⚠ BREAKING CHANGES
+
+- support strict ESM
+- use `sanity/structure` imports over `sanity/desk`
+
+### Features
+
+- support strict ESM ([ea18449](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/ea184490d5e712271df161bbc1a12412ba055e30))
+
+### Bug Fixes
+
+- reinit languages on workspace switch ([cc1b625](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/cc1b62514137409fbdcfc03c8e1f2a189a93dd8d))
+- use `sanity/structure` imports over `sanity/desk` ([6b2515c](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/6b2515c8ff2269073e351c5e24984259fec2efee))
+
 ## [1.10.9](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.8...v1.10.9) (2024-03-05)
 
 ### Bug Fixes
