@@ -2,16 +2,16 @@ import {AddIcon, TranslateIcon} from '@sanity/icons'
 import {useCallback} from 'react'
 import {
   defineDocumentFieldAction,
-  DocumentFieldActionItem,
-  DocumentFieldActionProps,
+  type DocumentFieldActionItem,
+  type DocumentFieldActionProps,
   PatchEvent,
   setIfMissing,
   useFormValue,
 } from 'sanity'
-import {useDocumentPane} from 'sanity/desk'
+import {useDocumentPane} from 'sanity/structure'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import {Language, Value} from '../types'
+import type {Language, Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'

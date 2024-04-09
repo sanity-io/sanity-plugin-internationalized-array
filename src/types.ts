@@ -21,6 +21,7 @@ export type ArrayConfig = {
   hidden?: boolean | (() => boolean)
   readOnly?: boolean | (() => boolean)
   validation?: Rule | Rule[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field?: {[key: string]: any; options: {[key: string]: any}}
 }
 

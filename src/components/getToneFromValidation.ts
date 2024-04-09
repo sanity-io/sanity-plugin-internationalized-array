@@ -1,5 +1,5 @@
-import {CardTone} from '@sanity/ui'
-import {FormNodeValidation} from 'sanity'
+import type {CardTone} from '@sanity/ui'
+import type {FormNodeValidation} from 'sanity'
 
 export function getToneFromValidation(
   validations: FormNodeValidation[]
