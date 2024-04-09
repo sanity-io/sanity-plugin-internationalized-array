@@ -8,7 +8,7 @@ import {
   PatchEvent,
   setIfMissing,
 } from 'sanity'
-import {useDocumentPane} from 'sanity/desk'
+import {useDocumentPane} from 'sanity/structure'
 
 import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
 import AddButtons from './AddButtons'
