@@ -18,9 +18,7 @@ type AddConfig = {
   path?: Path
 }
 
-export function createAddLanguagePatches(
-  config: AddConfig
-): FormInsertPatch[] {
+export function createAddLanguagePatches(config: AddConfig): FormInsertPatch[] {
   const {
     addLanguageKeys,
     schemaType,
@@ -33,7 +31,7 @@ export function createAddLanguagePatches(
   const itemBase = {_type: createValueSchemaTypeName(schemaType)}
 
   // Create new items
-  const getNewItems =  () => {
+  const getNewItems = () => {
     if (Array.isArray(addLanguageKeys) && addLanguageKeys.length > 0) {
       return addLanguageKeys.map((id) => ({
         ...itemBase,
