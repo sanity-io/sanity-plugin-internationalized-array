@@ -91,7 +91,7 @@ export default function InternationalizedArray(
         ? param
         : ([param?.currentTarget?.value].filter(Boolean) as string[])
 
-      const patches = await createAddLanguagePatches({
+      const patches = createAddLanguagePatches({
         addLanguageKeys,
         schemaType,
         languages,

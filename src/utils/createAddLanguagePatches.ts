@@ -18,9 +18,9 @@ type AddConfig = {
   path?: Path
 }
 
-export async function createAddLanguagePatches(
+export function createAddLanguagePatches(
   config: AddConfig
-): Promise<FormInsertPatch[]> {
+): FormInsertPatch[] {
   const {
     addLanguageKeys,
     schemaType,
@@ -33,7 +33,7 @@ export async function createAddLanguagePatches(
   const itemBase = {_type: createValueSchemaTypeName(schemaType)}
 
   // Create new items
-  const getNewItems = async () => {
+  const getNewItems =  () => {
     if (Array.isArray(addLanguageKeys) && addLanguageKeys.length > 0) {
       return addLanguageKeys.map((id) => ({
         ...itemBase,
@@ -50,7 +50,7 @@ export async function createAddLanguagePatches(
         _key: language.id,
       }))
   }
-  const newItems = await getNewItems()
+  const newItems = getNewItems()
 
   // Insert new items in the correct order
   const languagesInUse = value?.length ? value.map((v) => v) : []

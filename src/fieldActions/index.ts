@@ -11,7 +11,7 @@ import {
 import {useDocumentPane} from 'sanity/structure'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import {Language, Value} from '../types'
+import type {Language, Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
@@ -36,11 +36,11 @@ const createTranslateFieldActions: (
 
     const {onChange} = useDocumentPane()
 
-    const onAction = useCallback(async () => {
+    const onAction = useCallback(() => {
       const {schemaType, path} = fieldActionProps
 
       const addLanguageKeys = [language.id]
-      const patches = await createAddLanguagePatches({
+      const patches = createAddLanguagePatches({
         addLanguageKeys,
         schemaType,
         languages,
