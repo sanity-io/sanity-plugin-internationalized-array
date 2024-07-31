@@ -5,27 +5,21 @@ import {
   FormSetIfMissingPatch,
   insert,
   isSanityDocument,
-  type ObjectSchemaType,
   PatchEvent,
   setIfMissing,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
 
-import {Translator} from '../types'
 import {
   DocumentsToTranslate,
   getDocumentsToTranslate,
 } from '../utils/getDocumentsToTranslate'
-import {getTranslations} from '../utils/recursiveFileTranslations'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 type DocumentAddButtonsProps = {
-  schemaType: ObjectSchemaType
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any> | undefined
-  translator: Translator | undefined
-  excludeValues?: string[]
 }
 export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const {filteredLanguages} = useInternationalizedArrayContext()
@@ -82,24 +76,14 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
       for (const toTranslate of removeDuplicates) {
         const path = toTranslate.path
-        const sourceLang = toTranslate._key
-        const translations =
-          props.translator && toTranslate?.value
-            ? await getTranslations({
-                value: toTranslate?.value,
-                targetLang: languageId,
-                translator: props.translator,
-                excludeValues: props.excludeValues ?? [],
-                sourceLang,
-              })
-            : undefined
+
         const ifMissing = setIfMissing([], path)
         const insertValue = insert(
           [
             {
               _key: languageId,
               _type: toTranslate._type,
-              value: translations,
+              value: undefined,
             },
           ],
           'after',
@@ -111,13 +95,7 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
       onChange(PatchEvent.from(patches.flat()))
     },
-    [
-      documentsToTranslation,
-      onChange,
-      props.excludeValues,
-      props.translator,
-      toast,
-    ]
+    [documentsToTranslation, onChange, toast]
   )
   return (
     <Stack space={3}>

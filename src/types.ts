@@ -35,17 +35,6 @@ export type LanguageCallback = (
   selectedValue: Record<string, unknown>
 ) => Promise<Language[]>
 
-export interface TranslatorParams {
-  value: string
-  targetLang: string
-  sourceLang?: string
-}
-export type Translator = ({
-  value,
-  targetLang,
-  sourceLang,
-}: TranslatorParams) => Promise<string>
-
 export type PluginConfig = {
   /**
    * https://www.sanity.io/docs/api-versioning
@@ -136,8 +125,4 @@ export type PluginConfig = {
    * @defaultValue true
    * */
   buttonAddAll?: boolean
-
-  translator?: Translator | undefined
-
-  excludeValues?: string[]
 }

@@ -11,7 +11,7 @@ import {
 import {useDocumentPane} from 'sanity/structure'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import {Language, Translator, Value} from '../types'
+import {Language, Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
@@ -21,11 +21,10 @@ const createTranslateFieldActions: (
   context: {
     languages: Language[]
     filteredLanguages: Language[]
-    translator?: Translator
   }
 ) => DocumentFieldActionItem[] = (
   fieldActionProps,
-  {languages, filteredLanguages, translator}
+  {languages, filteredLanguages}
 ) =>
   languages.map((language) => {
     const value = useFormValue(fieldActionProps.path) as Value[]
@@ -48,7 +47,6 @@ const createTranslateFieldActions: (
         filteredLanguages,
         value,
         path,
-        translator,
       })
 
       onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
@@ -69,11 +67,10 @@ const AddMissingTranslationsFieldAction: (
   context: {
     languages: Language[]
     filteredLanguages: Language[]
-    translator?: Translator
   }
 ) => DocumentFieldActionItem = (
   fieldActionProps,
-  {languages, filteredLanguages, translator}
+  {languages, filteredLanguages}
 ) => {
   const value = useFormValue(fieldActionProps.path) as Value[]
   const disabled = value && value.length === filteredLanguages.length
@@ -92,18 +89,10 @@ const AddMissingTranslationsFieldAction: (
       filteredLanguages,
       value,
       path,
-      translator,
     })
 
     onChange(PatchEvent.from([setIfMissing([], path), ...patches]))
-  }, [
-    fieldActionProps,
-    filteredLanguages,
-    languages,
-    onChange,
-    translator,
-    value,
-  ])
+  }, [fieldActionProps, filteredLanguages, languages, onChange, value])
 
   return {
     type: 'action',
@@ -122,12 +111,11 @@ export const internationalizedArrayFieldAction = defineDocumentFieldAction({
       fieldActionProps?.schemaType?.type?.name.startsWith(
         'internationalizedArray'
       )
-    const {languages, filteredLanguages, translator} =
-      useInternationalizedArrayContext()
+    const {languages, filteredLanguages} = useInternationalizedArrayContext()
 
     const translateFieldActions = createTranslateFieldActions(
       fieldActionProps,
-      {languages, filteredLanguages, translator}
+      {languages, filteredLanguages}
     )
 
     return {

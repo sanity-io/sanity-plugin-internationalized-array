@@ -1,8 +1,7 @@
 import {FormInsertPatch, insert, Path, SchemaType} from 'sanity'
 
-import {Language, Translator, Value} from '../types'
+import {Language, Value} from '../types'
 import {createValueSchemaTypeName} from './createValueSchemaTypeName'
-import {getTranslations} from './recursiveFileTranslations'
 
 type AddConfig = {
   // New keys to add to the field
@@ -17,10 +16,6 @@ type AddConfig = {
   value?: Value[]
   // Path to this item
   path?: Path
-  // Translate Values
-  translator?: Translator
-  // Values not to translate
-  excludeValues?: string[]
 }
 
 export async function createAddLanguagePatches(
@@ -32,63 +27,18 @@ export async function createAddLanguagePatches(
     languages,
     filteredLanguages,
     value,
-    translator,
     path = [],
-    excludeValues = [],
   } = config
 
   const itemBase = {_type: createValueSchemaTypeName(schemaType)}
 
-  const hasValue = (value?.length ?? 0) > 0 && Boolean(value?.at(0)?.value)
-
-  const itemValue = hasValue ? value?.at(0)?.value : undefined
-  const itemValueSourceLanguage = hasValue ? value?.at(0)?._key : undefined
-
   // Create new items
   const getNewItems = async () => {
     if (Array.isArray(addLanguageKeys) && addLanguageKeys.length > 0) {
-      if (translator) {
-        return Promise.all(
-          addLanguageKeys.map(async (id) => {
-            const languageValue = await getTranslations({
-              value: itemValue,
-              targetLang: id,
-              translator,
-              excludeValues,
-              sourceLang: itemValueSourceLanguage,
-            })
-            return {
-              ...itemBase,
-              _key: id,
-              value: languageValue,
-            }
-          })
-        )
-      }
       return addLanguageKeys.map((id) => ({
         ...itemBase,
         _key: id,
       }))
-    }
-
-    if (translator) {
-      return Promise.all(
-        filteredLanguages
-          .filter((language) =>
-            value?.length ? !value.find((v) => v._key === language.id) : true
-          )
-          .map(async (language) => ({
-            ...itemBase,
-            _key: language.id,
-            value: await getTranslations({
-              value: itemValue,
-              targetLang: language.id,
-              translator,
-              excludeValues,
-              sourceLang: itemValueSourceLanguage,
-            }),
-          }))
-      )
     }
 
     return filteredLanguages

@@ -41,7 +41,6 @@ export default function InternationalizedArray(
     defaultLanguages,
     buttonAddAll,
     buttonLocations,
-    translator,
   } = useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed
@@ -98,12 +97,11 @@ export default function InternationalizedArray(
         languages,
         filteredLanguages,
         value,
-        translator,
       })
 
       onChange([setIfMissing([]), ...patches])
     },
-    [filteredLanguages, languages, onChange, schemaType, translator, value]
+    [filteredLanguages, languages, onChange, schemaType, value]
   )
 
   // Create default fields if the document is not yet created

@@ -12,7 +12,7 @@ import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
 import {CONFIG_DEFAULT} from '../constants'
-import {Language, PluginConfig, Translator} from '../types'
+import {Language, PluginConfig} from '../types'
 import DocumentAddButtons from './DocumentAddButtons'
 import {getSelectedValue} from './getSelectedValue'
 
@@ -24,7 +24,6 @@ type InternationalizedArrayContextProps = Required<
 > & {
   languages: Language[]
   filteredLanguages: Language[]
-  translator?: Translator
 }
 
 export const InternationalizedArrayContext =
@@ -32,7 +31,6 @@ export const InternationalizedArrayContext =
     ...CONFIG_DEFAULT,
     languages: [],
     filteredLanguages: [],
-    translator: undefined,
   })
 
 export function useInternationalizedArrayContext() {
@@ -40,9 +38,7 @@ export function useInternationalizedArrayContext() {
 }
 
 type InternationalizedArrayProviderProps = ObjectInputProps & {
-  internationalizedArray: Required<Omit<PluginConfig, 'translator'>> & {
-    translator?: Translator
-  }
+  internationalizedArray: Required<Omit<PluginConfig, 'translator'>> & {}
 }
 
 export function InternationalizedArrayProvider(
@@ -104,11 +100,7 @@ export function InternationalizedArrayProvider(
     >
       {showDocumentButtons ? (
         <Stack space={5}>
-          <DocumentAddButtons
-            value={props.value}
-            translator={internationalizedArray.translator}
-            excludeValues={internationalizedArray.excludeValues}
-          />
+          <DocumentAddButtons value={props.value} />
           {props.renderDefault(props)}
         </Stack>
       ) : (

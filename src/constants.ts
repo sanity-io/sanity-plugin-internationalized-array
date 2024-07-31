@@ -10,5 +10,4 @@ export const CONFIG_DEFAULT: Required<Omit<PluginConfig, 'translator'>> = {
   apiVersion: '2022-11-27',
   buttonLocations: ['field'],
   buttonAddAll: true,
-  excludeValues: [],
 }
