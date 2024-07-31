@@ -1,4 +1,4 @@
-import {FieldProps} from 'sanity'
+import type {FieldProps} from 'sanity'
 
 export default function InternationalizedField(props: FieldProps) {
   // Show reference field selector if there's a value

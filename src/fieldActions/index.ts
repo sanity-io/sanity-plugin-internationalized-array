@@ -2,13 +2,13 @@ import {AddIcon, TranslateIcon} from '@sanity/icons'
 import {useCallback} from 'react'
 import {
   defineDocumentFieldAction,
-  DocumentFieldActionItem,
-  DocumentFieldActionProps,
+  type DocumentFieldActionItem,
+  type DocumentFieldActionProps,
   PatchEvent,
   setIfMissing,
   useFormValue,
 } from 'sanity'
-import {useDocumentPane} from 'sanity/desk'
+import {useDocumentPane} from 'sanity/structure'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
 import {Language, Translator, Value} from '../types'

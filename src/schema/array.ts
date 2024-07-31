@@ -5,7 +5,7 @@ import {peek} from '../cache'
 import {createFieldName} from '../components/createFieldName'
 import {getSelectedValue} from '../components/getSelectedValue'
 import InternationalizedArray from '../components/InternationalizedArray'
-import {Language, LanguageCallback, Value} from '../types'
+import type {Language, LanguageCallback, Value} from '../types'
 import {getLanguagesFieldOption} from '../utils/getLanguagesFieldOption'
 
 type ArrayFactoryConfig = {
@@ -36,8 +36,6 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     },
     // These options are required for validation rules – not the custom input component
     options: {apiVersion, select, languages},
-    // TODO: Resolve this typing issue with the inner object
-    // @ts-expect-error
     of: [
       defineField({
         ...(typeof type === 'string' ? {} : type),

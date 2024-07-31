@@ -2,7 +2,12 @@ import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Stack} from '@sanity/ui'
 import equal from 'fast-deep-equal'
 import {createContext, useContext, useDeferredValue, useMemo} from 'react'
-import {ObjectInputProps, useClient, useFormBuilder} from 'sanity'
+import {
+  type ObjectInputProps,
+  useClient,
+  useFormBuilder,
+  useWorkspace,
+} from 'sanity'
 import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
@@ -46,6 +51,7 @@ export function InternationalizedArrayProvider(
   const {internationalizedArray} = props
 
   const client = useClient({apiVersion: internationalizedArray.apiVersion})
+  const workspace = useWorkspace()
   const {value: document} = useFormBuilder()
   const deferredDocument = useDeferredValue(document)
   const selectedValue = useMemo(
@@ -64,7 +70,7 @@ export function InternationalizedArrayProvider(
           }
           return internationalizedArray.languages
         },
-        [version, namespace, selectedValue],
+        [version, namespace, selectedValue, workspace],
         {equal}
       )
 

@@ -10,8 +10,9 @@ import {
   Spinner,
   Stack,
 } from '@sanity/ui'
-import React, {useCallback, useMemo} from 'react'
-import {ObjectItemProps, useFormValue} from 'sanity'
+import type React from 'react'
+import {useCallback, useMemo} from 'react'
+import {type ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
 import {getToneFromValidation} from './getToneFromValidation'
@@ -102,7 +103,7 @@ export default function InternationalizedInput(
                       key={language.id}
                       text={language.id.toLocaleUpperCase()}
                       value={language.id}
-                      // @ts-expect-error
+                      // @ts-expect-error - fix typings
                       onClick={handleKeyChange}
                     />
                   ))}

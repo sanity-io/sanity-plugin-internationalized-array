@@ -5,10 +5,11 @@ import {
   FormSetIfMissingPatch,
   insert,
   isSanityDocument,
+  type ObjectSchemaType,
   PatchEvent,
   setIfMissing,
 } from 'sanity'
-import {useDocumentPane} from 'sanity/desk'
+import {useDocumentPane} from 'sanity/structure'
 
 import {Translator} from '../types'
 import {
@@ -18,7 +19,10 @@ import {
 import {getTranslations} from '../utils/recursiveFileTranslations'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
+
 type DocumentAddButtonsProps = {
+  schemaType: ObjectSchemaType
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any> | undefined
   translator: Translator | undefined
   excludeValues?: string[]
