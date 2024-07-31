@@ -78,11 +78,11 @@ const AddMissingTranslationsFieldAction: (
 
   const {onChange} = useDocumentPane()
 
-  const onAction = useCallback(async () => {
+  const onAction = useCallback(() => {
     const {schemaType, path} = fieldActionProps
 
     const addLanguageKeys: string[] = []
-    const patches = await createAddLanguagePatches({
+    const patches = createAddLanguagePatches({
       addLanguageKeys,
       schemaType,
       languages,
