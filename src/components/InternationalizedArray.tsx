@@ -80,7 +80,9 @@ export default function InternationalizedArray(
   )
 
   const handleAddLanguage = useCallback(
-    (param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]) => {
+    async (
+      param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]
+    ) => {
       if (!filteredLanguages?.length) {
         return
       }
@@ -89,7 +91,7 @@ export default function InternationalizedArray(
         ? param
         : ([param?.currentTarget?.value].filter(Boolean) as string[])
 
-      const patches = createAddLanguagePatches({
+      const patches = await createAddLanguagePatches({
         addLanguageKeys,
         schemaType,
         languages,

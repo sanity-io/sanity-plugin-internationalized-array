@@ -11,14 +11,17 @@ import {
 import {useDocumentPane} from 'sanity/structure'
 
 import {useInternationalizedArrayContext} from '../components/InternationalizedArrayContext'
-import type {Language, Value} from '../types'
+import {Language, Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
 import {createAddAllTitle} from '../utils/createAddAllTitle'
 import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 
 const createTranslateFieldActions: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: {
+    languages: Language[]
+    filteredLanguages: Language[]
+  }
 ) => DocumentFieldActionItem[] = (
   fieldActionProps,
   {languages, filteredLanguages}
@@ -33,11 +36,11 @@ const createTranslateFieldActions: (
 
     const {onChange} = useDocumentPane()
 
-    const onAction = useCallback(() => {
+    const onAction = useCallback(async () => {
       const {schemaType, path} = fieldActionProps
 
       const addLanguageKeys = [language.id]
-      const patches = createAddLanguagePatches({
+      const patches = await createAddLanguagePatches({
         addLanguageKeys,
         schemaType,
         languages,
@@ -61,7 +64,10 @@ const createTranslateFieldActions: (
 
 const AddMissingTranslationsFieldAction: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: {
+    languages: Language[]
+    filteredLanguages: Language[]
+  }
 ) => DocumentFieldActionItem = (
   fieldActionProps,
   {languages, filteredLanguages}
@@ -72,11 +78,11 @@ const AddMissingTranslationsFieldAction: (
 
   const {onChange} = useDocumentPane()
 
-  const onAction = useCallback(() => {
+  const onAction = useCallback(async () => {
     const {schemaType, path} = fieldActionProps
 
     const addLanguageKeys: string[] = []
-    const patches = createAddLanguagePatches({
+    const patches = await createAddLanguagePatches({
       addLanguageKeys,
       schemaType,
       languages,
