@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v2.0.0...v2.1.0) (2024-08-05)
+
+### Features
+
+- add recursive translate support ([#75](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/75)) ([550af9f](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/550af9fb18105549b331dea03cc8195f8fcd1e25)), closes [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558) [#1558](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/1558)
+
 ## [2.0.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v1.10.9...v2.0.0) (2024-04-09)
 
 ### ⚠ BREAKING CHANGES
