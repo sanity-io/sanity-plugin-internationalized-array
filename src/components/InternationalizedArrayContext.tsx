@@ -2,12 +2,8 @@ import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Stack} from '@sanity/ui'
 import equal from 'fast-deep-equal'
 import {createContext, useContext, useDeferredValue, useMemo} from 'react'
-import {
-  type ObjectInputProps,
-  useClient,
-  useFormBuilder,
-  useWorkspace,
-} from 'sanity'
+import {type ObjectInputProps, useClient, useWorkspace} from 'sanity'
+import {useDocumentPane} from 'sanity/structure'
 import {suspend} from 'suspend-react'
 
 import {namespace, version} from '../cache'
@@ -46,8 +42,8 @@ export function InternationalizedArrayProvider(
 
   const client = useClient({apiVersion: internationalizedArray.apiVersion})
   const workspace = useWorkspace()
-  const {value: document} = useFormBuilder()
-  const deferredDocument = useDeferredValue(document)
+  const {formState} = useDocumentPane()
+  const deferredDocument = useDeferredValue(formState?.value)
   const selectedValue = useMemo(
     () => getSelectedValue(internationalizedArray.select, deferredDocument),
     [internationalizedArray.select, deferredDocument]
@@ -87,15 +83,13 @@ export function InternationalizedArrayProvider(
 
   const showDocumentButtons =
     internationalizedArray.buttonLocations.includes('document')
+  const context = useMemo(
+    () => ({...internationalizedArray, languages, filteredLanguages}),
+    [filteredLanguages, internationalizedArray, languages]
+  )
 
   return (
-    <InternationalizedArrayContext.Provider
-      value={{
-        ...internationalizedArray,
-        languages,
-        filteredLanguages,
-      }}
-    >
+    <InternationalizedArrayContext.Provider value={context}>
       {showDocumentButtons ? (
         <Stack space={5}>
           <DocumentAddButtons value={props.value} />

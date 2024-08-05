@@ -62,10 +62,12 @@ export const internationalizedArray = definePlugin<PluginConfig>((config) => {
             return props.renderDefault(props)
           }
 
-          return InternationalizedArrayProvider({
-            ...props,
-            internationalizedArray: pluginConfig,
-          })
+          return (
+            <InternationalizedArrayProvider
+              {...props}
+              internationalizedArray={pluginConfig}
+            />
+          )
         },
       },
     },

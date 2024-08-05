@@ -18,9 +18,9 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     title: `Internationalized array ${type}`,
     type: 'object',
     components: {
+      // @ts-expect-error - fix typings
       item: InternationalizedInput,
     },
-    // @ts-expect-error - Address this typing issue with the inner object
     fields: [
       typeof type === `string`
         ? // Define a simple field if all we have is the name as a string

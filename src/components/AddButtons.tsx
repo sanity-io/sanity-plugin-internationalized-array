@@ -1,6 +1,7 @@
 import {AddIcon} from '@sanity/icons'
 import {Button, Grid} from '@sanity/ui'
 import type React from 'react'
+import {memo} from 'react'
 
 import {MAX_COLUMNS} from '../constants'
 import type {Language, Value} from '../types'
@@ -12,7 +13,7 @@ type AddButtonsProps = {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
-export default function AddButtons(props: AddButtonsProps) {
+function AddButtons(props: AddButtonsProps) {
   const {languages, readOnly, value, onClick} = props
 
   return languages.length > 0 ? (
@@ -37,3 +38,5 @@ export default function AddButtons(props: AddButtonsProps) {
     </Grid>
   ) : null
 }
+
+export default memo(AddButtons)

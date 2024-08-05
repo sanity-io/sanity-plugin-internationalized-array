@@ -34,8 +34,12 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     components: {
       input: InternationalizedArray,
     },
-    // These options are required for validation rules – not the custom input component
-    options: {apiVersion, select, languages},
+    options: {
+      // @ts-expect-error - these options are required for validation rules – not the custom input component
+      apiVersion,
+      select,
+      languages,
+    },
     of: [
       defineField({
         ...(typeof type === 'string' ? {} : type),
@@ -43,6 +47,7 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
         type: objectName,
       }),
     ],
+    // @ts-expect-error - fix typings
     validation: (rule: Rule) =>
       rule.custom<Value[]>(async (value, context) => {
         if (!value) {
