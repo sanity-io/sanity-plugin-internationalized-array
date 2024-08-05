@@ -80,7 +80,9 @@ export default function InternationalizedArray(
   )
 
   const handleAddLanguage = useCallback(
-    (param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]) => {
+    async (
+      param?: React.MouseEvent<HTMLButtonElement, MouseEvent> | string[]
+    ) => {
       if (!filteredLanguages?.length) {
         return
       }

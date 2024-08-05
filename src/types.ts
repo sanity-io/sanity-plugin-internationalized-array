@@ -27,7 +27,7 @@ export type ArrayConfig = {
 
 export type Value = {
   _key: string
-  value?: string
+  value?: unknown
 }
 
 export type LanguageCallback = (

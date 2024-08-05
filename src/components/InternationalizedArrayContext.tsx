@@ -98,10 +98,7 @@ export function InternationalizedArrayProvider(
     >
       {showDocumentButtons ? (
         <Stack space={5}>
-          <DocumentAddButtons
-            schemaType={props.schemaType}
-            value={props.value}
-          />
+          <DocumentAddButtons value={props.value} />
           {props.renderDefault(props)}
         </Stack>
       ) : (

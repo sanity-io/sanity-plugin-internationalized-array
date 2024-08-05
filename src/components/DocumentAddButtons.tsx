@@ -1,45 +1,37 @@
 import {Box, Stack, Text, useToast} from '@sanity/ui'
-import type React from 'react'
-import {useCallback, useMemo} from 'react'
+import React, {useCallback} from 'react'
 import {
+  FormInsertPatch,
+  FormSetIfMissingPatch,
   insert,
   isSanityDocument,
-  type ObjectSchemaType,
   PatchEvent,
   setIfMissing,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
 
-import {createValueSchemaTypeName} from '../utils/createValueSchemaTypeName'
+import {
+  DocumentsToTranslate,
+  getDocumentsToTranslate,
+} from '../utils/getDocumentsToTranslate'
 import AddButtons from './AddButtons'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 type DocumentAddButtonsProps = {
-  schemaType: ObjectSchemaType
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any> | undefined
 }
-
 export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const {filteredLanguages} = useInternationalizedArrayContext()
-  const {fields} = props.schemaType
   const value = isSanityDocument(props.value) ? props.value : undefined
 
   const toast = useToast()
   const {onChange} = useDocumentPane()
 
-  // Find every internationalizedArray field at the document root
-  // TODO: This should be a recursive search through nested fields
-  const internationalizedArrayFields = useMemo(
-    () =>
-      fields.filter((field) =>
-        field.type.name.startsWith('internationalizedArray')
-      ),
-    [fields]
-  )
+  const documentsToTranslation = getDocumentsToTranslate(value, [])
 
   const handleDocumentButtonClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       const languageId = event.currentTarget.value
       if (!languageId) {
         toast.push({
@@ -48,8 +40,30 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
         })
         return
       }
+      const alreadyTranslated = documentsToTranslation.filter(
+        (translation) => translation?._key === languageId
+      )
+      const removeDuplicates = documentsToTranslation.reduce<
+        DocumentsToTranslate[]
+      >((filteredTranslations, translation) => {
+        if (
+          alreadyTranslated.filter(
+            (alreadyTranslation) =>
+              alreadyTranslation.pathString === translation.pathString
+          ).length > 0
+        ) {
+          return filteredTranslations
+        }
+        const translationAlreadyExists = filteredTranslations.filter(
+          (filteredTranslation) => filteredTranslation.path === translation.path
+        )
 
-      if (internationalizedArrayFields.length === 0) {
+        if (translationAlreadyExists.length > 0) {
+          return filteredTranslations
+        }
+        return [...filteredTranslations, translation]
+      }, [])
+      if (removeDuplicates.length === 0) {
         toast.push({
           status: 'error',
           title: 'No internationalizedArray fields found in document root',
@@ -57,45 +71,32 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
         return
       }
 
-      // Find every internationalizedArray field that is empty for the selected language
-      const emptyLanguageFields = internationalizedArrayFields.filter(
-        (field) => {
-          const fieldValue = value?.[field.name]
-          const fieldValueLanguage =
-            fieldValue && Array.isArray(fieldValue)
-              ? fieldValue.find((v) => v._key === languageId)
-              : undefined
-
-          return !fieldValueLanguage
-        }
-      )
-
       // Write a new patch for each empty field
-      const patches = emptyLanguageFields
-        .map((field) => {
-          const fieldKey = field.name
+      const patches: (FormSetIfMissingPatch | FormInsertPatch)[] = []
 
-          return [
-            setIfMissing([], [fieldKey]),
-            insert(
-              [
-                {
-                  _key: languageId,
-                  _type: createValueSchemaTypeName(field.type),
-                },
-              ],
-              'after',
-              [fieldKey, -1]
-            ),
-          ]
-        })
-        .flat()
+      for (const toTranslate of removeDuplicates) {
+        const path = toTranslate.path
 
-      onChange(PatchEvent.from(patches))
+        const ifMissing = setIfMissing([], path)
+        const insertValue = insert(
+          [
+            {
+              _key: languageId,
+              _type: toTranslate._type,
+              value: undefined,
+            },
+          ],
+          'after',
+          [...path, -1]
+        )
+        patches.push(ifMissing)
+        patches.push(insertValue)
+      }
+
+      onChange(PatchEvent.from(patches.flat()))
     },
-    [internationalizedArrayFields, onChange, toast, value]
+    [documentsToTranslation, onChange, toast]
   )
-
   return (
     <Stack space={3}>
       <Box>

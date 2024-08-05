@@ -18,7 +18,10 @@ import {createAddLanguagePatches} from '../utils/createAddLanguagePatches'
 
 const createTranslateFieldActions: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: {
+    languages: Language[]
+    filteredLanguages: Language[]
+  }
 ) => DocumentFieldActionItem[] = (
   fieldActionProps,
   {languages, filteredLanguages}
@@ -61,7 +64,10 @@ const createTranslateFieldActions: (
 
 const AddMissingTranslationsFieldAction: (
   fieldActionProps: DocumentFieldActionProps,
-  context: {languages: Language[]; filteredLanguages: Language[]}
+  context: {
+    languages: Language[]
+    filteredLanguages: Language[]
+  }
 ) => DocumentFieldActionItem = (
   fieldActionProps,
   {languages, filteredLanguages}
