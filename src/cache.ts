@@ -6,7 +6,7 @@ import type {Language} from './types'
 
 export const namespace = 'sanity-plugin-internationalized-array'
 
-export const version = 'v0'
+export const version = 'v1'
 
 // https://github.com/pmndrs/suspend-react#preloading
 export const preload = (fn: () => Promise<Language[]>) =>
