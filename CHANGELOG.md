@@ -5,6 +5,16 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v2.1.0...v3.0.0) (2024-08-06)
+
+### ⚠ BREAKING CHANGES
+
+- improve performance & bump deps (#76)
+
+### Bug Fixes
+
+- improve performance & bump deps ([#76](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/76)) ([7551e51](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/7551e510a5ae30187c82402318f0d9dd1cb9f612))
+
 ## [2.1.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v2.0.0...v2.1.0) (2024-08-05)
 
 ### Features
