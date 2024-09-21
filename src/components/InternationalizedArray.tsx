@@ -2,7 +2,7 @@ import {AddIcon} from '@sanity/icons'
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Button, Card, Stack, Text, useToast} from '@sanity/ui'
 import type React from 'react'
-import {useCallback, useEffect, useMemo, useRef} from 'react'
+import {useCallback, useEffect, useMemo} from 'react'
 import {
   type ArrayOfObjectsInputProps,
   ArrayOfObjectsItem,
@@ -12,6 +12,7 @@ import {
   setIfMissing,
   useFormValue,
 } from 'sanity'
+import {useDocumentPane} from 'sanity/structure'
 
 import type {Value} from '../types'
 import {checkAllLanguagesArePresent} from '../utils/checkAllLanguagesArePresent'
@@ -104,29 +105,23 @@ export default function InternationalizedArray(
     [filteredLanguages, languages, onChange, schemaType, value]
   )
 
-  // Create default fields if the document is not yet created
-  const documentCreatedAt = useFormValue(['_createdAt'])
-  const hasAddedDefaultLanguages = useRef(Boolean(documentCreatedAt))
+  const {isDeleting} = useDocumentPane()
 
-  // Write default languages
+  const addedLanguages = members.map(({key}) => key)
+  const hasAddedDefaultLanguages = defaultLanguages.every((language) =>
+    addedLanguages.includes(language)
+  )
+
   useEffect(() => {
-    const shouldAddDefaultLanguages =
-      !hasAddedDefaultLanguages.current &&
-      !value &&
-      !documentCreatedAt &&
-      Array.isArray(defaultLanguages) &&
-      defaultLanguages.length > 0
-
-    if (shouldAddDefaultLanguages) {
+    if (!isDeleting && !hasAddedDefaultLanguages) {
       handleAddLanguage(defaultLanguages)
     }
-
-    return () => {
-      if (shouldAddDefaultLanguages) {
-        hasAddedDefaultLanguages.current = true
-      }
-    }
-  }, [defaultLanguages, documentCreatedAt, handleAddLanguage, value])
+  }, [
+    isDeleting,
+    hasAddedDefaultLanguages,
+    handleAddLanguage,
+    defaultLanguages,
+  ])
 
   // TODO: This is reordering and re-setting the whole array, it could be surgical
   const handleRestoreOrder = useCallback(() => {
