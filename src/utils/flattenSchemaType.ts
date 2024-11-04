@@ -46,11 +46,13 @@ function extractInnerFields(
       field.type.of.length &&
       field.type.of.some((item) => 'fields' in item)
     ) {
-      const innerFields = extractInnerFields(
-        // @ts-expect-error - Fix TS assertion for array fields
-        field.type.of[0].fields,
-        [...path, field.name],
-        maxDepth
+      const innerFields = field.type.of.flatMap((innerField) =>
+        extractInnerFields(
+          // @ts-expect-error - Fix TS assertion for array fields
+          innerField.fields,
+          [...path, field.name],
+          maxDepth
+        )
       )
 
       return [...acc, thisFieldWithPath, ...innerFields]
