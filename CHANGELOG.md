@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.3](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.0.2...v3.0.3) (2024-12-17)
+
+### Bug Fixes
+
+- support react 19 ([#91](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/91)) ([67572ea](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/67572ea70bde1253618d2bf5a82008f04e55f70a))
+
 ## [3.0.2](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.0.1...v3.0.2) (2024-11-11)
 
 ### Bug Fixes
