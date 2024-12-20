@@ -135,7 +135,7 @@ The "Add translation" buttons can be positioned in one or multiple locations by 
 - `unstable__fieldAction` Inside a Field Action (currently unstable)
 - `document` Above the document fields, these buttons will add a new language item to every internationalized array field that can be found at the **root of the document**. Nested internationalized arrays are not yet supported.
 
-To control the "Add translation" button titles, configure `languageDisplay`. This also affects :
+To control the "Add translation" button titles, configure `languageDisplay`. This also affects language field labels.
 
 - `codeOnly` (default) Shows only the language codes (id)
 - `titleOnly` Shows the language title
