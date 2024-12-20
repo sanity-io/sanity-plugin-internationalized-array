@@ -11,12 +11,13 @@ import {
   Stack,
 } from '@sanity/ui'
 import type React from 'react'
-import {useCallback, useMemo} from 'react'
-import {type ObjectItemProps, useFormValue} from 'sanity'
-import {set, unset} from 'sanity'
+import { useCallback, useMemo } from 'react'
+import { type ObjectItemProps, useFormValue } from 'sanity'
+import { set, unset } from 'sanity'
 
-import {getToneFromValidation} from './getToneFromValidation'
-import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
+import { getToneFromValidation } from './getToneFromValidation'
+import { useInternationalizedArrayContext } from './InternationalizedArrayContext'
+import { getLanguageDisplay } from '../utils/getLanguageDisplay'
 
 type InternationalizedValue = {
   _type: string
@@ -42,10 +43,10 @@ export default function InternationalizedInput(
     value: props.value as InternationalizedValue,
   }
 
-  const {validation, value, onChange, readOnly} = inlineProps
+  const { validation, value, onChange, readOnly } = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages} = useInternationalizedArrayContext()
+  const { languages, languageDisplay } = useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -82,13 +83,18 @@ export default function InternationalizedInput(
     return <Spinner />
   }
 
+  const language = languages.find((l) => l.id === value._key)
+  const languageTitle: string = keyIsValid && language
+    ? getLanguageDisplay(languageDisplay, language.title, language.id) 
+    : ''
+
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
       <Stack space={2}>
         <Card tone="inherit">
           {keyIsValid ? (
             <Label muted size={1}>
-              {value._key}
+              {languageTitle}
             </Label>
           ) : (
             <MenuButton
@@ -109,7 +115,7 @@ export default function InternationalizedInput(
                   ))}
                 </Menu>
               }
-              popover={{portal: true}}
+              popover={{ portal: true }}
             />
           )}
         </Card>

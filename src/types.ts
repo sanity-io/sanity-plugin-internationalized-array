@@ -35,6 +35,8 @@ export type LanguageCallback = (
   selectedValue: Record<string, unknown>
 ) => Promise<Language[]>
 
+export type LanguageDisplay = 'titleOnly' | 'codeOnly' | 'titleAndCode'
+
 export type PluginConfig = {
   /**
    * https://www.sanity.io/docs/api-versioning
@@ -125,4 +127,9 @@ export type PluginConfig = {
    * @defaultValue true
    * */
   buttonAddAll?: boolean
+  /**
+   * How to display the languages on buttons and fields
+   * @defaultValue 'code'
+   * */
+  languageDisplay?: LanguageDisplay
 }
