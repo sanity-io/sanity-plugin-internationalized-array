@@ -15,6 +15,7 @@ import {useCallback, useMemo} from 'react'
 import {type ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
+import {getLanguageDisplay} from '../utils/getLanguageDisplay'
 import {getToneFromValidation} from './getToneFromValidation'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
@@ -45,7 +46,7 @@ export default function InternationalizedInput(
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages} = useInternationalizedArrayContext()
+  const {languages, languageDisplay} = useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -82,13 +83,19 @@ export default function InternationalizedInput(
     return <Spinner />
   }
 
+  const language = languages.find((l) => l.id === value._key)
+  const languageTitle: string =
+    keyIsValid && language
+      ? getLanguageDisplay(languageDisplay, language.title, language.id)
+      : ''
+
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
       <Stack space={2}>
         <Card tone="inherit">
           {keyIsValid ? (
             <Label muted size={1}>
-              {value._key}
+              {languageTitle}
             </Label>
           ) : (
             <MenuButton
@@ -96,13 +103,13 @@ export default function InternationalizedInput(
               id={`${value._key}-change-key`}
               menu={
                 <Menu>
-                  {languages.map((language) => (
+                  {languages.map((lang) => (
                     <MenuItem
-                      disabled={languageKeysInUse.includes(language.id)}
+                      disabled={languageKeysInUse.includes(lang.id)}
                       fontSize={1}
-                      key={language.id}
-                      text={language.id.toLocaleUpperCase()}
-                      value={language.id}
+                      key={lang.id}
+                      text={lang.id.toLocaleUpperCase()}
+                      value={lang.id}
                       // @ts-expect-error - fix typings
                       onClick={handleKeyChange}
                     />

@@ -135,6 +135,12 @@ The "Add translation" buttons can be positioned in one or multiple locations by 
 - `unstable__fieldAction` Inside a Field Action (currently unstable)
 - `document` Above the document fields, these buttons will add a new language item to every internationalized array field that can be found at the **root of the document**. Nested internationalized arrays are not yet supported.
 
+To control the "Add translation" button titles, configure `languageDisplay`. This also affects language field labels.
+
+- `codeOnly` (default) Shows only the language codes (id)
+- `titleOnly` Shows the language title
+- `titleAndCode` Shows the language title with the code in parentheses
+
 The "Add all languages" button can be hidden with `buttonAddAll`.
 
 ```ts
@@ -147,6 +153,7 @@ import {internationalizedArray} from 'sanity-plugin-internationalized-array'
     internationalizedArray({
       // ...other config
       buttonLocations: ['field', 'unstable__fieldAction', 'document'], // default ['field']
+      languageDisplay: 'codeOnly' // codeOnly (default) | titleOnly | titleAndCode
       buttonAddAll: false // default true
     })
   ]
