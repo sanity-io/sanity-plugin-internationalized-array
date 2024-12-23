@@ -153,8 +153,8 @@ import {internationalizedArray} from 'sanity-plugin-internationalized-array'
     internationalizedArray({
       // ...other config
       buttonLocations: ['field', 'unstable__fieldAction', 'document'], // default ['field']
+      buttonAddAll: false, // default true
       languageDisplay: 'codeOnly' // codeOnly (default) | titleOnly | titleAndCode
-      buttonAddAll: false // default true
     })
   ]
 })
