@@ -42,7 +42,6 @@ export default function InternationalizedArray(
     defaultLanguages,
     buttonAddAll,
     buttonLocations,
-    languageDisplay
   } = useInternationalizedArrayContext()
 
   // Support updating the UI if languageFilter is installed

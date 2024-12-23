@@ -11,13 +11,13 @@ import {
   Stack,
 } from '@sanity/ui'
 import type React from 'react'
-import { useCallback, useMemo } from 'react'
-import { type ObjectItemProps, useFormValue } from 'sanity'
-import { set, unset } from 'sanity'
+import {useCallback, useMemo} from 'react'
+import {type ObjectItemProps, useFormValue} from 'sanity'
+import {set, unset} from 'sanity'
 
-import { getToneFromValidation } from './getToneFromValidation'
-import { useInternationalizedArrayContext } from './InternationalizedArrayContext'
-import { getLanguageDisplay } from '../utils/getLanguageDisplay'
+import {getLanguageDisplay} from '../utils/getLanguageDisplay'
+import {getToneFromValidation} from './getToneFromValidation'
+import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
 type InternationalizedValue = {
   _type: string
@@ -43,10 +43,10 @@ export default function InternationalizedInput(
     value: props.value as InternationalizedValue,
   }
 
-  const { validation, value, onChange, readOnly } = inlineProps
+  const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const { languages, languageDisplay } = useInternationalizedArrayContext()
+  const {languages, languageDisplay} = useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -84,9 +84,10 @@ export default function InternationalizedInput(
   }
 
   const language = languages.find((l) => l.id === value._key)
-  const languageTitle: string = keyIsValid && language
-    ? getLanguageDisplay(languageDisplay, language.title, language.id) 
-    : ''
+  const languageTitle: string =
+    keyIsValid && language
+      ? getLanguageDisplay(languageDisplay, language.title, language.id)
+      : ''
 
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
@@ -102,20 +103,20 @@ export default function InternationalizedInput(
               id={`${value._key}-change-key`}
               menu={
                 <Menu>
-                  {languages.map((language) => (
+                  {languages.map((lang) => (
                     <MenuItem
-                      disabled={languageKeysInUse.includes(language.id)}
+                      disabled={languageKeysInUse.includes(lang.id)}
                       fontSize={1}
-                      key={language.id}
-                      text={language.id.toLocaleUpperCase()}
-                      value={language.id}
+                      key={lang.id}
+                      text={lang.id.toLocaleUpperCase()}
+                      value={lang.id}
                       // @ts-expect-error - fix typings
                       onClick={handleKeyChange}
                     />
                   ))}
                 </Menu>
               }
-              popover={{ portal: true }}
+              popover={{portal: true}}
             />
           )}
         </Card>
