@@ -108,19 +108,24 @@ export default function InternationalizedArray(
   const {isDeleting} = useDocumentPane()
 
   const addedLanguages = members.map(({key}) => key)
-  const hasAddedDefaultLanguages = defaultLanguages.every((language) =>
-    addedLanguages.includes(language)
-  )
+  const hasAddedDefaultLanguages = defaultLanguages
+    .filter((language) => languages.find((l) => l.id === language))
+    .every((language) => addedLanguages.includes(language))
 
   useEffect(() => {
     if (!isDeleting && !hasAddedDefaultLanguages) {
-      handleAddLanguage(defaultLanguages)
+      const languagesToAdd = defaultLanguages
+        .filter((language) => !addedLanguages.includes(language))
+        .filter((language) => languages.find((l) => l.id === language))
+      handleAddLanguage(languagesToAdd)
     }
   }, [
     isDeleting,
     hasAddedDefaultLanguages,
     handleAddLanguage,
     defaultLanguages,
+    addedLanguages,
+    languages,
   ])
 
   // TODO: This is reordering and re-setting the whole array, it could be surgical
