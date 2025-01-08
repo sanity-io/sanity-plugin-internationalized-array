@@ -94,6 +94,16 @@ export default function InternationalizedInput(
 
   const isDefault = defaultLanguages.includes(value._key)
 
+  const removeButton = (
+    <Button
+      mode="bleed"
+      icon={RemoveCircleIcon}
+      tone="critical"
+      disabled={readOnly || isDefault}
+      onClick={handleUnset}
+    />
+  )
+
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
       <Stack space={2}>
@@ -131,27 +141,22 @@ export default function InternationalizedInput(
           </Card>
 
           <Card tone="inherit">
-            <Tooltip
-              content={
-                <Text muted size={1}>
-                  Can&apos;t remove default language
-                </Text>
-              }
-              fallbackPlacements={['right', 'left']}
-              placement="top"
-              portal
-              disabled={!isDefault}
-            >
-              <span>
-                <Button
-                  mode="bleed"
-                  icon={RemoveCircleIcon}
-                  tone="critical"
-                  disabled={readOnly || isDefault}
-                  onClick={handleUnset}
-                />
-              </span>
-            </Tooltip>
+            {isDefault ? (
+              <Tooltip
+                content={
+                  <Text muted size={1}>
+                    Can&apos;t remove default language
+                  </Text>
+                }
+                fallbackPlacements={['right', 'left']}
+                placement="top"
+                portal
+              >
+                <span>{removeButton}</span>
+              </Tooltip>
+            ) : (
+              removeButton
+            )}
           </Card>
         </Flex>
       </Stack>
