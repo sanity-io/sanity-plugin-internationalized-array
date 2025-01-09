@@ -9,6 +9,8 @@ import {
   MenuItem,
   Spinner,
   Stack,
+  Text,
+  Tooltip,
 } from '@sanity/ui'
 import type React from 'react'
 import {useCallback, useMemo} from 'react'
@@ -46,7 +48,8 @@ export default function InternationalizedInput(
   const {validation, value, onChange, readOnly} = inlineProps
 
   // The parent array contains the languages from the plugin config
-  const {languages, languageDisplay} = useInternationalizedArrayContext()
+  const {languages, languageDisplay, defaultLanguages} =
+    useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
     () => parentValue?.map((v) => v._key) ?? [],
@@ -89,6 +92,18 @@ export default function InternationalizedInput(
       ? getLanguageDisplay(languageDisplay, language.title, language.id)
       : ''
 
+  const isDefault = defaultLanguages.includes(value._key)
+
+  const removeButton = (
+    <Button
+      mode="bleed"
+      icon={RemoveCircleIcon}
+      tone="critical"
+      disabled={readOnly || isDefault}
+      onClick={handleUnset}
+    />
+  )
+
   return (
     <Card paddingTop={2} tone={getToneFromValidation(validation)}>
       <Stack space={2}>
@@ -126,13 +141,22 @@ export default function InternationalizedInput(
           </Card>
 
           <Card tone="inherit">
-            <Button
-              mode="bleed"
-              icon={RemoveCircleIcon}
-              tone="critical"
-              disabled={readOnly}
-              onClick={handleUnset}
-            />
+            {isDefault ? (
+              <Tooltip
+                content={
+                  <Text muted size={1}>
+                    Can&apos;t remove default language
+                  </Text>
+                }
+                fallbackPlacements={['right', 'left']}
+                placement="top"
+                portal
+              >
+                <span>{removeButton}</span>
+              </Tooltip>
+            ) : (
+              removeButton
+            )}
           </Card>
         </Flex>
       </Stack>
