@@ -117,8 +117,11 @@ export default function InternationalizedArray(
       const languagesToAdd = defaultLanguages
         .filter((language) => !addedLanguages.includes(language))
         .filter((language) => languages.find((l) => l.id === language))
-      handleAddLanguage(languagesToAdd)
+      // Account for strict mode by scheduling the update
+      const timeout = setTimeout(() => handleAddLanguage(languagesToAdd))
+      return () => clearTimeout(timeout)
     }
+    return undefined
   }, [
     isDeleting,
     hasAddedDefaultLanguages,
