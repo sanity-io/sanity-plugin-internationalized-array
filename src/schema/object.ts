@@ -1,7 +1,6 @@
 import {defineField, FieldDefinition} from 'sanity'
 
 import {createFieldName} from '../components/createFieldName'
-import InternationalizedField from '../components/InternationalizedField'
 import InternationalizedInput from '../components/InternationalizedInput'
 
 type ObjectFactoryConfig = {
@@ -12,10 +11,6 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
   const {type} = config
   const typeName = typeof type === `string` ? type : type.name
   const objectName = createFieldName(typeName, true)
-
-  console.log('typeName:', typeName)
-  console.log('objectName:', objectName)
-  console.log('type:', type)
 
   return defineField({
     name: objectName,
@@ -30,9 +25,6 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
         ...(typeof type === 'string' ? {type} : type),
         name: 'value',
         title: '',
-        // components: {
-        //   field: InternationalizedField,
-        // },
       }),
     ],
     preview: {
