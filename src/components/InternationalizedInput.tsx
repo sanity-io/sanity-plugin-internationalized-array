@@ -14,7 +14,7 @@ import {
 } from '@sanity/ui'
 import type React from 'react'
 import {useCallback, useMemo} from 'react'
-import {type ObjectItemProps, useFormValue} from 'sanity'
+import {type ObjectItemProps, Schema, useFormValue, useSchema} from 'sanity'
 import {set, unset} from 'sanity'
 
 import {getLanguageDisplay} from '../utils/getLanguageDisplay'
@@ -33,6 +33,9 @@ export default function InternationalizedInput(
   const parentValue = useFormValue(
     props.path.slice(0, -1)
   ) as InternationalizedValue[]
+
+  const schema: Schema = useSchema()
+  console.log({schema})
 
   const inlineProps = {
     ...props.inputProps,

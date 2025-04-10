@@ -13,6 +13,10 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
   const typeName = typeof type === `string` ? type : type.name
   const objectName = createFieldName(typeName, true)
 
+  console.log('typeName:', typeName)
+  console.log('objectName:', objectName)
+  console.log('type:', type)
+
   return defineField({
     name: objectName,
     title: `Internationalized array ${type}`,
@@ -22,23 +26,14 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
       item: InternationalizedInput,
     },
     fields: [
-      typeof type === `string`
-        ? // Define a simple field if all we have is the name as a string
-          defineField({
-            name: 'value',
-            type,
-            components: {
-              field: InternationalizedField,
-            },
-          })
-        : // Pass in the configured options, but overwrite the name
-          {
-            ...type,
-            name: 'value',
-            components: {
-              field: InternationalizedField,
-            },
-          },
+      defineField({
+        ...(typeof type === 'string' ? {type} : type),
+        name: 'value',
+        title: '',
+        // components: {
+        //   field: InternationalizedField,
+        // },
+      }),
     ],
     preview: {
       select: {
