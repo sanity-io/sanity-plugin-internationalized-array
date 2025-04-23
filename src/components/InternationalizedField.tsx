@@ -7,6 +7,7 @@ import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 export default function InternationalizedField(props: FieldProps): ReactNode {
   const {languages} = useInternationalizedArrayContext()
 
+  // hide titles for 'value' fields within valid language entries
   const customProps = useMemo(() => {
     const pathSegment = props.path.slice(0, -1)[1]
     const languageId =
