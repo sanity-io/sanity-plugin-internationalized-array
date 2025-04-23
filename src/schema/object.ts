@@ -24,7 +24,6 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
       defineField({
         ...(typeof type === 'string' ? {type} : type),
         name: 'value',
-        title: '',
       }),
     ],
     preview: {

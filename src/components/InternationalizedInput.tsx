@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from '@sanity/ui'
 import type React from 'react'
-import {useCallback, useMemo} from 'react'
+import {ReactNode, useCallback, useMemo} from 'react'
 import {type ObjectItemProps, Schema, useFormValue, useSchema} from 'sanity'
 import {set, unset} from 'sanity'
 
@@ -21,7 +21,7 @@ import {getLanguageDisplay} from '../utils/getLanguageDisplay'
 import {getToneFromValidation} from './getToneFromValidation'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
-type InternationalizedValue = {
+export type InternationalizedValue = {
   _type: string
   _key: string
   value: string
@@ -29,13 +29,10 @@ type InternationalizedValue = {
 
 export default function InternationalizedInput(
   props: ObjectItemProps<InternationalizedValue>
-) {
+): ReactNode {
   const parentValue = useFormValue(
     props.path.slice(0, -1)
   ) as InternationalizedValue[]
-
-  const schema: Schema = useSchema()
-  console.log({schema})
 
   const inlineProps = {
     ...props.inputProps,

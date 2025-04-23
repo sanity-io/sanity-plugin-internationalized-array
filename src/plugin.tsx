@@ -45,17 +45,7 @@ export const internationalizedArray = definePlugin<PluginConfig>((config) => {
     // Wrap document editor with a language provider
     form: {
       components: {
-        field: (props) => {
-          // this is theonly condition that seems applicable in the props
-          if (
-            props.actions?.filter((action) =>
-              action.name.startsWith('internationalized')
-            )
-          ) {
-            return <InternationalizedField {...props} />
-          }
-          return props.renderDefault(props)
-        },
+        field: (props) => <InternationalizedField {...props} />,
 
         input: (props) => {
           const isRootInput = props.id === 'root' && isObjectInputProps(props)

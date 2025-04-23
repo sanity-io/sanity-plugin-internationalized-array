@@ -1,29 +1,49 @@
-import type {FieldProps} from 'sanity'
+import type {ReactNode} from 'react'
+import {type FieldProps} from 'sanity'
 
-export default function InternationalizedField(props: FieldProps) {
+import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
+
+export default function InternationalizedField(props: FieldProps): ReactNode {
+  const {languages} = useInternationalizedArrayContext()
+
+  // hide the title?
+  type LanguageKey = {_key: string}
+  const languageId: LanguageKey = props.path.slice(0, -1)[1] as LanguageKey
+  const hasValidLanguageId: boolean = languageId
+    ? languages.find((l) => l.id === languageId?._key) !== undefined
+    : false
+  const hideTitle = props.title?.toLowerCase() === 'value' && hasValidLanguageId
+  const customProps: FieldProps = {
+    ...props,
+    title: hideTitle ? '' : props.title,
+  }
+
+  if (!customProps.schemaType.name.startsWith('internationalizedArray')) {
+    return customProps.renderDefault(customProps)
+  }
+
   // Show reference field selector if there's a value
-  if (props.schemaType.name === 'reference' && props.value) {
-    return props.renderDefault({
-      ...props,
+  if (customProps.schemaType.name === 'reference' && customProps.value) {
+    return customProps.renderDefault({
+      ...customProps,
       title: '',
-      level: 0,
+      level: 0, // Reset the level to avoid nested styling
     })
   }
 
   // For basic field types, we can use children to keep the simple input
   if (
-    props.schemaType.name === 'string' ||
-    props.schemaType.name === 'number' ||
-    props.schemaType.name === 'text'
+    customProps.schemaType.name === 'string' ||
+    customProps.schemaType.name === 'number' ||
+    customProps.schemaType.name === 'text'
   ) {
-    return props.children
+    return customProps.children
   }
 
   // For complex fields (like markdown), we need to use renderDefault
   // to get all the field's functionality
-  return props.renderDefault({
-    ...props,
-    title: '', // Remove the title since we handle that in the wrapper
+  return customProps.renderDefault({
+    ...customProps,
     level: 0, // Reset the level to avoid nested styling
   })
 }
