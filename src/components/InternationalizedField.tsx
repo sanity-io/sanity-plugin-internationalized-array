@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react'
+import {useMemo} from 'react'
 import {type FieldProps} from 'sanity'
 
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
@@ -6,17 +7,23 @@ import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 export default function InternationalizedField(props: FieldProps): ReactNode {
   const {languages} = useInternationalizedArrayContext()
 
-  // hide the title?
-  type LanguageKey = {_key: string}
-  const languageId: LanguageKey = props.path.slice(0, -1)[1] as LanguageKey
-  const hasValidLanguageId: boolean = languageId
-    ? languages.find((l) => l.id === languageId?._key) !== undefined
-    : false
-  const hideTitle = props.title?.toLowerCase() === 'value' && hasValidLanguageId
-  const customProps: FieldProps = {
-    ...props,
-    title: hideTitle ? '' : props.title,
-  }
+  const customProps = useMemo(() => {
+    const pathSegment = props.path.slice(0, -1)[1]
+    const languageId =
+      typeof pathSegment === 'object' && '_key' in pathSegment
+        ? pathSegment._key
+        : undefined
+    const hasValidLanguageId = languageId
+      ? languages.some((l) => l.id === languageId)
+      : false
+    const shouldHideTitle =
+      props.title?.toLowerCase() === 'value' && hasValidLanguageId
+
+    return {
+      ...props,
+      title: shouldHideTitle ? '' : props.title,
+    }
+  }, [props, languages])
 
   if (!customProps.schemaType.name.startsWith('internationalizedArray')) {
     return customProps.renderDefault(customProps)
