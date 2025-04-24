@@ -14,7 +14,7 @@ import {
 } from '@sanity/ui'
 import type React from 'react'
 import {ReactNode, useCallback, useMemo} from 'react'
-import {type ObjectItemProps, Schema, useFormValue, useSchema} from 'sanity'
+import {type ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
 import {getLanguageDisplay} from '../utils/getLanguageDisplay'
@@ -41,7 +41,7 @@ export default function InternationalizedInput(
       (m) => m.kind === 'field' && m.name === 'value'
     ),
     // This just overrides the type
-    // TODO: Remove this as it shouldn't be necessary?
+    // Remove this as it shouldn't be necessary?
     value: props.value as InternationalizedValue,
   }
 
@@ -61,7 +61,7 @@ export default function InternationalizedInput(
 
   // Changes the key of this item, ideally to a valid language
   const handleKeyChange = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
       const languageId = event?.currentTarget?.value
 
       if (
@@ -78,7 +78,7 @@ export default function InternationalizedInput(
   )
 
   // Removes this item from the array
-  const handleUnset = useCallback(() => {
+  const handleUnset = useCallback((): void => {
     onChange(unset())
   }, [onChange])
 
