@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.3](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.2...v3.1.3) (2025-04-28)
+
+### Bug Fixes
+
+- resolve markdown field rendering issue ([#97](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/97)) ([4e85b95](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/4e85b95760b213b5b3b92f1838a75ae790553a7c))
+
 ## [3.1.2](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.1...v3.1.2) (2025-03-12)
 
 ### Bug Fixes
