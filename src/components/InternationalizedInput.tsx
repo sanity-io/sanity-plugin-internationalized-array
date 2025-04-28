@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from '@sanity/ui'
 import type React from 'react'
-import {useCallback, useMemo} from 'react'
+import {ReactNode, useCallback, useMemo} from 'react'
 import {type ObjectItemProps, useFormValue} from 'sanity'
 import {set, unset} from 'sanity'
 
@@ -21,7 +21,7 @@ import {getLanguageDisplay} from '../utils/getLanguageDisplay'
 import {getToneFromValidation} from './getToneFromValidation'
 import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 
-type InternationalizedValue = {
+export type InternationalizedValue = {
   _type: string
   _key: string
   value: string
@@ -29,7 +29,7 @@ type InternationalizedValue = {
 
 export default function InternationalizedInput(
   props: ObjectItemProps<InternationalizedValue>
-) {
+): ReactNode {
   const parentValue = useFormValue(
     props.path.slice(0, -1)
   ) as InternationalizedValue[]
@@ -41,7 +41,7 @@ export default function InternationalizedInput(
       (m) => m.kind === 'field' && m.name === 'value'
     ),
     // This just overrides the type
-    // TODO: Remove this as it shouldn't be necessary?
+    // Remove this as it shouldn't be necessary?
     value: props.value as InternationalizedValue,
   }
 
@@ -61,7 +61,7 @@ export default function InternationalizedInput(
 
   // Changes the key of this item, ideally to a valid language
   const handleKeyChange = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
       const languageId = event?.currentTarget?.value
 
       if (
@@ -78,7 +78,7 @@ export default function InternationalizedInput(
   )
 
   // Removes this item from the array
-  const handleUnset = useCallback(() => {
+  const handleUnset = useCallback((): void => {
     onChange(unset())
   }, [onChange])
 
