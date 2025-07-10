@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.4](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.3...v3.1.4) (2025-07-10)
+
+### Bug Fixes
+
+- **deps:** allow studio v4 in peer dep ranges + update main ([7aaf76c](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/7aaf76c21f6fa6f023151744861c5e3380aee54e))
+
 ## [3.1.3](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.2...v3.1.3) (2025-04-28)
 
 ### Bug Fixes
