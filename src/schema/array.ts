@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import {defineField, type FieldDefinition, type Rule} from 'sanity'
 
-import {peek} from '../cache'
+import {getFunctionCache, peek, setFunctionCache} from '../cache'
 import {createFieldName} from '../components/createFieldName'
 import {getSelectedValue} from '../components/getSelectedValue'
 import InternationalizedArray from '../components/InternationalizedArray'
@@ -50,7 +50,12 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     // @ts-expect-error - fix typings
     validation: (rule: Rule) =>
       rule.custom<Value[]>(async (value, context) => {
-        if (!value) {
+        if (!value || value.length === 0) {
+          return true
+        }
+
+        // Early return for simple cases to avoid expensive operations
+        if (value.length === 1 && !value[0]?._key) {
           return true
         }
 
@@ -65,7 +70,33 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
         } else if (Array.isArray(peek(selectedValue))) {
           contextLanguages = peek(selectedValue) || []
         } else if (typeof languagesFieldOption === 'function') {
-          contextLanguages = await languagesFieldOption(client, selectedValue)
+          // Try to get from function cache first (if it's the same function as the component)
+          const cachedLanguages = getFunctionCache(
+            languagesFieldOption,
+            selectedValue
+          )
+
+          if (Array.isArray(cachedLanguages)) {
+            contextLanguages = cachedLanguages
+          } else {
+            // Try suspend cache as fallback
+            const suspendCachedLanguages = peek(selectedValue)
+            if (Array.isArray(suspendCachedLanguages)) {
+              contextLanguages = suspendCachedLanguages
+            } else {
+              // Only make the async call if we don't have cached data
+              contextLanguages = await languagesFieldOption(
+                client,
+                selectedValue
+              )
+              // Cache the result for future validation calls
+              setFunctionCache(
+                languagesFieldOption,
+                selectedValue,
+                contextLanguages
+              )
+            }
+          }
         }
 
         if (value && value.length > contextLanguages.length) {
@@ -76,12 +107,13 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
           }`
         }
 
-        const nonLanguageKeys = value?.length
-          ? value.filter(
-              (item) =>
-                !contextLanguages.find((language) => item._key === language.id)
-            )
-          : []
+        // Create a Set for faster language ID lookups
+        const languageIds = new Set(contextLanguages.map((lang) => lang.id))
+
+        // Check for invalid language keys
+        const nonLanguageKeys = value.filter(
+          (item) => item?._key && !languageIds.has(item._key)
+        )
         if (nonLanguageKeys.length) {
           return {
             message: `Array item keys must be valid languages registered to the field type`,
@@ -89,27 +121,20 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
           }
         }
 
-        // Ensure there's no duplicate `language` fields
-        type KeyedValues = {
-          [key: string]: Value[]
+        // Check for duplicate language keys (more efficient)
+        const seenKeys = new Set<string>()
+        const duplicateValues: Value[] = []
+
+        for (const item of value) {
+          if (item?._key) {
+            if (seenKeys.has(item._key)) {
+              duplicateValues.push(item)
+            } else {
+              seenKeys.add(item._key)
+            }
+          }
         }
 
-        const valuesByLanguage = value?.length
-          ? value
-              .filter((item) => Boolean(item?._key))
-              .reduce((acc, cur) => {
-                if (acc[cur._key]) {
-                  return {...acc, [cur._key]: [...acc[cur._key], cur]}
-                }
-                return {
-                  ...acc,
-                  [cur._key]: [cur],
-                }
-              }, {} as KeyedValues)
-          : {}
-        const duplicateValues = Object.values(valuesByLanguage)
-          .filter((item) => item?.length > 1)
-          .flat()
         if (duplicateValues.length) {
           return {
             message: 'There can only be one field per language',
