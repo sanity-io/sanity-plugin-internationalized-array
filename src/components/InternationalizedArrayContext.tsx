@@ -6,7 +6,7 @@ import {type ObjectInputProps, useClient, useWorkspace} from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
 import {suspend} from 'suspend-react'
 
-import {namespace, version} from '../cache'
+import {createCacheKey, setFunctionCache} from '../cache'
 import {CONFIG_DEFAULT} from '../constants'
 import type {Language, PluginConfig} from '../types'
 import DocumentAddButtons from './DocumentAddButtons'
@@ -49,6 +49,27 @@ export function InternationalizedArrayProvider(
     [internationalizedArray.select, deferredDocument]
   )
 
+  // Use a stable workspace identifier to prevent unnecessary re-renders
+  const workspaceId = useMemo(() => {
+    // Use workspace name if available, otherwise create a stable hash
+    if (workspace?.name) {
+      return workspace.name
+    }
+    // Create a stable hash from workspace properties that matter for caching
+    const workspaceKey = {
+      name: workspace?.name,
+      title: workspace?.title,
+      // Add other stable properties as needed
+    }
+    return JSON.stringify(workspaceKey)
+  }, [workspace])
+
+  // Memoize the cache key to prevent expensive JSON.stringify calls
+  const cacheKey = useMemo(
+    () => createCacheKey(selectedValue, workspaceId),
+    [selectedValue, workspaceId]
+  )
+
   // Fetch or return languages
   const languages = Array.isArray(internationalizedArray.languages)
     ? internationalizedArray.languages
@@ -56,11 +77,22 @@ export function InternationalizedArrayProvider(
         // eslint-disable-next-line require-await
         async () => {
           if (typeof internationalizedArray.languages === 'function') {
-            return internationalizedArray.languages(client, selectedValue)
+            const result = await internationalizedArray.languages(
+              client,
+              selectedValue
+            )
+            // Populate function cache for use outside React context
+            setFunctionCache(
+              internationalizedArray.languages,
+              selectedValue,
+              result,
+              workspaceId
+            )
+            return result
           }
           return internationalizedArray.languages
         },
-        [version, namespace, selectedValue, workspace],
+        cacheKey,
         {equal}
       )
 
