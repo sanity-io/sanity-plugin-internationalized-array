@@ -34,6 +34,54 @@ export default function InternationalizedInput(
     props.path.slice(0, -1)
   ) as InternationalizedValue[]
 
+  // Extract the original onChange to avoid dependency issues
+  const originalOnChange = props.inputProps.onChange
+
+  // Create a wrapped onChange handler to intercept patches for paste operations
+  const wrappedOnChange = useCallback((patches: any) => {
+    // Check if this is a paste operation into an empty or uninitialized Portable Text field
+    const valueField = props.value?.value
+    const isEmptyOrUndefined = valueField === undefined ||
+                               (Array.isArray(valueField) && valueField.length === 0)
+
+    if (isEmptyOrUndefined) {
+      // Check for insert patches that are trying to operate on a non-existent structure
+      const hasProblematicInsert = patches.some((patch: any) => {
+        // Look for insert patches targeting the value field or direct array index
+        if (patch.type === 'insert' && patch.path && patch.path.length > 0) {
+          // The path might be ['value', index] or just [index] depending on context
+          const isTargetingValue = patch.path[0] === 'value' || typeof patch.path[0] === 'number'
+          return isTargetingValue
+        }
+        return false
+      })
+
+      if (hasProblematicInsert) {
+        // First, ensure the value field exists as an empty array if it doesn't
+        const initPatch = valueField === undefined ? { type: 'setIfMissing', path: ['value'], value: [] } : null
+
+        // Transform the patches to ensure they work with the nested structure
+        const fixedPatches = patches.map((patch: any) => {
+          if (patch.type === 'insert' && patch.path) {
+            // Ensure the path is correct for the nested structure
+            const fixedPath = patch.path[0] === 'value' ? patch.path : ['value', ...patch.path]
+            const fixedPatch = { ...patch, path: fixedPath }
+            return fixedPatch
+          }
+          return patch
+        })
+
+        // If we need to initialize the field, include that patch first
+        const allPatches = initPatch ? [initPatch, ...fixedPatches] : fixedPatches
+
+        return originalOnChange(allPatches)
+      }
+    }
+
+    // For all other cases, pass through unchanged
+    return originalOnChange(patches)
+  }, [props.value, originalOnChange])
+
   const inlineProps = {
     ...props.inputProps,
     // This is the magic that makes inline editing work?
@@ -43,6 +91,8 @@ export default function InternationalizedInput(
     // This just overrides the type
     // Remove this as it shouldn't be necessary?
     value: props.value as InternationalizedValue,
+    // Use our wrapped onChange handler
+    onChange: wrappedOnChange,
   }
 
   const {validation, value, onChange, readOnly} = inlineProps
@@ -137,7 +187,7 @@ export default function InternationalizedInput(
         </Card>
         <Flex align="center" gap={2}>
           <Card flex={1} tone="inherit">
-            {props.inputProps.renderInput(props.inputProps)}
+            {props.inputProps.renderInput(inlineProps)}
           </Card>
 
           <Card tone="inherit">

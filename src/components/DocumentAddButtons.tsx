@@ -7,6 +7,8 @@ import {
   isSanityDocument,
   PatchEvent,
   setIfMissing,
+  useClient,
+  useSchema,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
 
@@ -27,8 +29,52 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
   const toast = useToast()
   const {onChange} = useDocumentPane()
+  const schema = useSchema()
 
   const documentsToTranslation = getDocumentsToTranslate(value, [])
+
+  // Helper function to determine if a field should be initialized as an array
+  const getInitialValueForType = useCallback((typeName: string): any => {
+    if (!typeName) return undefined
+
+    // Extract the base type name from internationalized array type
+    // e.g., "internationalizedArrayBodyValue" -> "body"
+    const match = typeName.match(/^internationalizedArray(.+)Value$/)
+    if (!match) return undefined
+
+    const baseTypeName = match[1].charAt(0).toLowerCase() + match[1].slice(1)
+
+    // Check if it's a known array-based type (Portable Text fields)
+    const arrayBasedTypes = ['body', 'htmlContent', 'blockContent', 'portableText']
+    if (arrayBasedTypes.includes(baseTypeName)) {
+      return []
+    }
+
+    // Try to look up the schema type to determine if it's an array
+    try {
+      const schemaType = schema.get(typeName)
+      if (schemaType) {
+        // Check if this is an object type with a 'value' field
+        const valueField = (schemaType as any)?.fields?.find((f: any) => f.name === 'value')
+        if (valueField) {
+          const fieldType = valueField.type
+          // Check if the value field is an array type
+          if (fieldType?.jsonType === 'array' ||
+              fieldType?.name === 'array' ||
+              fieldType?.type === 'array' ||
+              fieldType?.of !== undefined ||
+              arrayBasedTypes.includes(fieldType?.name)) {
+            return []
+          }
+        }
+      }
+    } catch (error) {
+      // If we can't determine from schema, fall back to undefined
+      console.warn('Could not determine field type from schema:', typeName, error)
+    }
+
+    return undefined
+  }, [schema])
 
   const handleDocumentButtonClick = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -77,13 +123,16 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
       for (const toTranslate of removeDuplicates) {
         const path = toTranslate.path
 
+        // Get the appropriate initial value for this field type
+        const initialValue = getInitialValueForType(toTranslate._type)
+
         const ifMissing = setIfMissing([], path)
         const insertValue = insert(
           [
             {
               _key: languageId,
               _type: toTranslate._type,
-              value: undefined,
+              value: initialValue, // Use the determined initial value instead of undefined
             },
           ],
           'after',
@@ -95,7 +144,7 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
 
       onChange(PatchEvent.from(patches.flat()))
     },
-    [documentsToTranslation, onChange, toast]
+    [documentsToTranslation, getInitialValueForType, onChange, toast]
   )
   return (
     <Stack space={3}>
