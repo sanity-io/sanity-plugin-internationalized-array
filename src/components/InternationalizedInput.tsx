@@ -39,6 +39,7 @@ export default function InternationalizedInput(
 
   // Create a wrapped onChange handler to intercept patches for paste operations
   const wrappedOnChange = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (patches: any) => {
       // Ensure patches is an array before proceeding with paste logic
       // For single patch operations (like unset), pass through directly
@@ -55,6 +56,7 @@ export default function InternationalizedInput(
 
       if (isEmptyOrUndefined) {
         // Check for insert patches that are trying to operate on a non-existent structure
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hasProblematicInsert = patches.some((patch: any) => {
           // Ensure patch exists and has required properties
           if (!patch || typeof patch !== 'object') {
@@ -84,6 +86,7 @@ export default function InternationalizedInput(
               : null
 
           // Transform the patches to ensure they work with the nested structure
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const fixedPatches = patches.map((patch: any) => {
             // Ensure patch exists and has required properties
             if (!patch || typeof patch !== 'object') {

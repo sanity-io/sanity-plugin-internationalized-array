@@ -1,4 +1,5 @@
 import {Card, Code, Stack, Text} from '@sanity/ui'
+import type React from 'react'
 
 const schemaExample = {
   languages: [
@@ -7,7 +8,7 @@ const schemaExample = {
   ],
 }
 
-export default function Feedback() {
+export default function Feedback(): React.ReactElement {
   return (
     <Card tone="caution" border radius={2} padding={3}>
       <Stack space={4}>

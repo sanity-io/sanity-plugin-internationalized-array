@@ -7,7 +7,6 @@ import {
   isSanityDocument,
   PatchEvent,
   setIfMissing,
-  useClient,
   useSchema,
 } from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
@@ -23,7 +22,9 @@ type DocumentAddButtonsProps = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any> | undefined
 }
-export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
+export default function DocumentAddButtons(
+  props: DocumentAddButtonsProps
+): React.ReactElement {
   const {filteredLanguages} = useInternationalizedArrayContext()
   const value = isSanityDocument(props.value) ? props.value : undefined
 
@@ -34,47 +35,65 @@ export default function DocumentAddButtons(props: DocumentAddButtonsProps) {
   const documentsToTranslation = getDocumentsToTranslate(value, [])
 
   // Helper function to determine if a field should be initialized as an array
-  const getInitialValueForType = useCallback((typeName: string): any => {
-    if (!typeName) return undefined
+  const getInitialValueForType = useCallback(
+    (typeName: string): unknown => {
+      if (!typeName) return undefined
 
-    // Extract the base type name from internationalized array type
-    // e.g., "internationalizedArrayBodyValue" -> "body"
-    const match = typeName.match(/^internationalizedArray(.+)Value$/)
-    if (!match) return undefined
+      // Extract the base type name from internationalized array type
+      // e.g., "internationalizedArrayBodyValue" -> "body"
+      const match = typeName.match(/^internationalizedArray(.+)Value$/)
+      if (!match) return undefined
 
-    const baseTypeName = match[1].charAt(0).toLowerCase() + match[1].slice(1)
+      const baseTypeName = match[1].charAt(0).toLowerCase() + match[1].slice(1)
 
-    // Check if it's a known array-based type (Portable Text fields)
-    const arrayBasedTypes = ['body', 'htmlContent', 'blockContent', 'portableText']
-    if (arrayBasedTypes.includes(baseTypeName)) {
-      return []
-    }
+      // Check if it's a known array-based type (Portable Text fields)
+      const arrayBasedTypes = [
+        'body',
+        'htmlContent',
+        'blockContent',
+        'portableText',
+      ]
+      if (arrayBasedTypes.includes(baseTypeName)) {
+        return []
+      }
 
-    // Try to look up the schema type to determine if it's an array
-    try {
-      const schemaType = schema.get(typeName)
-      if (schemaType) {
-        // Check if this is an object type with a 'value' field
-        const valueField = (schemaType as any)?.fields?.find((f: any) => f.name === 'value')
-        if (valueField) {
-          const fieldType = valueField.type
-          // Check if the value field is an array type
-          if (fieldType?.jsonType === 'array' ||
+      // Try to look up the schema type to determine if it's an array
+      try {
+        const schemaType = schema.get(typeName)
+        if (schemaType) {
+          // Check if this is an object type with a 'value' field
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const valueField = (schemaType as any)?.fields?.find(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (f: any) => f.name === 'value'
+          )
+          if (valueField) {
+            const fieldType = valueField.type
+            // Check if the value field is an array type
+            if (
+              fieldType?.jsonType === 'array' ||
               fieldType?.name === 'array' ||
               fieldType?.type === 'array' ||
               fieldType?.of !== undefined ||
-              arrayBasedTypes.includes(fieldType?.name)) {
-            return []
+              arrayBasedTypes.includes(fieldType?.name)
+            ) {
+              return []
+            }
           }
         }
+      } catch (error) {
+        // If we can't determine from schema, fall back to undefined
+        console.warn(
+          'Could not determine field type from schema:',
+          typeName,
+          error
+        )
       }
-    } catch (error) {
-      // If we can't determine from schema, fall back to undefined
-      console.warn('Could not determine field type from schema:', typeName, error)
-    }
 
-    return undefined
-  }, [schema])
+      return undefined
+    },
+    [schema]
+  )
 
   const handleDocumentButtonClick = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
