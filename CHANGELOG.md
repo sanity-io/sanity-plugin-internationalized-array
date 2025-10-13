@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.6](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.5...v3.1.6) (2025-10-13)
+
+### Bug Fixes
+
+- initialize array fields with empty array to prevent insert patch error ([#105](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/105)) ([9072757](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/9072757bcba93a3bca2f1071ab390f127912594c)), closes [#2](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/2)
+
 ## [3.1.5](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.4...v3.1.5) (2025-08-14)
 
 ### Bug Fixes
