@@ -1,6 +1,7 @@
 import {useLanguageFilterStudioContext} from '@sanity/language-filter'
 import {Stack} from '@sanity/ui'
 import equal from 'fast-deep-equal'
+import type React from 'react'
 import {createContext, useContext, useDeferredValue, useMemo} from 'react'
 import {type ObjectInputProps, useClient, useWorkspace} from 'sanity'
 import {useDocumentPane} from 'sanity/structure'
@@ -27,7 +28,7 @@ export const InternationalizedArrayContext =
     filteredLanguages: [],
   })
 
-export function useInternationalizedArrayContext() {
+export function useInternationalizedArrayContext(): InternationalizedArrayContextProps {
   return useContext(InternationalizedArrayContext)
 }
 
@@ -37,7 +38,7 @@ type InternationalizedArrayProviderProps = ObjectInputProps & {
 
 export function InternationalizedArrayProvider(
   props: InternationalizedArrayProviderProps
-) {
+): React.ReactElement {
   const {internationalizedArray} = props
 
   const client = useClient({apiVersion: internationalizedArray.apiVersion})

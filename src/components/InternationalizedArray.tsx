@@ -29,7 +29,7 @@ export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
 
 export default function InternationalizedArray(
   props: InternationalizedArrayProps
-) {
+): React.ReactElement {
   const {members, value, schemaType, onChange} = props
 
   const readOnly =
@@ -131,7 +131,7 @@ export default function InternationalizedArray(
     languages,
   ])
 
-  // TODO: This is reordering and re-setting the whole array, it could be surgical
+  // NOTE: This is reordering and re-setting the whole array, it could be surgical
   const handleRestoreOrder = useCallback(() => {
     if (!value?.length || !languages?.length) {
       return
