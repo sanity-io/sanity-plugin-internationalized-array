@@ -40,7 +40,7 @@ export type LanguageDisplay = 'titleOnly' | 'codeOnly' | 'titleAndCode'
 export type PluginConfig = {
   /**
    * https://www.sanity.io/docs/api-versioning
-   * @defaultValue '2022-11-27'
+   * @defaultValue '2025-10-15'
    */
   apiVersion?: string
   /**
