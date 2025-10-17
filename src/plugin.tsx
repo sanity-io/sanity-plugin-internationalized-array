@@ -13,7 +13,7 @@ import {flattenSchemaType} from './utils/flattenSchemaType'
 export const internationalizedArray = definePlugin<PluginConfig>((config) => {
   const pluginConfig = {...CONFIG_DEFAULT, ...config}
   const {
-    apiVersion = '2022-11-27',
+    apiVersion = '2025-10-15',
     select,
     languages,
     fieldTypes,

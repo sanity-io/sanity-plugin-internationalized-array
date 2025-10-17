@@ -11,7 +11,7 @@ export const CONFIG_DEFAULT: Required<PluginConfig> = {
   select: {},
   defaultLanguages: [],
   fieldTypes: [],
-  apiVersion: '2022-11-27',
+  apiVersion: '2025-10-15',
   buttonLocations: ['field'],
   buttonAddAll: true,
   languageDisplay: 'codeOnly',
