@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.0](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.6...v3.2.0) (2025-10-17)
+
+### Features
+
+- support raw perspective with updated api version ([#108](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/108)) ([fed49e4](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/fed49e4db32476c8ed7137a67f955a0a6f4267c1))
+
 ## [3.1.6](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.1.5...v3.1.6) (2025-10-13)
 
 ### Bug Fixes
