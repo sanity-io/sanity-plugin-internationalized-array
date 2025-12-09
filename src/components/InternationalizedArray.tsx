@@ -30,7 +30,13 @@ export type InternationalizedArrayProps = ArrayOfObjectsInputProps<
 export default function InternationalizedArray(
   props: InternationalizedArrayProps
 ): React.ReactElement {
-  const {members, value, schemaType, onChange} = props
+  const {
+    members,
+    value,
+    schemaType,
+    onChange,
+    readOnly: documentReadOnly,
+  } = props
 
   const readOnly =
     typeof schemaType.readOnly === 'boolean' ? schemaType.readOnly : false
@@ -118,7 +124,9 @@ export default function InternationalizedArray(
         .filter((language) => !addedLanguages.includes(language))
         .filter((language) => languages.find((l) => l.id === language))
       // Account for strict mode by scheduling the update
-      const timeout = setTimeout(() => handleAddLanguage(languagesToAdd))
+      const timeout = setTimeout(() => {
+        if (!documentReadOnly) handleAddLanguage(languagesToAdd)
+      })
       return () => clearTimeout(timeout)
     }
     return undefined
@@ -129,6 +137,7 @@ export default function InternationalizedArray(
     defaultLanguages,
     addedLanguages,
     languages,
+    documentReadOnly,
   ])
 
   // NOTE: This is reordering and re-setting the whole array, it could be surgical
