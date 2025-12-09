@@ -137,6 +137,7 @@ export default function InternationalizedArray(
     defaultLanguages,
     addedLanguages,
     languages,
+    documentReadOnly,
   ])
 
   // NOTE: This is reordering and re-setting the whole array, it could be surgical
