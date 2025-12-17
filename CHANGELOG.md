@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.2](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.2.1...v3.2.2) (2025-12-17)
+
+### Bug Fixes
+
+- **deps:** allow sanity v5 as peer dependency ([#110](https://github.com/sanity-io/sanity-plugin-internationalized-array/issues/110)) ([c46b07d](https://github.com/sanity-io/sanity-plugin-internationalized-array/commit/c46b07d30609b10b76ef2f0cb0771386ebbf9dbf))
+
 ## [3.2.1](https://github.com/sanity-io/sanity-plugin-internationalized-array/compare/v3.2.0...v3.2.1) (2025-12-09)
 
 ### Bug Fixes
