@@ -110,6 +110,17 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
         // Create a Set for faster language ID lookups
         const languageIds = new Set(contextLanguages.map((lang) => lang.id))
 
+        // Check for missing or empty language values
+        const missingLanguages = value.filter(
+          (item) => item && (!item.language || item.language.trim() === '')
+        )
+        if (missingLanguages.length) {
+          return {
+            message: 'Language is required for each array item',
+            paths: missingLanguages.map((item) => [{_key: item._key}]),
+          }
+        }
+
         // Check for invalid language values
         const invalidLanguages = value.filter(
           (item) => item?.language && !languageIds.has(item.language)
