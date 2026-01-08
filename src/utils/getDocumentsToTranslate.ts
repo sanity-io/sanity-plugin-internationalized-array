@@ -4,6 +4,7 @@ export interface DocumentsToTranslate {
   path: (string | number)[]
   pathString: string
   _key: string
+  language: string
   _type: string
   [key: string]: unknown
 }

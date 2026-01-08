@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any, consistent-return */
 
-import {getCliClient} from 'sanity/cli'
 import {nanoid} from 'nanoid'
+import {getCliClient} from 'sanity/cli'
 
 // Migration script: Convert _key-based language identification to dedicated language field
 //
@@ -66,7 +66,9 @@ const API_VERSION = '2024-01-01'
 const client = getCliClient({apiVersion: API_VERSION})
 
 // Normalize config to arrays
-const documentTypes = Array.isArray(DOCUMENT_TYPES) ? DOCUMENT_TYPES : [DOCUMENT_TYPES]
+const documentTypes = Array.isArray(DOCUMENT_TYPES)
+  ? DOCUMENT_TYPES
+  : [DOCUMENT_TYPES]
 const fieldNames = Array.isArray(FIELD_NAMES) ? FIELD_NAMES : [FIELD_NAMES]
 
 /**
@@ -79,7 +81,9 @@ const fieldNames = Array.isArray(FIELD_NAMES) ? FIELD_NAMES : [FIELD_NAMES]
  */
 function buildFetchQuery(): string {
   // Build field existence checks
-  const fieldChecks = fieldNames.map((field) => `defined(${field})`).join(' || ')
+  const fieldChecks = fieldNames
+    .map((field) => `defined(${field})`)
+    .join(' || ')
 
   // Build migration status checks - find docs where any field has items without language
   const migrationChecks = fieldNames
@@ -173,14 +177,19 @@ function buildPatch(doc: any): {id: string; patch: any} | null {
  * Build patches for a batch of documents
  */
 function buildPatches(docs: any[]): Array<{id: string; patch: any}> {
-  return docs.map(buildPatch).filter((patch): patch is {id: string; patch: any} => patch !== null)
+  return docs
+    .map(buildPatch)
+    .filter((patch): patch is {id: string; patch: any} => patch !== null)
 }
 
 /**
  * Create a transaction from patches
  */
 function createTransaction(patches: Array<{id: string; patch: any}>) {
-  return patches.reduce((tx, {id, patch}) => tx.patch(id, patch), client.transaction())
+  return patches.reduce(
+    (tx, {id, patch}) => tx.patch(id, patch),
+    client.transaction()
+  )
 }
 
 /**
@@ -223,7 +232,9 @@ async function migrateNextBatch(): Promise<void> {
   const patches = buildPatches(documents)
 
   if (patches.length === 0) {
-    console.log('No patches to apply (documents may have been migrated concurrently)')
+    console.log(
+      'No patches to apply (documents may have been migrated concurrently)'
+    )
     return migrateNextBatch()
   }
 
@@ -261,12 +272,14 @@ async function runMigration(): Promise<void> {
 
   if (DRY_RUN) {
     console.log('⚠️  DRY RUN MODE - No changes will be applied')
-    console.log('   Review the output and set DRY_RUN = false to apply changes\n')
+    console.log(
+      '   Review the output and set DRY_RUN = false to apply changes\n'
+    )
   }
 
   await migrateNextBatch()
 
-  console.log('\n' + '='.repeat(60))
+  console.log(`\n${'='.repeat(60)}`)
   console.log('Migration complete')
   console.log('='.repeat(60))
 }

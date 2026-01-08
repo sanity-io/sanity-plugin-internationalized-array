@@ -146,11 +146,11 @@ export default function InternationalizedInput(
     useInternationalizedArrayContext()
 
   const languageKeysInUse = useMemo(
-    () => parentValue?.map((v) => v._key) ?? [],
+    () => parentValue?.map((v) => v.language) ?? [],
     [parentValue]
   )
   const keyIsValid = languages?.length
-    ? languages.find((l) => l.id === value._key)
+    ? languages.find((l) => l.id === value.language)
     : false
 
   // Changes the key of this item, ideally to a valid language
@@ -166,7 +166,7 @@ export default function InternationalizedInput(
         return
       }
 
-      onChange([set(languageId, ['_key'])])
+      onChange([set(languageId, ['language'])])
     },
     [onChange, value, languages]
   )
@@ -180,13 +180,13 @@ export default function InternationalizedInput(
     return <Spinner />
   }
 
-  const language = languages.find((l) => l.id === value._key)
+  const language = languages.find((l) => l.id === value.language)
   const languageTitle: string =
     keyIsValid && language
       ? getLanguageDisplay(languageDisplay, language.title, language.id)
       : ''
 
-  const isDefault = defaultLanguages.includes(value._key)
+  const isDefault = defaultLanguages.includes(value.language)
 
   const removeButton = (
     <Button
@@ -208,8 +208,10 @@ export default function InternationalizedInput(
             </Label>
           ) : (
             <MenuButton
-              button={<Button fontSize={1} text={`Change "${value._key}"`} />}
-              id={`${value._key}-change-key`}
+              button={
+                <Button fontSize={1} text={`Change "${value.language}"`} />
+              }
+              id={`${value.language}-change-key`}
               menu={
                 <Menu>
                   {languages.map((lang) => (
