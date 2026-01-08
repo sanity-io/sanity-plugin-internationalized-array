@@ -1,4 +1,5 @@
 import {Box, Stack, Text, useToast} from '@sanity/ui'
+import {nanoid} from 'nanoid'
 import React, {useCallback} from 'react'
 import {
   FormInsertPatch,
@@ -106,7 +107,7 @@ export default function DocumentAddButtons(
         return
       }
       const alreadyTranslated = documentsToTranslation.filter(
-        (translation) => translation?._key === languageId
+        (translation) => translation?.language === languageId
       )
       const removeDuplicates = documentsToTranslation.reduce<
         DocumentsToTranslate[]
@@ -149,7 +150,8 @@ export default function DocumentAddButtons(
         const insertValue = insert(
           [
             {
-              _key: languageId,
+              _key: nanoid(),
+              language: languageId,
               _type: toTranslate._type,
               value: initialValue, // Use the determined initial value instead of undefined
             },
