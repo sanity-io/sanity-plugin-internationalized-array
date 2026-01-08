@@ -5,7 +5,7 @@ export function checkAllLanguagesArePresent(
   value: Value[] | undefined
 ): boolean {
   const filteredLanguageIds = languages.map((l) => l.id)
-  const languagesInUseIds = value ? value.map((v) => v.language) : []
+  const languagesInUseIds = value ? value.map((v) => v._key) : []
 
   return (
     languagesInUseIds.length === filteredLanguageIds.length &&

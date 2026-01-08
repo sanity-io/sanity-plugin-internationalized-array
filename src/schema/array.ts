@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import type {ComponentType} from 'react'
-import {
-  type ArrayOfPrimitivesInputProps,
-  defineField,
-  type FieldDefinition,
-  type Rule,
-} from 'sanity'
+import {defineField, type FieldDefinition, type Rule} from 'sanity'
 
 import {getFunctionCache, peek, setFunctionCache} from '../cache'
 import {createFieldName} from '../components/createFieldName'
@@ -38,10 +32,7 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     title: 'Internationalized array',
     type: 'array',
     components: {
-      // Type assertion needed: InternationalizedArray uses ArrayOfObjectsInputProps internally,
-      // but defineField expects ArrayOfPrimitivesInputProps. The component works correctly at runtime.
-      input:
-        InternationalizedArray as unknown as ComponentType<ArrayOfPrimitivesInputProps>,
+      input: InternationalizedArray,
     },
     options: {
       // @ts-expect-error - these options are required for validation rules – not the custom input component
@@ -64,7 +55,7 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
         }
 
         // Early return for simple cases to avoid expensive operations
-        if (value.length === 1 && !value[0]?.language) {
+        if (value.length === 1 && !value[0]?._key) {
           return true
         }
 
@@ -119,38 +110,27 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
         // Create a Set for faster language ID lookups
         const languageIds = new Set(contextLanguages.map((lang) => lang.id))
 
-        // Check for missing or empty language values
-        const missingLanguages = value.filter(
-          (item) => item && (!item.language || item.language.trim() === '')
+        // Check for invalid language keys
+        const nonLanguageKeys = value.filter(
+          (item) => item?._key && !languageIds.has(item._key)
         )
-        if (missingLanguages.length) {
+        if (nonLanguageKeys.length) {
           return {
-            message: 'Language is required for each array item',
-            paths: missingLanguages.map((item) => [{_key: item._key}]),
+            message: `Array item keys must be valid languages registered to the field type`,
+            paths: nonLanguageKeys.map((item) => [{_key: item._key}]),
           }
         }
 
-        // Check for invalid language values
-        const invalidLanguages = value.filter(
-          (item) => item?.language && !languageIds.has(item.language)
-        )
-        if (invalidLanguages.length) {
-          return {
-            message: `Array item language values must be valid languages registered to the field type`,
-            paths: invalidLanguages.map((item) => [{_key: item._key}]),
-          }
-        }
-
-        // Check for duplicate language values (more efficient)
-        const seenLanguages = new Set<string>()
+        // Check for duplicate language keys (more efficient)
+        const seenKeys = new Set<string>()
         const duplicateValues: Value[] = []
 
         for (const item of value) {
-          if (item?.language) {
-            if (seenLanguages.has(item.language)) {
+          if (item?._key) {
+            if (seenKeys.has(item._key)) {
               duplicateValues.push(item)
             } else {
-              seenLanguages.add(item.language)
+              seenKeys.add(item._key)
             }
           }
         }
