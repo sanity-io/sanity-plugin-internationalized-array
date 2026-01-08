@@ -24,6 +24,8 @@ import {useInternationalizedArrayContext} from './InternationalizedArrayContext'
 export type InternationalizedValue = {
   _type: string
   _key: string
+  /** The language identifier (e.g., 'en', 'fr'). This is the semantic identifier. */
+  language: string
   value: string
 }
 
