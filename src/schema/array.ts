@@ -1,5 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import {defineField, type FieldDefinition, type Rule} from 'sanity'
+import type {ComponentType} from 'react'
+import {
+  type ArrayOfPrimitivesInputProps,
+  defineField,
+  type FieldDefinition,
+  type Rule,
+} from 'sanity'
 
 import {getFunctionCache, peek, setFunctionCache} from '../cache'
 import {createFieldName} from '../components/createFieldName'
@@ -32,7 +38,10 @@ export default (config: ArrayFactoryConfig): FieldDefinition<'array'> => {
     title: 'Internationalized array',
     type: 'array',
     components: {
-      input: InternationalizedArray,
+      // Type assertion needed: InternationalizedArray uses ArrayOfObjectsInputProps internally,
+      // but defineField expects ArrayOfPrimitivesInputProps. The component works correctly at runtime.
+      input:
+        InternationalizedArray as unknown as ComponentType<ArrayOfPrimitivesInputProps>,
     },
     options: {
       // @ts-expect-error - these options are required for validation rules – not the custom input component
