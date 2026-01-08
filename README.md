@@ -4,7 +4,7 @@
 
 # sanity-plugin-internationalized-array
 
-A plugin to register array fields with a custom input component to store field values in multiple languages, queryable by the `language` field.
+A plugin to register array fields with a custom input component to store field values in multiple languages, queryable by using the language ID as an array `_key`.
 
 ![Screenshot of an internationalized input](./img/internationalized-array.png)
 
@@ -19,7 +19,6 @@ A plugin to register array fields with a custom input component to store field v
   - [Usage with @sanity/language-filter](#usage-with-sanitylanguage-filter)
   - [Shape of stored data](#shape-of-stored-data)
   - [Querying data](#querying-data)
-  - [Migrate from v3 to v4](#migrate-from-v3-to-v4)
   - [Migrate from objects to arrays](#migrate-from-objects-to-arrays)
     - [Why store localized field data like this?](#why-store-localized-field-data-like-this)
   - [License](#license)
@@ -309,14 +308,15 @@ export default defineConfig({
           enclosingType.name.startsWith('internationalizedArray') &&
           'kind' in member
         ) {
-          // Get the language from the member's parent value
-          // In v4+, language is stored in a dedicated `language` field
-          const parentValue = member.field.path.length >= 2
-            ? member.field.document?.[member.field.path[0]]?.find(
-                (item: any) => item._key === member.field.path[1]?._key
-              )
-            : null
-          const language = parentValue?.language
+          // Get last two segments of the field's path
+          const pathEnd = member.field.path.slice(-2)
+          // If the second-last segment is a _key, and the last segment is `value`,
+          // It's an internationalized array value
+          // And the array _key is the language of the field
+          const language =
+            pathEnd[1] === 'value' && isKeySegment(pathEnd[0])
+              ? pathEnd[0]._key
+              : null
 
           return language ? selectedLanguageIds.includes(language) : false
         }
@@ -339,92 +339,24 @@ export default defineConfig({
 
 ## Shape of stored data
 
-The custom input contains buttons which will add new array items with a `language` field identifying the language. Data returned from this array will look like this:
+The custom input contains buttons which will add new array items with the language as the `_key` value. Data returned from this array will look like this:
 
 ```json
 "greeting": [
-  { "_key": "abc123", "language": "en", "value": "hello" },
-  { "_key": "def456", "language": "fr", "value": "bonjour" }
+  { "_key": "en", "value": "hello" },
+  { "_key": "fr", "value": "bonjour" },
 ]
 ```
 
-> **Note:** In versions prior to v4, the language ID was stored in the `_key` field. See [Migrate from v3 to v4](#migrate-from-v3-to-v4) if you're upgrading from an earlier version.
-
 ## Querying data
 
-Using GROQ filters you can query for a specific language like so:
+Using GROQ filters you can query for a specific language key like so:
 
 ```js
 *[_type == "person"] {
-  "greeting": greeting[language == "en"][0].value
+  "greeting": greeting[_key == "en"][0].value
 }
 ```
-
-> **Migrating queries from v3:** If upgrading from v3, replace `_key == "en"` with `language == "en"` in your GROQ queries.
-
-## Migrate from v3 to v4
-
-Version 4 changes how language identification is stored. Previously, the language ID was stored in the array item's `_key` field. Now, a dedicated `language` field is used, and `_key` contains a random identifier.
-
-**Before (v3):**
-```json
-{ "_key": "en", "value": "hello" }
-```
-
-**After (v4):**
-```json
-{ "_key": "abc123", "language": "en", "value": "hello" }
-```
-
-### Why this change?
-
-The `_key` field in Sanity arrays is meant for tracking item identity across edits, not for storing semantic data. Using it for language IDs caused issues with:
-- Array reordering and diffing in the Studio
-- Portable Text operations that rely on stable keys
-- Edge cases when copying/pasting between documents
-
-### Migration steps
-
-1. **Take a backup first!**
-   ```bash
-   npx sanity@latest dataset export
-   ```
-
-2. **Update the plugin** to v4
-
-3. **Update your GROQ queries** to use `language` instead of `_key`:
-   ```js
-   // Before
-   greeting[_key == "en"][0].value
-
-   // After
-   greeting[language == "en"][0].value
-   ```
-
-4. **Run the migration script** to update existing documents:
-
-   Edit `migrations/keyToLanguage.ts` to configure your document types and field names:
-   ```ts
-   const DOCUMENT_TYPES = ['post', 'page']  // Your document types
-   const FIELD_NAMES = ['title', 'description']  // Your internationalized fields
-   ```
-
-   First, run in dry-run mode to preview changes:
-   ```bash
-   npx sanity@latest exec ./migrations/keyToLanguage.ts --with-user-token
-   ```
-
-   Then set `DRY_RUN = false` and run again to apply changes.
-
-5. **Handle drafts and published documents** - The migration script processes all documents. Run it twice if needed: once for production, once after publishing any pending drafts.
-
-### Migration script details
-
-The migration script (`migrations/keyToLanguage.ts`):
-- Processes documents in batches of 100
-- Uses optimistic locking (`ifRevisionID`) for safe concurrent execution
-- Is idempotent - safe to run multiple times
-- Skips items that already have a `language` field
 
 ## Migrate from objects to arrays
 

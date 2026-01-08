@@ -22,13 +22,6 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     },
     fields: [
       defineField({
-        name: 'language',
-        type: 'string',
-        title: 'Language',
-        readOnly: true,
-        hidden: true,
-      }),
-      defineField({
         ...(typeof type === 'string' ? {type} : type),
         name: 'value',
       }),
@@ -36,7 +29,7 @@ export default (config: ObjectFactoryConfig): FieldDefinition<'object'> => {
     preview: {
       select: {
         title: 'value',
-        subtitle: 'language',
+        subtitle: '_key',
       },
     },
   })

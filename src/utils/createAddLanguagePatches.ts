@@ -1,4 +1,3 @@
-import {nanoid} from 'nanoid'
 import {FormInsertPatch, insert, Path, SchemaType} from 'sanity'
 
 import {Language, Value} from '../types'
@@ -36,19 +35,17 @@ export function createAddLanguagePatches(config: AddConfig): FormInsertPatch[] {
     if (Array.isArray(addLanguageKeys) && addLanguageKeys.length > 0) {
       return addLanguageKeys.map((id) => ({
         ...itemBase,
-        _key: nanoid(),
-        language: id,
+        _key: id,
       }))
     }
 
     return filteredLanguages
       .filter((language) =>
-        value?.length ? !value.find((v) => v.language === language.id) : true
+        value?.length ? !value.find((v) => v._key === language.id) : true
       )
       .map((language) => ({
         ...itemBase,
-        _key: nanoid(),
-        language: language.id,
+        _key: language.id,
       }))
   }
   const newItems = getNewItems()
@@ -58,7 +55,7 @@ export function createAddLanguagePatches(config: AddConfig): FormInsertPatch[] {
 
   const insertions = newItems.map((item) => {
     // What's the original index of this language?
-    const languageIndex = languages.findIndex((l) => item.language === l.id)
+    const languageIndex = languages.findIndex((l) => item._key === l.id)
 
     // What languages are there beyond that index?
     const remainingLanguages = languages.slice(languageIndex + 1)
@@ -66,7 +63,7 @@ export function createAddLanguagePatches(config: AddConfig): FormInsertPatch[] {
     // So what is the index in the current value array of the next language in the language array?
     const nextLanguageIndex = languagesInUse.findIndex((l) =>
       // eslint-disable-next-line max-nested-callbacks
-      remainingLanguages.find((r) => r.id === l.language)
+      remainingLanguages.find((r) => r.id === l._key)
     )
 
     // Keep local state up to date incase multiple insertions are being made

@@ -27,8 +27,6 @@ export type ArrayConfig = {
 
 export type Value = {
   _key: string
-  /** The language identifier (e.g., 'en', 'fr'). This is the semantic identifier. */
-  language: string
   value?: unknown
 }
 

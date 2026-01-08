@@ -30,7 +30,7 @@ const createTranslateFieldActions: (
     const value = useFormValue(fieldActionProps.path) as Value[]
     const disabled =
       value && Array.isArray(value)
-        ? Boolean(value?.find((item) => item.language === language.id))
+        ? Boolean(value?.find((item) => item._key === language.id))
         : false
     const hidden = !filteredLanguages.some((f) => f.id === language.id)
 
